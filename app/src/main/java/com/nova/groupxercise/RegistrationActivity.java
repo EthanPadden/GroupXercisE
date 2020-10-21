@@ -3,6 +3,7 @@ package com.nova.groupxercise;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,13 +30,18 @@ public class RegistrationActivity extends AppCompatActivity {
                 String email = m_emailEt.getText().toString();
                 String password = m_passwordEt.getText().toString();
 
-                if (email.compareTo("") == 0 || password.compareTo("") == 0) {
-                    Toast.makeText(RegistrationActivity.this, "Enter all details", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(RegistrationActivity.this, "Registering...", Toast.LENGTH_SHORT).show();
-                }
+                validateFields(email, password);
             }
         });
     }
 
+    private void validateFields(String email, String password) {
+        if (email.equals("") || password.equals("")) {
+            Toast.makeText(RegistrationActivity.this, "Enter all details", Toast.LENGTH_SHORT).show();
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(RegistrationActivity.this, "Please enter a valid email", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(RegistrationActivity.this, "Registering...", Toast.LENGTH_SHORT).show();
+        }
+    }
 }
