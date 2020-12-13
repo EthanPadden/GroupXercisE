@@ -9,14 +9,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class RegistrationActivity extends AppCompatActivity {
     private Button m_registrationBtn;
     private EditText m_emailEt;
     private EditText m_passwordEt;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.activity_registration);
 
         // Initialise components
