@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "673998071326",
+    "firebase_url": "https://groupxercise-31ffa-default-rtdb.firebaseio.com",
+    "project_id": "groupxercise-31ffa",
+    "storage_bucket": "groupxercise-31ffa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673998071326:android:1769142a165625e741b00f",
+        "android_client_info": {
+          "package_name": "com.nova.groupxercise"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673998071326-kjdpqebgg2vojo2svefbn1eqbm7eb2b5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nova.groupxercise",
+            "certificate_hash": "fd7e76c31d35c5e8b2e7d11aa68ab3b115150e06"
+          }
+        },
+        {
+          "client_id": "673998071326-5l3uoca4i150fd80t5sjutusqu9fiest.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5Nz2d0IoJelmYK8UEWK6lCoPsdDJ4yFw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673998071326-5l3uoca4i150fd80t5sjutusqu9fiest.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
