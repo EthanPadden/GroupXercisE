@@ -23,8 +23,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Check if there is a user currently logged in
         if (mAuth.getCurrentUser() == null) {
-            // If the current user is null, go to the registration screen
-            Intent intent = new Intent(MainActivity.this, RegistrationActivity.class);
+            // If the current user is null, go to the login screen
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
         } else {
             // If there is a user logged in, go to the home screen
