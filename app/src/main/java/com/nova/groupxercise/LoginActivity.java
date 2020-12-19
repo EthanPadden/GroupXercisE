@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 
 public class LoginActivity extends AppCompatActivity {
     private Button mLoginBtn;
+    private Button mRegistrationBtn;
     private EditText mEmailEt;
     private EditText mPasswordEt;
     private FirebaseAuth mAuth;
@@ -37,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Initialise components
         mLoginBtn = findViewById(R.id.btn_login);
+        mRegistrationBtn = findViewById(R.id.btn_register_link);
         mEmailEt = findViewById(R.id.et_email);
         mPasswordEt = findViewById(R.id.et_password);
 
@@ -47,6 +49,12 @@ public class LoginActivity extends AppCompatActivity {
                 String password = mPasswordEt.getText().toString();
 
                 signInUser(email,password);
+            }
+        });
+        mRegistrationBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
+                startActivity(intent);
             }
         });
     }

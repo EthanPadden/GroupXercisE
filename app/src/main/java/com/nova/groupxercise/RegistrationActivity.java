@@ -3,6 +3,7 @@ package com.nova.groupxercise;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class RegistrationActivity extends AppCompatActivity {
     private Button mRegistrationBtn;
+    private Button mLoginBtn;
     private EditText mEmailEt;
     private EditText mPasswordEt;
     private FirebaseAuth mAuth;
@@ -35,6 +37,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         // Initialise components
         mRegistrationBtn = findViewById(R.id.btn_register);
+        mLoginBtn = findViewById(R.id.btn_login_link);
         mEmailEt = findViewById(R.id.et_email);
         mPasswordEt = findViewById(R.id.et_password);
 
@@ -46,6 +49,12 @@ public class RegistrationActivity extends AppCompatActivity {
 
                 boolean fieldsAreValid = validateFields(email, password);
                 if(fieldsAreValid) registerUser(email, password);
+            }
+        });
+        mLoginBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         });
     }
