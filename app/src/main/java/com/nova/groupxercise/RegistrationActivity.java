@@ -18,9 +18,9 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class RegistrationActivity extends AppCompatActivity {
-    private Button m_registrationBtn;
-    private EditText m_emailEt;
-    private EditText m_passwordEt;
+    private Button mRegistrationBtn;
+    private EditText mEmailEt;
+    private EditText mPasswordEt;
     private FirebaseAuth mAuth;
 
     @Override
@@ -29,18 +29,20 @@ public class RegistrationActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+
+        // Set screen layout
         setContentView(R.layout.activity_registration);
 
         // Initialise components
-        m_registrationBtn = findViewById(R.id.btn_register);
-        m_emailEt = findViewById(R.id.et_email);
-        m_passwordEt = findViewById(R.id.et_password);
+        mRegistrationBtn = findViewById(R.id.btn_register);
+        mEmailEt = findViewById(R.id.et_email);
+        mPasswordEt = findViewById(R.id.et_password);
 
         // Set event listeners
-        m_registrationBtn.setOnClickListener(new View.OnClickListener() {
+        mRegistrationBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String email = m_emailEt.getText().toString();
-                String password = m_passwordEt.getText().toString();
+                String email = mEmailEt.getText().toString();
+                String password = mPasswordEt.getText().toString();
 
                 boolean fieldsAreValid = validateFields(email, password);
                 if(fieldsAreValid) registerUser(email, password);
