@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">GroupXercisE</string>
+
+    // Error messages
+    <string name="error_user_not_logged_in">Error: User not logged in</string>
+    <string name="error_no_email_entered">Enter an email address</string>
+    <string name="error_no_psw_entered">Enter a password</string>
+    <string name="error_invalid_email">Please enter a valid email</string>
 </resources>

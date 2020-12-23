@@ -62,10 +62,14 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private boolean validateFields(String email, String password) {
         boolean fieldsAreValid = false;
-        if (email.equals("") || password.equals("")) {
-            Toast.makeText(RegistrationActivity.this, "Enter all details", Toast.LENGTH_SHORT).show();
+        if(email == null || email.compareTo("") == 0) {
+            Toast.makeText(RegistrationActivity.this, R.string.error_no_email_entered,
+                    Toast.LENGTH_SHORT).show();
+        } else if(password == null || password.compareTo("") == 0) {
+            Toast.makeText(RegistrationActivity.this, R.string.error_no_psw_entered,
+                    Toast.LENGTH_SHORT).show();
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(RegistrationActivity.this, "Please enter a valid email", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RegistrationActivity.this, R.string.error_invalid_email, Toast.LENGTH_SHORT).show();
         } else {
             fieldsAreValid = true;
         }

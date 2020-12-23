@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -57,7 +56,7 @@ public class HomeActivity extends AppCompatActivity {
         if(mCurrentUser != null) {
             mAuth.signOut();
         } else {
-            Toast.makeText(HomeActivity.this, "Error: user not logged in",
+            Toast.makeText(HomeActivity.this, R.string.error_user_not_logged_in,
                     Toast.LENGTH_SHORT).show();
         }
 

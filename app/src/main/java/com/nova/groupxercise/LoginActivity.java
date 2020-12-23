@@ -61,10 +61,10 @@ public class LoginActivity extends AppCompatActivity {
 
     private void signInUser(String email, String password) {
         if(email == null || email.compareTo("") == 0) {
-            Toast.makeText(LoginActivity.this, "Enter an email address",
+            Toast.makeText(LoginActivity.this, R.string.error_no_email_entered,
                     Toast.LENGTH_SHORT).show();
         } else if(password == null || password.compareTo("") == 0) {
-            Toast.makeText(LoginActivity.this, "Enter a password",
+            Toast.makeText(LoginActivity.this, R.string.error_no_psw_entered,
                     Toast.LENGTH_SHORT).show();
         } else {
             mAuth.signInWithEmailAndPassword(email, password)
@@ -76,9 +76,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                                 startActivity(intent);
                             } else {
-                                String errorMsg = "Authentication failed";
-                                if(task.getException() instanceof FirebaseAuthInvalidCredentialsException)
-                                    errorMsg = task.getException().getMessage();
+                                String errorMsg = task.getException().getMessage();
                                 Toast.makeText(LoginActivity.this, errorMsg,
                                         Toast.LENGTH_SHORT).show();
                             }
