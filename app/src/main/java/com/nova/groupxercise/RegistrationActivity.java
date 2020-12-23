@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthEmailException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -77,17 +78,10 @@ public class RegistrationActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            String successMsg = "Success";
-                            String dn = user.getDisplayName();
-                            Toast.makeText(RegistrationActivity.this, successMsg,
-                                    Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(RegistrationActivity.this, HomeActivity.class);
+                            startActivity(intent);
                         } else {
-
-                            String errorMsg = "Authentication failed";
-                            if(task.getException() instanceof FirebaseAuthWeakPasswordException)
-                                errorMsg = task.getException().getMessage();
-
+                            String errorMsg = task.getException().getMessage();
                             Toast.makeText(RegistrationActivity.this, errorMsg,
                                     Toast.LENGTH_SHORT).show();
                         }
