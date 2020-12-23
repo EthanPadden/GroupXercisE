@@ -3,35 +3,29 @@ package com.nova.groupxercise;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.os.Bundle;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     @Override
     public void onStart() {
+        // This method executes before the screen UI elements are rendered
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            Intent intent = new Intent(MainActivity.this, RegistrationActivity.class);
-            startActivity(intent);
-        } else {
-            String msg = "User signed in: " + currentUser.getEmail();
-            Toast.makeText(MainActivity.this, msg,
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+
+        // Check if there is a user currently logged in
+        if ( mAuth.getCurrentUser() == null ) {
+            // If the current user is null, go to the login screen
+            Intent intent = new Intent( MainActivity.this, LoginActivity.class );
+            startActivity( intent );
+        } else {
+            // If there is a user logged in, go to the home screen
+            Intent intent = new Intent( MainActivity.this, HomeActivity.class );
+            startActivity( intent );
+        }
     }
 }
