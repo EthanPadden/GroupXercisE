@@ -59,6 +59,12 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Sign in the user using Firebase method
+     * Checks if the email/password is null or empty
+     * @param email the email of the user
+     * @param password the password of the user
+     */
     private void signInUser(String email, String password) {
         if(email == null || email.compareTo("") == 0) {
             Toast.makeText(LoginActivity.this, R.string.error_no_email_entered,
@@ -72,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                // If the current user is null, go to the login screen
+                                // Go to the home screen
                                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                                 startActivity(intent);
                             } else {

@@ -52,7 +52,12 @@ public class HomeActivity extends AppCompatActivity {
         mEmailText.setText("User logged in: " + mCurrentUser.getEmail());
     }
 
+    /**
+     * Sign out the user that is currently logged in using Firebase method
+     * Toast with error message if no user is currently logged in
+     */
     private void signOutUser() {
+        // Check if there is a user currently logged in
         if(mCurrentUser != null) {
             mAuth.signOut();
         } else {
@@ -60,6 +65,7 @@ public class HomeActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
         }
 
+        // Regardless, go to login screen
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
         startActivity(intent);
     }

@@ -60,15 +60,26 @@ public class RegistrationActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Checks if the email and password strings are valid
+     * Checks: not null, not empty, email is in the form x@y.z
+     * @param email the email of the user
+     * @param password the password of the user
+     * @return true if both strings are valid
+     */
     private boolean validateFields(String email, String password) {
         boolean fieldsAreValid = false;
+
         if(email == null || email.compareTo("") == 0) {
+            // If the email is null or empty
             Toast.makeText(RegistrationActivity.this, R.string.error_no_email_entered,
                     Toast.LENGTH_SHORT).show();
         } else if(password == null || password.compareTo("") == 0) {
+            // If the password is null or empty
             Toast.makeText(RegistrationActivity.this, R.string.error_no_psw_entered,
                     Toast.LENGTH_SHORT).show();
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            // If the email is not in the form x@y.z
             Toast.makeText(RegistrationActivity.this, R.string.error_invalid_email, Toast.LENGTH_SHORT).show();
         } else {
             fieldsAreValid = true;
@@ -76,6 +87,11 @@ public class RegistrationActivity extends AppCompatActivity {
         return fieldsAreValid;
     }
 
+    /**
+     * Registers the user using Firebase method
+     * @param email the email of the user
+     * @param password the password of the user
+     */
     private void registerUser(String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -89,7 +105,6 @@ public class RegistrationActivity extends AppCompatActivity {
                             Toast.makeText(RegistrationActivity.this, errorMsg,
                                     Toast.LENGTH_SHORT).show();
                         }
-
                     }
                 });
     }
