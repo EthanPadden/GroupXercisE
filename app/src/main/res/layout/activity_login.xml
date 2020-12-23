@@ -46,6 +46,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginRight="20dp"
         android:text="Login" />
+
     <Button
         android:id="@+id/btn_register_link"
         android:layout_width="wrap_content"
@@ -57,7 +58,6 @@
         android:layout_marginRight="20dp"
         android:text="Register
 " />
-
 
 
 </RelativeLayout>
