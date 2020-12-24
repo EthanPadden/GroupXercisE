@@ -1,22 +1,27 @@
 package com.nova.groupxercise;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class EditUserDetailsActivity extends AppCompatActivity {
     private EditText mNameEt;
-    private EditText mDobEt;
+    private TextView mDobText;
     private EditText mWeightEt;
     private Spinner mSexSpinner;
     private Button mUpdateBtn;
@@ -31,7 +36,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
 
         // Initialise components
         mNameEt = findViewById( R.id.et_name );
-        mDobEt = findViewById( R.id.et_dob );
+        mDobText = findViewById( R.id.text_dob );
         mWeightEt = findViewById( R.id.et_weight );
         mSexSpinner = findViewById( R.id.spinner_sex );
         mUpdateBtn = findViewById( R.id.btn_update );
@@ -60,6 +65,12 @@ public class EditUserDetailsActivity extends AppCompatActivity {
                 updateSelectedSex( null );
             }
         });
+        mDobText.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                DialogFragment newFragment = new DatePickerFragment();
+                newFragment.show(getSupportFragmentManager(), "datePicker");
+            }
+        } );
     }
 
     private void updateSelectedSex(Object selectedOption){
@@ -73,6 +84,26 @@ public class EditUserDetailsActivity extends AppCompatActivity {
             Toast.makeText( EditUserDetailsActivity.this, "There was an error setting your details",
                     Toast.LENGTH_SHORT ).show();
             mSelectedSex = null;
+        }
+    }
+
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog( Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet( DatePicker view, int year, int month, int day) {
+            // Do something with the date chosen by the user
         }
     }
 }
