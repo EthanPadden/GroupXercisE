@@ -6,4 +6,10 @@
     <string name="error_no_email_entered">Enter an email address</string>
     <string name="error_no_psw_entered">Enter a password</string>
     <string name="error_invalid_email">Please enter a valid email</string>
+
+    // User details
+    <string-array name="sex_array">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
 </resources>

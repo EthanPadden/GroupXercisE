@@ -23,8 +23,7 @@
             android:id="@+id/et_name"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Name" />
+            android:inputType="textPersonName"/>
     </TableRow>
 
     <TableRow>
