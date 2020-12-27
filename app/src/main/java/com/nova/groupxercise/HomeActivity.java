@@ -17,6 +17,7 @@ public class HomeActivity extends AppCompatActivity {
     private FirebaseUser mCurrentUser;
     private TextView mEmailText;
     private Button mLogoutBtn;
+    private Button mEditDetailsBtn;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -40,11 +41,19 @@ public class HomeActivity extends AppCompatActivity {
         // Initialise components
         mEmailText = findViewById( R.id.email_text );
         mLogoutBtn = findViewById( R.id.btn_logout );
+        mEditDetailsBtn = findViewById( R.id.btn_edit_details_link );
 
         // Set event listeners
         mLogoutBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 signOutUser();
+            }
+        } );
+        mEditDetailsBtn.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                // Go to edit details screen
+                Intent intent = new Intent( HomeActivity.this, EditUserDetailsActivity.class );
+                startActivity( intent );
             }
         } );
 
