@@ -1,6 +1,8 @@
 package com.nova.groupxercise;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Calendar;
 
@@ -23,6 +25,19 @@ public class User {
 
     public static User getInstance() {
         return user;
+    }
+
+    // Override methods
+    @Override
+    public String toString() {
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
+
+        return String.format(
+                "Name: " + name
+                + "\nDOB: " + dtf.print( dob )
+                + "\nWeight: " + weight
+                + "\nSex: " + sex
+        );
     }
 
     // Accessor/Mutator methods

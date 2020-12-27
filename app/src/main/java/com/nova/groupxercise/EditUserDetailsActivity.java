@@ -17,6 +17,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.Period;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -60,13 +64,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         // Set event listeners
         mUpdateBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
-                // TODO: Set user details
-                // Temporarily:
-                String msg = "DETAILS SET:"
-                        + "\nDob: " + mSelectedDob.getTime().toString()
-                        + "\nSex: " + mSelectedSex.toString();
-                Toast.makeText( EditUserDetailsActivity.this, msg,
-                        Toast.LENGTH_SHORT ).show();
+                setLocalUserDetails();
             }
         } );
         mSexSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
@@ -130,6 +128,50 @@ public class EditUserDetailsActivity extends AppCompatActivity {
 
             // Update UI element
             mDobText.setText( String.format( "%d/%d/%d", day, month, year ) );
+        }
+    }
+
+    private void setLocalUserDetails() {
+        boolean validDetails = true;
+
+        // Get name
+        String name = mNameEt.getText().toString();
+        if ( name == null || name.compareTo( "" ) == 0 ) validDetails = false;
+
+        // Get DOB
+        DateTime dob = new DateTime( mSelectedDob.getTime() );
+        Period period = new Period( dob, DateTime.now() );
+        int age = period.getYears();
+        if ( age < 14 || age > 89 ) validDetails = false;
+
+        // Get weight
+        String weightStr = mWeightEt.getText().toString();
+        float weight = 50;
+        if(weightStr == null || weightStr.compareTo( "" ) == 0 ) validDetails = false;
+        else {
+            weight = Float.parseFloat( mWeightEt.getText().toString() );
+
+            // If male, weight should be in range 50-140
+            if ( mSelectedSex == User.Sex.MALE && ( weight < 50 || weight > 140 ) )
+                validDetails = false;
+                // If femail, weight should be in range 40-120
+            else if ( mSelectedSex == User.Sex.FEMALE && ( weight < 40 || weight > 120 ) )
+                validDetails = false;
+        }
+
+
+        if(validDetails) {
+            User localUser = User.getInstance();
+            localUser.setName( name );
+            localUser.setDob( dob );
+            localUser.setWeight( weight );
+            localUser.setSex( mSelectedSex );
+            // Temporary:
+            Toast.makeText( EditUserDetailsActivity.this, "USER DETAILS SET:\n" + localUser,
+                    Toast.LENGTH_SHORT ).show();
+        } else {
+            Toast.makeText( EditUserDetailsActivity.this, "There was an error setting your details",
+                    Toast.LENGTH_SHORT ).show();
         }
     }
 }
