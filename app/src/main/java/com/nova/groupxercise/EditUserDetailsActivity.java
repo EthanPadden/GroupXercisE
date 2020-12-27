@@ -134,11 +134,11 @@ public class EditUserDetailsActivity extends AppCompatActivity {
          * @param day The selected day
          */
         public void onDateSet( DatePicker view, int year, int month, int day ) {
-            // Set the selected date value
+            // Set the selected date value (months are 0 indexed in both Calendar and the datepicker element)
             mSelectedDate.set( year, month, day );
 
             // Update UI element
-            mDobText.setText( String.format( "%d/%d/%d", day, month, year ) );
+            mDobText.setText( String.format( "%d/%d/%d", day, month+1, year ) );
         }
     }
 
