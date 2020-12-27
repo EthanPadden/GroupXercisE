@@ -2,6 +2,7 @@ package com.nova.groupxercise;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -14,8 +15,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import org.joda.time.DateTime;
 import org.joda.time.Period;
+
 import java.util.Calendar;
 
 public class EditUserDetailsActivity extends AppCompatActivity {
@@ -82,14 +85,15 @@ public class EditUserDetailsActivity extends AppCompatActivity {
 
     /**
      * Updates the member variable mSelectedSex with the option in the parameters
+     *
      * @param selectedOption The object(String) corresponding to the selected option
      */
     private void updateSelectedSex( Object selectedOption ) {
         String selectedOptionStr = selectedOption.toString();
 
-        if ( selectedOptionStr.compareTo( getResources().getString(R.string.sex_male) ) == 0 ) {
+        if ( selectedOptionStr.compareTo( getResources().getString( R.string.sex_male ) ) == 0 ) {
             mSelectedSex = User.Sex.MALE;
-        } else if ( selectedOptionStr.compareTo( getResources().getString(R.string.sex_female) ) == 0 ) {
+        } else if ( selectedOptionStr.compareTo( getResources().getString( R.string.sex_female ) ) == 0 ) {
             mSelectedSex = User.Sex.FEMALE;
         } else {
             Toast.makeText( EditUserDetailsActivity.this, R.string.error_invalid_user_details,
@@ -128,17 +132,18 @@ public class EditUserDetailsActivity extends AppCompatActivity {
 
         /**
          * Method called when the user selects the date (hits OK button)
-         * @param view The datepicker component
-         * @param year The selected year
+         *
+         * @param view  The datepicker component
+         * @param year  The selected year
          * @param month The selected month
-         * @param day The selected day
+         * @param day   The selected day
          */
         public void onDateSet( DatePicker view, int year, int month, int day ) {
             // Set the selected date value (months are 0 indexed in both Calendar and the datepicker element)
             mSelectedDate.set( year, month, day );
 
             // Update UI element
-            mDobText.setText( String.format( "%d/%d/%d", day, month+1, year ) );
+            mDobText.setText( String.format( "%d/%d/%d", day, month + 1, year ) );
         }
     }
 
@@ -162,7 +167,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         // Get weight
         String weightStr = mWeightEt.getText().toString();
         float weight = 50;
-        if(weightStr == null || weightStr.compareTo( "" ) == 0 ) validDetails = false;
+        if ( weightStr == null || weightStr.compareTo( "" ) == 0 ) validDetails = false;
         else {
             weight = Float.parseFloat( mWeightEt.getText().toString() );
 
@@ -175,7 +180,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         }
 
 
-        if(validDetails) {
+        if ( validDetails ) {
             User localUser = User.getInstance();
             localUser.setName( name );
             localUser.setDob( dob );

@@ -28,13 +28,13 @@ public class User {
     // Override methods
     @Override
     public String toString() {
-        DateTimeFormatter dtf = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormat.forPattern( "MM/dd/yyyy HH:mm:ss" );
 
         return String.format(
                 "Name: " + name
-                + "\nDOB: " + dtf.print( dob )
-                + "\nWeight: " + weight
-                + "\nSex: " + sex
+                        + "\nDOB: " + dtf.print( dob )
+                        + "\nWeight: " + weight
+                        + "\nSex: " + sex
         );
     }
 
