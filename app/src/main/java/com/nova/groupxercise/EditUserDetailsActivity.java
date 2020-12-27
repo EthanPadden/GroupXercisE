@@ -52,7 +52,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         mSelectedSex = User.Sex.MALE;
         mSelectedDob = Calendar.getInstance();
 
-        // Set adapters
+        /** Set adapters */
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter< CharSequence > adapter = ArrayAdapter.createFromResource( this,
                 R.array.sex_array, android.R.layout.simple_spinner_item );
@@ -61,7 +61,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         // Apply the adapter to the spinner
         mSexSpinner.setAdapter( adapter );
 
-        // Set event listeners
+        /** Set event listeners */
         mUpdateBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 setLocalUserDetails();
@@ -86,6 +86,10 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         } );
     }
 
+    /**
+     * Updates the member variable mSelectedSex with the option in the parameters
+     * @param selectedOption The object(String) corresponding to the selected option
+     */
     private void updateSelectedSex( Object selectedOption ) {
         String selectedOptionStr = selectedOption.toString();
 
@@ -100,16 +104,22 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Inner class for the DOB date picker fragment
+     */
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
+        // Instance variables
         private Calendar mSelectedDate;
         private TextView mDobText;
 
+        // Constructors
         public DatePickerFragment( Calendar mSelectedDate, TextView mDobText ) {
             this.mSelectedDate = mSelectedDate;
             this.mDobText = mDobText;
         }
 
+        // Override methods
         @Override
         public Dialog onCreateDialog( Bundle savedInstanceState ) {
             // Use the current date as the default date in the picker
@@ -122,6 +132,13 @@ public class EditUserDetailsActivity extends AppCompatActivity {
             return new DatePickerDialog( getActivity(), this, year, month, day );
         }
 
+        /**
+         * Method called when the user selects the date (hits OK button)
+         * @param view The datepicker component
+         * @param year The selected year
+         * @param month The selected month
+         * @param day The selected day
+         */
         public void onDateSet( DatePicker view, int year, int month, int day ) {
             // Set the selected date value
             mSelectedDate.set( year, month, day );
@@ -131,6 +148,10 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks if the user has entered valid details
+     * If so, updates the singleton instance of the user (locally stored)
+     */
     private void setLocalUserDetails() {
         boolean validDetails = true;
 

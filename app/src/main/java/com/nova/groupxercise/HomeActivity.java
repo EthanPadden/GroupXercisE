@@ -51,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
         } );
         mEditDetailsBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
+                // Go to edit details screen
                 Intent intent = new Intent( HomeActivity.this, EditUserDetailsActivity.class );
                 startActivity( intent );
             }
