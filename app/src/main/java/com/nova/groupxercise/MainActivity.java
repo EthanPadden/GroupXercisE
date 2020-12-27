@@ -1,9 +1,7 @@
 package com.nova.groupxercise;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {

@@ -2,8 +2,6 @@ package com.nova.groupxercise;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -16,13 +14,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.joda.time.Period;
-
 import java.util.Calendar;
-import java.util.Date;
 
 public class EditUserDetailsActivity extends AppCompatActivity {
     private EditText mNameEt;
