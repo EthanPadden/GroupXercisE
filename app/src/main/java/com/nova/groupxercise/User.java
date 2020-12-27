@@ -1,12 +1,13 @@
 package com.nova.groupxercise;
 
-import java.util.Date;
+import org.joda.time.DateTime;
+
+import java.util.Calendar;
 
 public class User {
     // Instance variables
-    private String email;
     private String name;
-    private Date dob;
+    private DateTime dob;
     private float weight;
 
     public enum Sex {MALE, FEMALE}
@@ -17,18 +18,14 @@ public class User {
     private static final User user = new User();
 
     // Constructors
-    public User() {
+    private User() {
+    }
+
+    public static User getInstance() {
+        return user;
     }
 
     // Accessor/Mutator methods
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail( String email ) {
-        this.email = email;
-    }
-
     public String getName() {
         return name;
     }
@@ -37,11 +34,11 @@ public class User {
         this.name = name;
     }
 
-    public Date getDob() {
+    public DateTime getDob() {
         return dob;
     }
 
-    public void setDob( Date dob ) {
+    public void setDob( DateTime dob ) {
         this.dob = dob;
     }
 
