@@ -89,12 +89,12 @@ public class EditUserDetailsActivity extends AppCompatActivity {
     private void updateSelectedSex( Object selectedOption ) {
         String selectedOptionStr = selectedOption.toString();
 
-        if ( selectedOptionStr.compareTo( "Male" ) == 0 ) {
+        if ( selectedOptionStr.compareTo( getResources().getString(R.string.sex_male) ) == 0 ) {
             mSelectedSex = User.Sex.MALE;
-        } else if ( selectedOptionStr.compareTo( "Female" ) == 0 ) {
+        } else if ( selectedOptionStr.compareTo( getResources().getString(R.string.sex_female) ) == 0 ) {
             mSelectedSex = User.Sex.FEMALE;
         } else {
-            Toast.makeText( EditUserDetailsActivity.this, "There was an error setting your details",
+            Toast.makeText( EditUserDetailsActivity.this, R.string.error_invalid_user_details,
                     Toast.LENGTH_SHORT ).show();
             mSelectedSex = null;
         }
@@ -170,7 +170,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
             Toast.makeText( EditUserDetailsActivity.this, "USER DETAILS SET:\n" + localUser,
                     Toast.LENGTH_SHORT ).show();
         } else {
-            Toast.makeText( EditUserDetailsActivity.this, "There was an error setting your details",
+            Toast.makeText( EditUserDetailsActivity.this, R.string.error_invalid_user_details,
                     Toast.LENGTH_SHORT ).show();
         }
     }
