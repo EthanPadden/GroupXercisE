@@ -152,35 +152,24 @@ public class EditUserDetailsActivity extends AppCompatActivity {
      * If so, updates the singleton instance of the user (locally stored)
      */
     private void setLocalUserDetails() {
-        boolean validDetails = true;
+        boolean detailsCanBeSet = true;
 
         // Get name
         String name = mNameEt.getText().toString();
-        if ( name == null || name.compareTo( "" ) == 0 ) validDetails = false;
+        if ( name == null || name.compareTo( "" ) == 0 ) detailsCanBeSet = false;
 
         // Get DOB
         DateTime dob = new DateTime( mSelectedDob.getTime() );
-        Period period = new Period( dob, DateTime.now() );
-        int age = period.getYears();
-        if ( age < 14 || age > 89 ) validDetails = false;
 
         // Get weight
         String weightStr = mWeightEt.getText().toString();
         float weight = 50;
-        if ( weightStr == null || weightStr.compareTo( "" ) == 0 ) validDetails = false;
+        if ( weightStr == null || weightStr.compareTo( "" ) == 0 ) detailsCanBeSet = false;
         else {
             weight = Float.parseFloat( mWeightEt.getText().toString() );
-
-            // If male, weight should be in range 50-140
-            if ( mSelectedSex == User.Sex.MALE && ( weight < 50 || weight > 140 ) )
-                validDetails = false;
-                // If femail, weight should be in range 40-120
-            else if ( mSelectedSex == User.Sex.FEMALE && ( weight < 40 || weight > 120 ) )
-                validDetails = false;
         }
 
-
-        if ( validDetails ) {
+        if ( detailsCanBeSet ) {
             User localUser = User.getInstance();
             localUser.setName( name );
             localUser.setDob( dob );

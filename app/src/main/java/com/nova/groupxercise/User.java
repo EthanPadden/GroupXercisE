@@ -1,6 +1,9 @@
 package com.nova.groupxercise;
 
+import android.widget.Toast;
+
 import org.joda.time.DateTime;
+import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -36,6 +39,28 @@ public class User {
                         + "\nWeight: " + weight
                         + "\nSex: " + sex
         );
+    }
+
+    // Other methods
+    public boolean detailsAreValid() {
+        boolean validDetails = true;
+
+        // Validate name
+        if ( name == null || name.compareTo( "" ) == 0 ) validDetails = false;
+
+        // Validate DOB
+        Period period = new Period( dob, DateTime.now() );
+        int age = period.getYears();
+        if ( age < 14 || age > 89 ) validDetails = false;
+
+        // If male, weight should be in range 50-140
+        if ( sex == Sex.MALE && ( weight < 50 || weight > 140 ) )
+            validDetails = false;
+        // If female, weight should be in range 40-120
+        else if ( sex == Sex.FEMALE && ( weight < 40 || weight > 120 ) )
+            validDetails = false;
+
+        return validDetails;
     }
 
     // Accessor/Mutator methods
