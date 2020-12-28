@@ -18,6 +18,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView mEmailText;
     private Button mLogoutBtn;
     private Button mEditDetailsBtn;
+    private Button mCalculateGoalBtn;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -42,6 +43,7 @@ public class HomeActivity extends AppCompatActivity {
         mEmailText = findViewById( R.id.email_text );
         mLogoutBtn = findViewById( R.id.btn_logout );
         mEditDetailsBtn = findViewById( R.id.btn_edit_details_link );
+        mCalculateGoalBtn = findViewById( R.id.btn_calculate_goal );
 
         // Set event listeners
         mLogoutBtn.setOnClickListener( new View.OnClickListener() {
@@ -54,6 +56,14 @@ public class HomeActivity extends AppCompatActivity {
                 // Go to edit details screen
                 Intent intent = new Intent( HomeActivity.this, EditUserDetailsActivity.class );
                 startActivity( intent );
+            }
+        } );
+        mCalculateGoalBtn.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                // Temporary
+                String exerciseName = "Bench Press";
+                GoalCalculator goalCalculator = new GoalCalculator( exerciseName );
+
             }
         } );
 
