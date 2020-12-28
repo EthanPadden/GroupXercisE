@@ -21,7 +21,8 @@ public class User {
     private static final User user = new User();
 
     // Constructors
-    private User() {
+    public User() {
+
     }
 
     public static User getInstance() {
