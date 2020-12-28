@@ -24,4 +24,20 @@
         android:layout_below="@id/btn_logout"
         android:layout_centerHorizontal="true"
         android:text="Edit Details" />
+
+    <Button
+        android:id="@+id/btn_calculate_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_edit_details_link"
+        android:layout_centerHorizontal="true"
+        android:text="Calculate Goal" />
+
+    <TextView
+        android:id="@+id/text_goal_info"
+        android:layout_below="@id/btn_calculate_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
 </RelativeLayout>
