@@ -1,11 +1,19 @@
 package com.nova.groupxercise;
 
-public class StrengthGoal {
+public class Goal {
     private String mExerciseName;
-    private String[] mStandards;
+    private int[] mStandards;
 
-    public StrengthGoal( String mExerciseName ) {
+    public Goal( String mExerciseName ) {
         setmExerciseName( mExerciseName );
+    }
+
+    @Override
+    public String toString() {
+        String info = mExerciseName;
+        for ( int standard : mStandards ) info += "\n" + standard;
+        return info;
+
     }
 
     public String getmExerciseName() {
@@ -16,11 +24,11 @@ public class StrengthGoal {
         this.mExerciseName = mExerciseName;
     }
 
-    public String[] getmStandards() {
+    public int[] getmStandards() {
         return mStandards;
     }
 
-    public void setmStandards( String[] mStandards ) {
+    public void setmStandards( int[] mStandards ) {
         this.mStandards = mStandards;
     }
 }
