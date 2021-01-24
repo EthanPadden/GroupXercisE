@@ -1,12 +1,16 @@
 package com.nova.groupxercise;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -18,7 +22,7 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 
-public class ExerciseListActivity extends AppCompatActivity {
+public class ExerciseListActivity extends AppCompatActivity implements ExerciseListItemFragment.OnFragmentInteractionListener {
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     private ArrayList< String > mExerciseNameList;
     private ListView mListView;
@@ -33,6 +37,20 @@ public class ExerciseListActivity extends AppCompatActivity {
         mLoadingText = findViewById( R.id.text_loading_exercise_list );
 
         retrieveExerciseList();
+        mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
+                String exerciseName = mListView.getItemAtPosition( i ).toString();
+                ExerciseListItemFragment exerciseListItemFragment = ExerciseListItemFragment.newInstance( exerciseName );
+                // Begin the transaction
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                // Replace the contents of the container with the new fragment
+                ft.replace( R.id.frame_set_goal_fragment_placeholder, exerciseListItemFragment );
+                // or ft.add(R.id.your_placeholder, new FooFragment());
+                // Complete the changes added above
+                ft.commit();
+            }
+        } );
     }
 
     private void retrieveExerciseList() {
@@ -59,5 +77,10 @@ public class ExerciseListActivity extends AppCompatActivity {
             public void onCancelled( DatabaseError databaseError ) {
             }
         } );
+    }
+
+    @Override
+    public void onFragmentInteraction( Uri uri ) {
+
     }
 }

@@ -22,4 +22,13 @@
         android:paddingRight="10dp"
         android:paddingBottom="10dp"
         tools:context="com.nova.groupxercise.ExerciseListActivity" />
+
+    <FrameLayout
+        android:id="@+id/frame_set_goal_fragment_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        >
+
+    </FrameLayout>
 </RelativeLayout>
