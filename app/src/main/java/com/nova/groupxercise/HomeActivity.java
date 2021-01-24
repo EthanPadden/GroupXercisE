@@ -27,6 +27,7 @@ public class HomeActivity extends AppCompatActivity {
     private Button mLogoutBtn;
     private Button mEditDetailsBtn;
     private Button mCalculateGoalBtn;
+    private Button mExerciseListBtn;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
     @Override
@@ -54,6 +55,7 @@ public class HomeActivity extends AppCompatActivity {
         mLogoutBtn = findViewById( R.id.btn_logout );
         mEditDetailsBtn = findViewById( R.id.btn_edit_details_link );
         mCalculateGoalBtn = findViewById( R.id.btn_calculate_goal );
+        mExerciseListBtn = findViewById( R.id.btn_exercise_list );
 
         // Set event listeners
         mLogoutBtn.setOnClickListener( new View.OnClickListener() {
@@ -65,6 +67,13 @@ public class HomeActivity extends AppCompatActivity {
             public void onClick( View v ) {
                 // Go to edit details screen
                 Intent intent = new Intent( HomeActivity.this, EditUserDetailsActivity.class );
+                startActivity( intent );
+            }
+        } );
+        mExerciseListBtn.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                // Go to edit details screen
+                Intent intent = new Intent( HomeActivity.this, ExerciseListActivity.class );
                 startActivity( intent );
             }
         } );
