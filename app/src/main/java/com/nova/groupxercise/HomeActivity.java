@@ -110,7 +110,7 @@ public class HomeActivity extends AppCompatActivity {
 
     public void calculateStrengthGoal( String exerciseName) {
         User user = User.getInstance();
-        mGoalText.setText( "Loading..." );
+        mGoalText.setText( R.string.loading );
         // Check if all user details are set correctly
         User testUser = new User();
 
@@ -131,11 +131,11 @@ public class HomeActivity extends AppCompatActivity {
             public void onDataChange( DataSnapshot dataSnapshot) {
                 int[] standards = new int[5];
                 Long[] standardLongValues = new Long[5];
-                standardLongValues[0] = (Long) dataSnapshot.child( "Beginner" ).getValue();
-                standardLongValues[1] = (Long) dataSnapshot.child( "Novice" ).getValue();
-                standardLongValues[2] = (Long) dataSnapshot.child( "Intermediate" ).getValue();
-                standardLongValues[3] = (Long) dataSnapshot.child( "Advanced" ).getValue();
-                standardLongValues[4] = (Long) dataSnapshot.child( "Elite" ).getValue();
+                standardLongValues[0] = (Long) dataSnapshot.child( getResources().getString( R.string.level_beginner) ).getValue();
+                standardLongValues[1] = (Long) dataSnapshot.child( getResources().getString( R.string.level_novice) ).getValue();
+                standardLongValues[2] = (Long) dataSnapshot.child( getResources().getString( R.string.level_intermediate) ).getValue();
+                standardLongValues[3] = (Long) dataSnapshot.child( getResources().getString( R.string.level_advanced) ).getValue();
+                standardLongValues[4] = (Long) dataSnapshot.child( getResources().getString( R.string.level_expert) ).getValue();
                 for( int i = 0; i < standardLongValues.length; i++ ) {
                     standards[i] = standardLongValues[i] == null ? null : Math.toIntExact(standardLongValues[i]);
                 }

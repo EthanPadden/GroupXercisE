@@ -91,7 +91,7 @@ public class ExerciseListItemFragment extends Fragment {
 
         mLevelSpinner = view.findViewById( R.id.spinner_level );
         mLevelSpinner.setAdapter( mLevelSpinnerAdapter );
-        mSelectedLevel = "Beginner";
+        mSelectedLevel = getResources().getString(R.string.level_beginner);
 
         // Apply the adapter to the spinner
         mLevelSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
@@ -107,7 +107,7 @@ public class ExerciseListItemFragment extends Fragment {
             }
         } );
 
-        mSetGoalTitleText.setText( "Set Goal: " + mExerciseName );
+        mSetGoalTitleText.setText( R.string.set_goal_title + mExerciseName );
         mSetsText.setText( "3" );
         mRepsText.setText( "10" );
         retrieveStrengthStandards( mExerciseName );
@@ -125,7 +125,7 @@ public class ExerciseListItemFragment extends Fragment {
 
     public void retrieveStrengthStandards( String exerciseName) {
         User user = User.getInstance();
-        mSuggestedGoalText.setText( "Loading..." );
+        mSuggestedGoalText.setText( R.string.loading );
         // Check if all user details are set correctly
         User testUser = new User();
 

@@ -12,6 +12,9 @@
     <string name="sex_male">Male</string>
     <string name="sex_female">Female</string>
 
+    <string name="set_goal_title">Set Goal: </string>
+    <string name="loading">Loading...</string>
+
     <string name="level_beginner">Beginner</string>
     <string name="level_novice">Novice</string>
     <string name="level_intermediate">Intermediate</string>
