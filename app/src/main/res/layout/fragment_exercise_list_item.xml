@@ -20,12 +20,9 @@
             android:text="Sets:" />
 
 
-        <EditText
-            android:id="@+id/et_sets"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number" />
+        <TextView
+            android:id="@+id/text_sets"
+            android:gravity="center"/>
     </TableRow>
     <TableRow>
 
@@ -34,12 +31,10 @@
             android:text="Reps:" />
 
 
-        <EditText
-            android:id="@+id/et_reps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number" />
+        <TextView
+            android:id="@+id/text_reps"
+            android:gravity="center"/>
+
     </TableRow>
 
     <TableRow>
@@ -60,6 +55,18 @@
         </LinearLayout>
 
 
+    </TableRow>
+    <TableRow>
+
+        <TextView
+            android:gravity="center"
+            android:text="Level" />
+
+
+        <Spinner
+            android:id="@+id/spinner_level"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </TableRow>
     <TableRow>
         <TextView

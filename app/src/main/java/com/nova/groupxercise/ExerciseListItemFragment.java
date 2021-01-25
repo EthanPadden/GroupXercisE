@@ -9,7 +9,11 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,6 +44,12 @@ public class ExerciseListItemFragment extends Fragment {
 
     private TextView mSetGoalTitleText;
     private TextView mSuggestedGoalText;
+    private TextView mSetsText;
+    private TextView mRepsText;
+    private Spinner mLevelSpinner;
+    private String mSelectedLevel;
+    private ArrayAdapter<CharSequence> mLevelSpinnerAdapter;
+
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
 
@@ -60,6 +70,7 @@ public class ExerciseListItemFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString( EXERCISE_NAME, mExerciseName );
         fragment.setArguments( args );
+
         return fragment;
     }
 
@@ -76,7 +87,39 @@ public class ExerciseListItemFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mSetGoalTitleText =  view.findViewById( R.id.text_set_goal_title );
         mSuggestedGoalText =  view.findViewById( R.id.text_suggested_goal );
+        mSetsText =  view.findViewById( R.id.text_sets );
+        mRepsText =  view.findViewById( R.id.text_reps );
+
+        mLevelSpinner = view.findViewById( R.id.spinner_level );
+        mLevelSpinner.setAdapter( mLevelSpinnerAdapter );
+        mSelectedLevel = "Beginner";
+
+        // Apply the adapter to the spinner
+        mLevelSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected( AdapterView< ? > parent, View view, int pos, long id ) {
+                Object selectedOption = parent.getItemAtPosition( pos );
+                String selectedOptionStr = selectedOption.toString();
+                mSelectedLevel = selectedOptionStr;
+            }
+
+            public void onNothingSelected( AdapterView< ? > parent ) {
+                mSelectedLevel = null;
+            }
+        } );
+
         mSetGoalTitleText.setText( "Set Goal: " + mExerciseName );
+        mSetsText.setText( "3" );
+        mRepsText.setText( "10" );
+        calculateStrengthGoal( mExerciseName );
+    }
+
+
+    public ArrayAdapter< CharSequence > getmLevelSpinnerAdapter() {
+        return mLevelSpinnerAdapter;
+    }
+
+    public void setmLevelSpinnerAdapter( ArrayAdapter< CharSequence > mLevelSpinnerAdapter ) {
+        this.mLevelSpinnerAdapter = mLevelSpinnerAdapter;
     }
 
     public void calculateStrengthGoal( String exerciseName) {
@@ -112,7 +155,7 @@ public class ExerciseListItemFragment extends Fragment {
                 }
 
                 goal.setmStandards( standards );
-                mSuggestedGoalText.setText( goal.toString() );
+                mSuggestedGoalText.setText( "Got it" );
             }
 
             @Override

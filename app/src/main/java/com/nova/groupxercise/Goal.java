@@ -3,6 +3,7 @@ package com.nova.groupxercise;
 public class Goal {
     private String mExerciseName;
     private int[] mStandards;
+    public enum Level {BEGINNER,NOVICE,INTERMEDIATE,ADVANCED,EXPERT}
 
     public Goal( String mExerciseName ) {
         setmExerciseName( mExerciseName );

@@ -28,6 +28,7 @@ public class ExerciseListActivity extends AppCompatActivity implements ExerciseL
     private ListView mListView;
     private TextView mLoadingText;
     private ArrayAdapter< String > mItemsAdapter;
+    private ArrayAdapter< CharSequence > mLevelSpinnerAdapter;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -37,11 +38,17 @@ public class ExerciseListActivity extends AppCompatActivity implements ExerciseL
         mLoadingText = findViewById( R.id.text_loading_exercise_list );
 
         retrieveExerciseList();
+        mLevelSpinnerAdapter = ArrayAdapter.createFromResource( this,
+                R.array.level_array, android.R.layout.simple_spinner_item );
+        // Specify the layout to use when the list of choices appears
+        mLevelSpinnerAdapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+
         mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
                 String exerciseName = mListView.getItemAtPosition( i ).toString();
                 ExerciseListItemFragment exerciseListItemFragment = ExerciseListItemFragment.newInstance( exerciseName );
+                exerciseListItemFragment.setmLevelSpinnerAdapter( mLevelSpinnerAdapter );
                 // Begin the transaction
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 // Replace the contents of the container with the new fragment
@@ -51,6 +58,8 @@ public class ExerciseListActivity extends AppCompatActivity implements ExerciseL
                 ft.commit();
             }
         } );
+
+
     }
 
     private void retrieveExerciseList() {

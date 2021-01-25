@@ -12,9 +12,23 @@
     <string name="sex_male">Male</string>
     <string name="sex_female">Female</string>
 
+    <string name="level_beginner">Beginner</string>
+    <string name="level_novice">Novice</string>
+    <string name="level_intermediate">Intermediate</string>
+    <string name="level_advanced">Advanced</string>
+    <string name="level_expert">Expert</string>
+
     <string-array name="sex_array">
         <item>@string/sex_male</item>
         <item>@string/sex_female</item>
+    </string-array>
+
+    <string-array name="level_array">
+        <item>@string/level_beginner</item>
+        <item>@string/level_novice</item>
+        <item>@string/level_intermediate</item>
+        <item>@string/level_advanced</item>
+        <item>@string/level_expert</item>
     </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
