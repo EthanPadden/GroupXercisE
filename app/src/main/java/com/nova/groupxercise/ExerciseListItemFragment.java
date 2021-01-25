@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -49,7 +48,7 @@ public class ExerciseListItemFragment extends Fragment {
     private Spinner mLevelSpinner;
     private String mSelectedLevel;
     private ArrayAdapter<CharSequence> mLevelSpinnerAdapter;
-
+    private DataSnapshot mStrengthStandards;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
 
@@ -100,6 +99,7 @@ public class ExerciseListItemFragment extends Fragment {
                 Object selectedOption = parent.getItemAtPosition( pos );
                 String selectedOptionStr = selectedOption.toString();
                 mSelectedLevel = selectedOptionStr;
+                calculateSuggestedWeight();
             }
 
             public void onNothingSelected( AdapterView< ? > parent ) {
@@ -110,7 +110,8 @@ public class ExerciseListItemFragment extends Fragment {
         mSetGoalTitleText.setText( "Set Goal: " + mExerciseName );
         mSetsText.setText( "3" );
         mRepsText.setText( "10" );
-        calculateStrengthGoal( mExerciseName );
+        retrieveStrengthStandards( mExerciseName );
+        calculateSuggestedWeight();
     }
 
 
@@ -122,7 +123,7 @@ public class ExerciseListItemFragment extends Fragment {
         this.mLevelSpinnerAdapter = mLevelSpinnerAdapter;
     }
 
-    public void calculateStrengthGoal( String exerciseName) {
+    public void retrieveStrengthStandards( String exerciseName) {
         User user = User.getInstance();
         mSuggestedGoalText.setText( "Loading..." );
         // Check if all user details are set correctly
@@ -139,28 +140,27 @@ public class ExerciseListItemFragment extends Fragment {
         int weightClass = getWeightClass( testUser.getWeight() );
         String path = "strength_standards/" + exerciseName + "/" + testUser.getSex().toString() + "/" + weightClass;
         DatabaseReference childRef = mRootRef.child( path );
-        final Goal goal = new Goal( exerciseName );
         childRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot) {
-                int[] standards = new int[5];
-                Long[] standardLongValues = new Long[5];
-                standardLongValues[0] = (Long) dataSnapshot.child( "Beginner" ).getValue();
-                standardLongValues[1] = (Long) dataSnapshot.child( "Novice" ).getValue();
-                standardLongValues[2] = (Long) dataSnapshot.child( "Intermediate" ).getValue();
-                standardLongValues[3] = (Long) dataSnapshot.child( "Advanced" ).getValue();
-                standardLongValues[4] = (Long) dataSnapshot.child( "Elite" ).getValue();
-                for( int i = 0; i < standardLongValues.length; i++ ) {
-                    standards[i] = standardLongValues[i] == null ? null : Math.toIntExact(standardLongValues[i]);
-                }
-
-                goal.setmStandards( standards );
-                mSuggestedGoalText.setText( "Got it" );
+                // TODO: ISSUE IS PULLING DATA AGAIN, SHOULD NOT HAVE TO
+                mStrengthStandards = dataSnapshot;
+                calculateSuggestedWeight();
             }
 
             @Override
             public void onCancelled( DatabaseError databaseError) {}
         });
+    }
+
+    private void calculateSuggestedWeight() {
+        if (mStrengthStandards == null) {
+            // TODO: Error
+        } else {
+            Long suggestedWeightLong = (Long) mStrengthStandards.child( mSelectedLevel ).getValue();
+            double suggestedWeight = suggestedWeightLong.doubleValue();
+            mSuggestedGoalText.setText( Double.toString( suggestedWeight ) );
+        }
     }
     private int getWeightClass(float weight) {
         return (int)(Math.floor( weight/5 )*5);
