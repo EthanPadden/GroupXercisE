@@ -1,6 +1,7 @@
 package com.nova.groupxercise;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -15,7 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class HomeScreenActivity extends AppCompatActivity {
+public class HomeScreenActivity extends AppCompatActivity implements ExerciseListItemFragment.OnFragmentInteractionListener{
     private TextView mTextMessage;
     private FirebaseAuth mAuth;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
@@ -105,5 +106,19 @@ public class HomeScreenActivity extends AppCompatActivity {
 
     public FirebaseAuth getmAuth() {
         return mAuth;
+    }
+
+    public DatabaseReference getmRootRef() {
+        return mRootRef;
+    }
+
+
+
+    /**
+     * Required for implementing OnFragmentInteractionListener
+     */
+    @Override
+    public void onFragmentInteraction( Uri uri ) {
+
     }
 }
