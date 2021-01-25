@@ -43,6 +43,11 @@ public class User {
     }
 
     // Other methods
+
+    /**
+     * Verifies user details are in the range expected
+     * @return true if details are valid
+     */
     public boolean detailsAreValid() {
         boolean validDetails = true;
 

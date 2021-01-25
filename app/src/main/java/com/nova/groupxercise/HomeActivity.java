@@ -81,7 +81,6 @@ public class HomeActivity extends AppCompatActivity {
             public void onClick( View v ) {
                 // Temporary
                 String exerciseName = "Bench Press";
-
                 calculateStrengthGoal( exerciseName );
             }
         } );
@@ -108,6 +107,7 @@ public class HomeActivity extends AppCompatActivity {
         startActivity( intent );
     }
 
+    // TODO: REMOVE
     public void calculateStrengthGoal( String exerciseName) {
         User user = User.getInstance();
         mGoalText.setText( R.string.loading );
@@ -135,7 +135,7 @@ public class HomeActivity extends AppCompatActivity {
                 standardLongValues[1] = (Long) dataSnapshot.child( getResources().getString( R.string.level_novice) ).getValue();
                 standardLongValues[2] = (Long) dataSnapshot.child( getResources().getString( R.string.level_intermediate) ).getValue();
                 standardLongValues[3] = (Long) dataSnapshot.child( getResources().getString( R.string.level_advanced) ).getValue();
-                standardLongValues[4] = (Long) dataSnapshot.child( getResources().getString( R.string.level_expert) ).getValue();
+                standardLongValues[4] = (Long) dataSnapshot.child( getResources().getString( R.string.level_elite ) ).getValue();
                 for( int i = 0; i < standardLongValues.length; i++ ) {
                     standards[i] = standardLongValues[i] == null ? null : Math.toIntExact(standardLongValues[i]);
                 }
@@ -149,6 +149,7 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    // TODO: Remove
     private int getWeightClass(float weight) {
         return (int)(Math.floor( weight/5 )*5);
     }

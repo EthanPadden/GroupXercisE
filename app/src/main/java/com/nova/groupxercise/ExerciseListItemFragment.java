@@ -32,15 +32,14 @@ import org.joda.time.DateTime;
  * create an instance of this fragment.
  */
 public class ExerciseListItemFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    // Parameters
     private static final String EXERCISE_NAME = "Exercise Name";
-
-    // TODO: Rename and change types of parameters
     private String mExerciseName;
 
+    // Event listeners
     private OnFragmentInteractionListener mListener;
 
+    // Components
     private TextView mSetGoalTitleText;
     private TextView mSuggestedGoalText;
     private TextView mSetsText;
@@ -48,7 +47,11 @@ public class ExerciseListItemFragment extends Fragment {
     private Spinner mLevelSpinner;
     private String mSelectedLevel;
     private ArrayAdapter<CharSequence> mLevelSpinnerAdapter;
+
+    // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
+
+    // DB root reference
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
 
@@ -84,21 +87,28 @@ public class ExerciseListItemFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        // Initialise components
         mSetGoalTitleText =  view.findViewById( R.id.text_set_goal_title );
         mSuggestedGoalText =  view.findViewById( R.id.text_suggested_goal );
         mSetsText =  view.findViewById( R.id.text_sets );
         mRepsText =  view.findViewById( R.id.text_reps );
-
         mLevelSpinner = view.findViewById( R.id.spinner_level );
+
+        // Set spinner adapter
         mLevelSpinner.setAdapter( mLevelSpinnerAdapter );
+
+        // Set default level
         mSelectedLevel = getResources().getString(R.string.level_beginner);
 
-        // Apply the adapter to the spinner
+        // Set event listeners
         mLevelSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
             public void onItemSelected( AdapterView< ? > parent, View view, int pos, long id ) {
+                // Set selected level
                 Object selectedOption = parent.getItemAtPosition( pos );
                 String selectedOptionStr = selectedOption.toString();
                 mSelectedLevel = selectedOptionStr;
+
+                // Update to show the new suggested weight
                 calculateSuggestedWeight();
             }
 
@@ -107,25 +117,36 @@ public class ExerciseListItemFragment extends Fragment {
             }
         } );
 
+        // Set the fragment title
         mSetGoalTitleText.setText( R.string.set_goal_title + mExerciseName );
+
+        // Set defauls sets and reps
         mSetsText.setText( "3" );
         mRepsText.setText( "10" );
+
+        // Get the strength standards from the DB based on the user details
         retrieveStrengthStandards( mExerciseName );
-        calculateSuggestedWeight();
     }
 
-
-    public ArrayAdapter< CharSequence > getmLevelSpinnerAdapter() {
-        return mLevelSpinnerAdapter;
-    }
-
+    /**
+     * Set the array adapter for the spinner component
+     * @param mLevelSpinnerAdapter
+     */
     public void setmLevelSpinnerAdapter( ArrayAdapter< CharSequence > mLevelSpinnerAdapter ) {
         this.mLevelSpinnerAdapter = mLevelSpinnerAdapter;
     }
 
+    /**
+     * Get the strength standards from the DB based on the user details
+     * @param exerciseName the name of the exercise to retrieve
+     */
     public void retrieveStrengthStandards( String exerciseName) {
+        // Get the current user
         User user = User.getInstance();
+
+        // Set the loading messave
         mSuggestedGoalText.setText( R.string.loading );
+
         // Check if all user details are set correctly
         User testUser = new User();
 
@@ -137,14 +158,17 @@ public class ExerciseListItemFragment extends Fragment {
             testUser.setDob( new DateTime( 1990, 9,1,0,0 ) );
         }
 
+        // Build the path and retrieve the strength standards
         int weightClass = getWeightClass( testUser.getWeight() );
         String path = "strength_standards/" + exerciseName + "/" + testUser.getSex().toString() + "/" + weightClass;
         DatabaseReference childRef = mRootRef.child( path );
         childRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot) {
-                // TODO: ISSUE IS PULLING DATA AGAIN, SHOULD NOT HAVE TO
+                // Store the standards in memory so that they do not have to be retrieved again
                 mStrengthStandards = dataSnapshot;
+
+                // Display the current suggested weight
                 calculateSuggestedWeight();
             }
 
@@ -153,6 +177,9 @@ public class ExerciseListItemFragment extends Fragment {
         });
     }
 
+    /**
+     * Display the current suggested weight based on the user details and selected level
+     */
     private void calculateSuggestedWeight() {
         if (mStrengthStandards == null) {
             // TODO: Error
@@ -162,6 +189,12 @@ public class ExerciseListItemFragment extends Fragment {
             mSuggestedGoalText.setText( Double.toString( suggestedWeight ) );
         }
     }
+
+    /**
+     * Return the weight class based on the user details for retrieving strength standards
+     * @param weight the user weight
+     * @return the weight class as listed in the DB
+     */
     private int getWeightClass(float weight) {
         return (int)(Math.floor( weight/5 )*5);
     }
@@ -173,7 +206,6 @@ public class ExerciseListItemFragment extends Fragment {
         return inflater.inflate( R.layout.fragment_exercise_list_item, container, false );
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed( Uri uri ) {
         if ( mListener != null ) {
             mListener.onFragmentInteraction( uri );
@@ -197,16 +229,6 @@ public class ExerciseListItemFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction( Uri uri );

@@ -36,35 +36,4 @@ public class Goal {
         this.mStandards = mStandards;
     }
 
-    public String getmLevel() {
-        return mLevel;
-    }
-
-    public void setmLevel( String mLevel ) {
-        this.mLevel = mLevel;
-    }
-
-    public int getmSets() {
-        return mSets;
-    }
-
-    public void setmSets( int mSets ) {
-        this.mSets = mSets;
-    }
-
-    public int getmReps() {
-        return mReps;
-    }
-
-    public void setmReps( int mReps ) {
-        this.mReps = mReps;
-    }
-
-    public double getmWeight() {
-        return mWeight;
-    }
-
-    public void setmWeight( double mWeight ) {
-        this.mWeight = mWeight;
-    }
 }
