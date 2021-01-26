@@ -10,7 +10,7 @@ public class Goal {
     }
 
     public Goal( String mExerciseName, float mCurrentStatus, float mTarget ) {
-        this(mExerciseName);
+        this( mExerciseName );
         setmCurrentStatus( mCurrentStatus );
         setmTarget( mTarget );
     }

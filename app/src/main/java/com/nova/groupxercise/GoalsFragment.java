@@ -37,10 +37,10 @@ public class GoalsFragment extends Fragment {
 
         // TODO: Populate the array here - check discoveries fragment
         // Temporary:
-        mGoalsList = new ArrayList<>(  );
-        mGoalsList.add( new Goal("Bench Press", 30,60) );
-        mGoalsList.add( new Goal("Deadlift", 45,75) );
-        mGoalsList.add( new Goal("Squat", 20,50) );
+        mGoalsList = new ArrayList<>();
+        mGoalsList.add( new Goal( "Bench Press", 30, 60 ) );
+        mGoalsList.add( new Goal( "Deadlift", 45, 75 ) );
+        mGoalsList.add( new Goal( "Squat", 20, 50 ) );
 
         // Set the list as the list for the items adapter
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mGoalsList );

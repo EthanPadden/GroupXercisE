@@ -6,6 +6,5 @@
         android:icon="@drawable/ic_menu_black_24dp"
         android:title="Menu"
         app:showAsAction="ifRoom"
-        android:orderInCategory="1">
-    </item>
+        android:orderInCategory="1"></item>
 </menu>

@@ -13,6 +13,7 @@
             android:padding="10dp"
             android:text="Set Goal: " />
     </TableRow>
+
     <TableRow>
 
         <TextView
@@ -22,8 +23,9 @@
 
         <TextView
             android:id="@+id/text_sets"
-            android:gravity="center"/>
+            android:gravity="center" />
     </TableRow>
+
     <TableRow>
 
         <TextView
@@ -33,7 +35,7 @@
 
         <TextView
             android:id="@+id/text_reps"
-            android:gravity="center"/>
+            android:gravity="center" />
 
     </TableRow>
 
@@ -46,7 +48,7 @@
 
             <androidx.appcompat.widget.AppCompatRadioButton
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -56,6 +58,7 @@
 
 
     </TableRow>
+
     <TableRow>
 
         <TextView
@@ -68,7 +71,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </TableRow>
+
     <TableRow>
+
         <TextView
             android:gravity="center"
             android:text="Suggested Weight:" />
@@ -95,7 +100,7 @@
 
             <androidx.appcompat.widget.AppCompatRadioButton
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -105,7 +110,6 @@
 
 
     </TableRow>
-
 
 
     <TableRow>
@@ -127,9 +131,6 @@
             android:text="kg" />
 
     </TableRow>
-
-
-
 
 
     <TableRow>

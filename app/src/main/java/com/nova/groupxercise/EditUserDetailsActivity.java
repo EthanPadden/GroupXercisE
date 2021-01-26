@@ -64,11 +64,11 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         mWeightEt = findViewById( R.id.et_weight );
         mSexSpinner = findViewById( R.id.spinner_sex );
         mUpdateBtn = findViewById( R.id.btn_update );
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById( R.id.toolbar );
 
         // Sets the Toolbar to act as the ActionBar for this Activity window.
         // Make sure the toolbar exists in the activity and is not null
-        setSupportActionBar(toolbar);
+        setSupportActionBar( toolbar );
 
         // Initialise and set up navigation drawer
         mDrawerContainer = findViewById( R.id.drawer_container );
@@ -120,11 +120,11 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         mDrawer.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected( @NonNull MenuItem item ) {
-                if(item.getItemId() == R.id.drawer_home) {
+                if ( item.getItemId() == R.id.drawer_home ) {
                     // Go to edit details screen
                     Intent intent = new Intent( EditUserDetailsActivity.this, HomeScreenActivity.class );
                     startActivity( intent );
-                } else if(item.getItemId() == R.id.drawer_logout) {
+                } else if ( item.getItemId() == R.id.drawer_logout ) {
                     signOutUser();
                 }
                 mDrawerContainer.closeDrawers();
@@ -134,22 +134,22 @@ public class EditUserDetailsActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu( Menu menu) {
+    public boolean onCreateOptionsMenu( Menu menu ) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate( R.menu.toolbar_menu, menu );
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected( MenuItem item) {
+    public boolean onOptionsItemSelected( MenuItem item ) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if(id == R.id.toolbar_btn_open_drawer) {
+        if ( id == R.id.toolbar_btn_open_drawer ) {
             mDrawerContainer.openDrawer( GravityCompat.START );
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected( item );
     }
 
     /**
@@ -169,6 +169,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         Intent intent = new Intent( EditUserDetailsActivity.this, LoginActivity.class );
         startActivity( intent );
     }
+
     /**
      * Updates the member variable mSelectedSex with the option in the parameters
      *

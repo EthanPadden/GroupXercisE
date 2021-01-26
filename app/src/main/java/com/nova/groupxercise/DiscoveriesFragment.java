@@ -78,7 +78,7 @@ public class DiscoveriesFragment extends Fragment {
         // TODO: change to differentiate between strength and cardio
         String category = "strength";
         String path = "exercise_list/" + category;
-        HomeScreenActivity homeScreenActivity = (HomeScreenActivity ) getActivity();
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
         DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
 
         // Create an empty list for the exercise names

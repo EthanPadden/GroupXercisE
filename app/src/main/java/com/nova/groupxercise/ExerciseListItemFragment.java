@@ -3,9 +3,6 @@ package com.nova.groupxercise;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,7 +45,7 @@ public class ExerciseListItemFragment extends Fragment {
     private TextView mRepsText;
     private Spinner mLevelSpinner;
     private String mSelectedLevel;
-    private ArrayAdapter<CharSequence> mLevelSpinnerAdapter;
+    private ArrayAdapter< CharSequence > mLevelSpinnerAdapter;
 
     // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
@@ -67,7 +66,7 @@ public class ExerciseListItemFragment extends Fragment {
      * @return A new instance of fragment ExerciseListItemFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ExerciseListItemFragment newInstance( String mExerciseName) {
+    public static ExerciseListItemFragment newInstance( String mExerciseName ) {
         ExerciseListItemFragment fragment = new ExerciseListItemFragment();
         Bundle args = new Bundle();
         args.putString( EXERCISE_NAME, mExerciseName );
@@ -86,19 +85,19 @@ public class ExerciseListItemFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated( View view, Bundle savedInstanceState ) {
         // Initialise components
-        mSetGoalTitleText =  view.findViewById( R.id.text_set_goal_title );
-        mSuggestedGoalText =  view.findViewById( R.id.text_suggested_goal );
-        mSetsText =  view.findViewById( R.id.text_sets );
-        mRepsText =  view.findViewById( R.id.text_reps );
+        mSetGoalTitleText = view.findViewById( R.id.text_set_goal_title );
+        mSuggestedGoalText = view.findViewById( R.id.text_suggested_goal );
+        mSetsText = view.findViewById( R.id.text_sets );
+        mRepsText = view.findViewById( R.id.text_reps );
         mLevelSpinner = view.findViewById( R.id.spinner_level );
 
         // Set spinner adapter
         mLevelSpinner.setAdapter( mLevelSpinnerAdapter );
 
         // Set default level
-        mSelectedLevel = getResources().getString(R.string.level_beginner);
+        mSelectedLevel = getResources().getString( R.string.level_beginner );
 
         // Set event listeners
         mLevelSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
@@ -130,6 +129,7 @@ public class ExerciseListItemFragment extends Fragment {
 
     /**
      * Set the array adapter for the spinner component
+     *
      * @param mLevelSpinnerAdapter
      */
     public void setmLevelSpinnerAdapter( ArrayAdapter< CharSequence > mLevelSpinnerAdapter ) {
@@ -138,9 +138,10 @@ public class ExerciseListItemFragment extends Fragment {
 
     /**
      * Get the strength standards from the DB based on the user details
+     *
      * @param exerciseName the name of the exercise to retrieve
      */
-    public void retrieveStrengthStandards( String exerciseName) {
+    public void retrieveStrengthStandards( String exerciseName ) {
         // Get the current user
         User user = User.getInstance();
 
@@ -155,16 +156,16 @@ public class ExerciseListItemFragment extends Fragment {
             testUser.setName( "John Doe" );
             testUser.setSex( User.Sex.MALE );
             testUser.setWeight( 68 );
-            testUser.setDob( new DateTime( 1990, 9,1,0,0 ) );
+            testUser.setDob( new DateTime( 1990, 9, 1, 0, 0 ) );
         }
 
         // Build the path and retrieve the strength standards
         int weightClass = getWeightClass( testUser.getWeight() );
         String path = "strength_standards/" + exerciseName + "/" + testUser.getSex().toString() + "/" + weightClass;
         DatabaseReference childRef = mRootRef.child( path );
-        childRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
-            public void onDataChange( DataSnapshot dataSnapshot) {
+            public void onDataChange( DataSnapshot dataSnapshot ) {
                 // Store the standards in memory so that they do not have to be retrieved again
                 mStrengthStandards = dataSnapshot;
 
@@ -173,18 +174,19 @@ public class ExerciseListItemFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled( DatabaseError databaseError) {}
-        });
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
     }
 
     /**
      * Display the current suggested weight based on the user details and selected level
      */
     private void calculateSuggestedWeight() {
-        if (mStrengthStandards == null) {
+        if ( mStrengthStandards == null ) {
             // TODO: Error
         } else {
-            Long suggestedWeightLong = (Long) mStrengthStandards.child( mSelectedLevel ).getValue();
+            Long suggestedWeightLong = ( Long ) mStrengthStandards.child( mSelectedLevel ).getValue();
             double suggestedWeight = suggestedWeightLong.doubleValue();
             mSuggestedGoalText.setText( Double.toString( suggestedWeight ) );
         }
@@ -192,11 +194,12 @@ public class ExerciseListItemFragment extends Fragment {
 
     /**
      * Return the weight class based on the user details for retrieving strength standards
+     *
      * @param weight the user weight
      * @return the weight class as listed in the DB
      */
-    private int getWeightClass(float weight) {
-        return (int)(Math.floor( weight/5 )*5);
+    private int getWeightClass( float weight ) {
+        return ( int ) ( Math.floor( weight / 5 ) * 5 );
     }
 
     @Override

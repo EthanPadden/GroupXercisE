@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class HomeScreenActivity extends AppCompatActivity implements ExerciseListItemFragment.OnFragmentInteractionListener{
+public class HomeScreenActivity extends AppCompatActivity implements ExerciseListItemFragment.OnFragmentInteractionListener {
     private FirebaseAuth mAuth;
     private DrawerLayout mDrawerContainer;
     private NavigationView mDrawer;
@@ -70,11 +70,11 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
 
         // Initialise components
         BottomNavigationView navView = findViewById( R.id.nav_view );
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById( R.id.toolbar );
 
         // Sets the Toolbar to act as the ActionBar for this Activity window.
         // Make sure the toolbar exists in the activity and is not null
-        setSupportActionBar(toolbar);
+        setSupportActionBar( toolbar );
 
         // Initialise and set up navigation drawer
         mDrawerContainer = findViewById( R.id.drawer_container );
@@ -98,21 +98,22 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
     }
 
     @Override
-    public boolean onCreateOptionsMenu( Menu menu) {
+    public boolean onCreateOptionsMenu( Menu menu ) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate( R.menu.toolbar_menu, menu );
         return true;
     }
+
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected( MenuItem item ) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if(id == R.id.toolbar_btn_open_drawer) {
+        if ( id == R.id.toolbar_btn_open_drawer ) {
             mDrawerContainer.openDrawer( GravityCompat.START );
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected( item );
     }
 
     /**
@@ -148,11 +149,11 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         mDrawer.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected( @NonNull MenuItem item ) {
-                if(item.getItemId() == R.id.drawer_profile) {
+                if ( item.getItemId() == R.id.drawer_profile ) {
                     // Go to edit details screen
                     Intent intent = new Intent( HomeScreenActivity.this, EditUserDetailsActivity.class );
                     startActivity( intent );
-                } else if(item.getItemId() == R.id.drawer_logout) {
+                } else if ( item.getItemId() == R.id.drawer_logout ) {
                     signOutUser();
                 }
                 mDrawerContainer.closeDrawers();
