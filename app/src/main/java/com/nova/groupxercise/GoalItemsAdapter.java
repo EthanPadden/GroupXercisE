@@ -13,10 +13,6 @@ public class GoalItemsAdapter extends ArrayAdapter {
     private static final String LOG_TAG = GoalItemsAdapter.class.getSimpleName();
 
     public GoalItemsAdapter( Activity context, ArrayList<Goal> goals) {
-        // Here, we initialize the ArrayAdapter's internal storage for the context and the list.
-        // the second argument is used when the ArrayAdapter is populating a single TextView.
-        // Because this is a custom adapter for two TextViews and an ImageView, the adapter is not
-        // going to use this second argument, so it can be any value. Here, we used 0.
         super(context, 0, goals);
     }
 
@@ -30,7 +26,6 @@ public class GoalItemsAdapter extends ArrayAdapter {
                     R.layout.layout_goal_list_item, parent, false);
         }
 
-        // Get the {@link AndroidFlavor} object located at this position in the list
         Goal currentGoal = (Goal) getItem(position);
 
         TextView exerciseNameText = listItemView.findViewById( R.id.goal_exercise_name );

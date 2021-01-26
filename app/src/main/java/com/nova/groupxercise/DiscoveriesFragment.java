@@ -43,9 +43,9 @@ public class DiscoveriesFragment extends Fragment {
         // Initialise components
         mListView = view.findViewById( R.id.exercise_list );
         mLoadingText = view.findViewById( R.id.text_loading_exercise_list );
-
         mLevelSpinnerAdapter = ArrayAdapter.createFromResource( getActivity(),
                 R.array.level_array, android.R.layout.simple_spinner_item );
+
         // Specify the layout to use when the list of choices appears
         mLevelSpinnerAdapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
 
@@ -70,8 +70,9 @@ public class DiscoveriesFragment extends Fragment {
             }
         } );
     }
+
     /**
-     * Gets the list of exercises from the DB and makes the UI list visible when retriieved
+     * Gets the list of exercises from the DB and makes the UI list visible when retrieved
      */
     private void retrieveExerciseList() {
         // TODO: change to differentiate between strength and cardio

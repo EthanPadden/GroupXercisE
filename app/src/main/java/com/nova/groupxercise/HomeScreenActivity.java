@@ -71,9 +71,12 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         // Initialise components
         BottomNavigationView navView = findViewById( R.id.nav_view );
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         // Sets the Toolbar to act as the ActionBar for this Activity window.
         // Make sure the toolbar exists in the activity and is not null
         setSupportActionBar(toolbar);
+
+        // Initialise and set up navigation drawer
         mDrawerContainer = findViewById( R.id.drawer_container );
         mDrawer = findViewById( R.id.drawer );
         setupDrawerContent();
@@ -138,7 +141,9 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         return mRootRef;
     }
 
-
+    /**
+     * Sets the event listeners for the navigation drawer
+     */
     private void setupDrawerContent() {
         mDrawer.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener() {
             @Override
