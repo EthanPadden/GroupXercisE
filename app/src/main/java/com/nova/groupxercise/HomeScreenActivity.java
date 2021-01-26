@@ -148,7 +148,13 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         mDrawer.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected( @NonNull MenuItem item ) {
-                item.setChecked( true );
+                if(item.getItemId() == R.id.drawer_profile) {
+                    // Go to edit details screen
+                    Intent intent = new Intent( HomeScreenActivity.this, EditUserDetailsActivity.class );
+                    startActivity( intent );
+                } else if(item.getItemId() == R.id.drawer_logout) {
+                    signOutUser();
+                }
                 mDrawerContainer.closeDrawers();
                 return true;
             }

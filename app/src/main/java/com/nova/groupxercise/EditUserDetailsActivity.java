@@ -110,16 +110,18 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         } );
     }
 
-    public FirebaseAuth getmAuth() {
-        return mAuth;
-    }
-
-
     private void setupDrawerContent() {
         mDrawer.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected( @NonNull MenuItem item ) {
-                item.setChecked( true );
+
+                if(item.getItemId() == R.id.drawer_home) {
+                    // Go to edit details screen
+                    Intent intent = new Intent( EditUserDetailsActivity.this, HomeScreenActivity.class );
+                    startActivity( intent );
+                } else if(item.getItemId() == R.id.drawer_logout) {
+                    signOutUser();
+                }
                 mDrawerContainer.closeDrawers();
                 return true;
             }
