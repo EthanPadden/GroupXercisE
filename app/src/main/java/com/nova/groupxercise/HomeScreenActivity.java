@@ -3,12 +3,16 @@ package com.nova.groupxercise;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -19,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class HomeScreenActivity extends AppCompatActivity implements ExerciseListItemFragment.OnFragmentInteractionListener{
     private TextView mTextMessage;
     private FirebaseAuth mAuth;
+    private DrawerLayout mDrawerContainer;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
 
@@ -73,6 +78,11 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         // Initialise components
         BottomNavigationView navView = findViewById( R.id.nav_view );
         mTextMessage = findViewById( R.id.message );
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // Sets the Toolbar to act as the ActionBar for this Activity window.
+        // Make sure the toolbar exists in the activity and is not null
+        setSupportActionBar(toolbar);
+        mDrawerContainer = findViewById( R.id.drawer_container );
 
         // Set event listeners
         navView.setOnNavigationItemSelectedListener( mOnNavigationItemSelectedListener );
@@ -84,6 +94,24 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace( R.id.frame_home_screen_fragment_placeholder, homeFragment );
         ft.commit();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu( Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if(id == R.id.toolbar_btn_open_drawer) {
+            mDrawerContainer.openDrawer( GravityCompat.START );
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
