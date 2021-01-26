@@ -16,6 +16,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -24,8 +25,8 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
     private TextView mTextMessage;
     private FirebaseAuth mAuth;
     private DrawerLayout mDrawerContainer;
+    private NavigationView mDrawer;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -83,6 +84,8 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         // Make sure the toolbar exists in the activity and is not null
         setSupportActionBar(toolbar);
         mDrawerContainer = findViewById( R.id.drawer_container );
+        mDrawer = findViewById( R.id.drawer );
+        setupDrawerContent();
 
         // Set event listeners
         navView.setOnNavigationItemSelectedListener( mOnNavigationItemSelectedListener );
@@ -141,6 +144,16 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
     }
 
 
+    private void setupDrawerContent() {
+        mDrawer.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected( @NonNull MenuItem item ) {
+                item.setChecked( true );
+                mDrawerContainer.closeDrawers();
+                return true;
+            }
+        } );
+    }
 
     /**
      * Required for implementing OnFragmentInteractionListener
