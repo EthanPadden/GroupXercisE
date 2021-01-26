@@ -2,38 +2,40 @@ package com.nova.groupxercise;
 
 public class Goal {
     private String mExerciseName;
-    private int[] mStandards;
-    private String mLevel;
-    private int mSets;
-    private int mReps;
-    private double mWeight;
+    private float mCurrentStatus;
+    private float mTarget;
 
     public Goal( String mExerciseName ) {
         setmExerciseName( mExerciseName );
     }
 
-    @Override
-    public String toString() {
-        String info = mExerciseName;
-        for ( int standard : mStandards ) info += "\n" + standard;
-        return info;
-
-    }
-
-    public String getmExerciseName() {
-        return mExerciseName;
+    public Goal( String mExerciseName, float mCurrentStatus, float mTarget ) {
+        this(mExerciseName);
+        setmCurrentStatus( mCurrentStatus );
+        setmTarget( mTarget );
     }
 
     public void setmExerciseName( String mExerciseName ) {
         this.mExerciseName = mExerciseName;
     }
 
-    public int[] getmStandards() {
-        return mStandards;
+    public String getmExerciseName() {
+        return mExerciseName;
     }
 
-    public void setmStandards( int[] mStandards ) {
-        this.mStandards = mStandards;
+    public float getmCurrentStatus() {
+        return mCurrentStatus;
     }
 
+    public void setmCurrentStatus( float mCurrentStatus ) {
+        this.mCurrentStatus = mCurrentStatus;
+    }
+
+    public float getmTarget() {
+        return mTarget;
+    }
+
+    public void setmTarget( float mTarget ) {
+        this.mTarget = mTarget;
+    }
 }

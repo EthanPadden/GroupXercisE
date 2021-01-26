@@ -39,8 +39,9 @@ public class DiscoveriesFragment extends Fragment {
     @Override
     public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
         super.onViewCreated( view, savedInstanceState );
+
         // Initialise components
-        mListView = view.findViewById( R.id.list );
+        mListView = view.findViewById( R.id.exercise_list );
         mLoadingText = view.findViewById( R.id.text_loading_exercise_list );
 
         mLevelSpinnerAdapter = ArrayAdapter.createFromResource( getActivity(),
