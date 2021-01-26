@@ -1,14 +1,14 @@
 package com.nova.groupxercise;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
                         public void onComplete( @NonNull Task< AuthResult > task ) {
                             if ( task.isSuccessful() ) {
                                 // Go to the home screen
-                                Intent intent = new Intent( LoginActivity.this, HomeActivity.class );
+                                Intent intent = new Intent( LoginActivity.this, HomeScreenActivity.class );
                                 startActivity( intent );
                             } else {
                                 String errorMsg = task.getException().getMessage();

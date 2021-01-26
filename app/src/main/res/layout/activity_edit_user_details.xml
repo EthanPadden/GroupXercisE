@@ -1,83 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:stretchColumns="1">
+    android:fitsSystemWindows="true"
+    tools:context=".EditUserDetailsActivity">
 
-    <TableRow>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <TextView
-            android:layout_weight="1"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="Enter details" />
-    </TableRow>
-
-    <TableRow>
-
-        <TextView
-            android:gravity="center"
-            android:text="Name" />
-
-        <EditText
-            android:id="@+id/et_name"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName"/>
-    </TableRow>
-
-    <TableRow>
-
-        <TextView
-            android:gravity="center"
-            android:text="DOB" />
-
-        <TextView
-            android:id="@+id/text_dob"
-            android:gravity="center"/>
-
-    </TableRow>
-
-    <TableRow>
-
-        <TextView
-            android:gravity="center"
-            android:text="Weight" />
-
-
-        <EditText
-            android:id="@+id/et_weight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number" />
-
-        <TextView
-            android:gravity="center"
-            android:text="kg" />
-
-    </TableRow>
-
-    <TableRow>
-
-        <TextView
-            android:gravity="center"
-            android:text="Sex" />
-
-
-        <Spinner
-            android:id="@+id/spinner_sex"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </TableRow>
-
-    <TableRow>
-
-        <Button
-            android:id="@+id/btn_update"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Update" />
-    </TableRow>
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme">
 
-</TableLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/toolbar"
+            android:stretchColumns="1">
+
+            <TableRow>
+
+                <TextView
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="Enter details" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:gravity="center"
+                    android:text="Name" />
+
+                <EditText
+                    android:id="@+id/et_name"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="textPersonName" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:gravity="center"
+                    android:text="DOB" />
+
+                <TextView
+                    android:id="@+id/text_dob"
+                    android:gravity="center" />
+
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:gravity="center"
+                    android:text="Weight" />
+
+
+                <EditText
+                    android:id="@+id/et_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="number" />
+
+                <TextView
+                    android:gravity="center"
+                    android:text="kg" />
+
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:gravity="center"
+                    android:text="Sex" />
+
+
+                <Spinner
+                    android:id="@+id/spinner_sex"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </TableRow>
+
+            <TableRow>
+
+                <Button
+                    android:id="@+id/btn_update"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Update" />
+            </TableRow>
+
+        </TableLayout>
+    </RelativeLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/drawer"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/drawer" />
+</androidx.drawerlayout.widget.DrawerLayout>

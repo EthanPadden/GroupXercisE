@@ -1,11 +1,11 @@
 package com.nova.groupxercise;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,8 +16,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+
+import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+
 import org.joda.time.DateTime;
-import org.joda.time.Period;
 
 import java.util.Calendar;
 
@@ -29,11 +38,23 @@ public class EditUserDetailsActivity extends AppCompatActivity {
     private Button mUpdateBtn;
     private User.Sex mSelectedSex;
     private Calendar mSelectedDob;
+    private DrawerLayout mDrawerContainer;
+    private NavigationView mDrawer;
+    private FirebaseAuth mAuth;
+
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
 
+        // If it is the case that the current user is null, go to the login screen
+        if ( mAuth.getCurrentUser() == null ) {
+            // If the current user is null, go to the registration screen
+            Intent intent = new Intent( EditUserDetailsActivity.this, RegistrationActivity.class );
+            startActivity( intent );
+        }
         // Set content view
         setContentView( R.layout.activity_edit_user_details );
 
@@ -43,7 +64,16 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         mWeightEt = findViewById( R.id.et_weight );
         mSexSpinner = findViewById( R.id.spinner_sex );
         mUpdateBtn = findViewById( R.id.btn_update );
+        Toolbar toolbar = findViewById( R.id.toolbar );
 
+        // Sets the Toolbar to act as the ActionBar for this Activity window.
+        // Make sure the toolbar exists in the activity and is not null
+        setSupportActionBar( toolbar );
+
+        // Initialise and set up navigation drawer
+        mDrawerContainer = findViewById( R.id.drawer_container );
+        mDrawer = findViewById( R.id.drawer );
+        setupDrawerContent();
 
         // Set default selected values
         mSelectedSex = User.Sex.MALE;
@@ -81,6 +111,63 @@ public class EditUserDetailsActivity extends AppCompatActivity {
                 newFragment.show( getSupportFragmentManager(), "datePicker" );
             }
         } );
+    }
+
+    /**
+     * Sets the event listeners for the navigation drawer
+     */
+    private void setupDrawerContent() {
+        mDrawer.setNavigationItemSelectedListener( new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected( @NonNull MenuItem item ) {
+                if ( item.getItemId() == R.id.drawer_home ) {
+                    // Go to edit details screen
+                    Intent intent = new Intent( EditUserDetailsActivity.this, HomeScreenActivity.class );
+                    startActivity( intent );
+                } else if ( item.getItemId() == R.id.drawer_logout ) {
+                    signOutUser();
+                }
+                mDrawerContainer.closeDrawers();
+                return true;
+            }
+        } );
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu( Menu menu ) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate( R.menu.toolbar_menu, menu );
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected( MenuItem item ) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if ( id == R.id.toolbar_btn_open_drawer ) {
+            mDrawerContainer.openDrawer( GravityCompat.START );
+        }
+        return super.onOptionsItemSelected( item );
+    }
+
+    /**
+     * Sign out the user that is currently logged in using Firebase method
+     * Toast with error message if no user is currently logged in
+     */
+    protected void signOutUser() {
+        // Check if there is a user currently logged in
+        if ( mAuth.getCurrentUser() != null ) {
+            mAuth.signOut();
+        } else {
+            Toast.makeText( EditUserDetailsActivity.this, R.string.error_user_not_logged_in,
+                    Toast.LENGTH_SHORT ).show();
+        }
+
+        // Regardless, go to login screen
+        Intent intent = new Intent( EditUserDetailsActivity.this, LoginActivity.class );
+        startActivity( intent );
     }
 
     /**

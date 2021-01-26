@@ -1,7 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".GoalsFragment">
 
     <TextView
         android:id="@+id/text_loading_exercise_list"
@@ -13,7 +15,7 @@
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/list"
+        android:id="@+id/goal_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -21,14 +23,6 @@
         android:paddingTop="10dp"
         android:paddingRight="10dp"
         android:paddingBottom="10dp"
-        tools:context="com.nova.groupxercise.ExerciseListActivity" />
+        tools:context="com.nova.groupxercise.HomeScreenActivity" />
 
-    <FrameLayout
-        android:id="@+id/frame_set_goal_fragment_placeholder"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        >
-
-    </FrameLayout>
-</RelativeLayout>
+</FrameLayout>

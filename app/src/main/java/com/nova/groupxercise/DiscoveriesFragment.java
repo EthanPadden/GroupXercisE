@@ -1,29 +1,28 @@
 package com.nova.groupxercise;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
-
-import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 
-public class ExerciseListActivity extends AppCompatActivity implements ExerciseListItemFragment.OnFragmentInteractionListener {
-    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+
+public class DiscoveriesFragment extends Fragment {
     private ArrayList< String > mExerciseNameList;
     private ListView mListView;
     private TextView mLoadingText;
@@ -31,18 +30,22 @@ public class ExerciseListActivity extends AppCompatActivity implements ExerciseL
     private ArrayAdapter< CharSequence > mLevelSpinnerAdapter;
 
     @Override
-    protected void onCreate( Bundle savedInstanceState ) {
-        super.onCreate( savedInstanceState );
+    public View onCreateView( LayoutInflater inflater, ViewGroup container,
+                              Bundle savedInstanceState ) {
+        // Inflate the layout for this fragment
+        return inflater.inflate( R.layout.fragment_discoveries, container, false );
+    }
 
-        // Set content view
-        setContentView( R.layout.activity_exercise_list );
+    @Override
+    public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
+        super.onViewCreated( view, savedInstanceState );
 
         // Initialise components
-        mListView = findViewById( R.id.list );
-        mLoadingText = findViewById( R.id.text_loading_exercise_list );
-
-        mLevelSpinnerAdapter = ArrayAdapter.createFromResource( this,
+        mListView = view.findViewById( R.id.exercise_list );
+        mLoadingText = view.findViewById( R.id.text_loading_exercise_list );
+        mLevelSpinnerAdapter = ArrayAdapter.createFromResource( getActivity(),
                 R.array.level_array, android.R.layout.simple_spinner_item );
+
         // Specify the layout to use when the list of choices appears
         mLevelSpinnerAdapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
 
@@ -61,29 +64,28 @@ public class ExerciseListActivity extends AppCompatActivity implements ExerciseL
                 exerciseListItemFragment.setmLevelSpinnerAdapter( mLevelSpinnerAdapter );
 
                 // Set the fragment to be displayed in the frame view
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 ft.replace( R.id.frame_set_goal_fragment_placeholder, exerciseListItemFragment );
                 ft.commit();
             }
         } );
-
-
     }
 
     /**
-     * Gets the list of exercises from the DB and makes the UI list visible when retriieved
+     * Gets the list of exercises from the DB and makes the UI list visible when retrieved
      */
     private void retrieveExerciseList() {
         // TODO: change to differentiate between strength and cardio
         String category = "strength";
         String path = "exercise_list/" + category;
-        DatabaseReference childRef = mRootRef.child( path );
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
 
         // Create an empty list for the exercise names
         mExerciseNameList = new ArrayList<>();
 
         // Set the list as the list for the items adapter
-        mItemsAdapter = new ArrayAdapter< String >( this, android.R.layout.simple_list_item_1, mExerciseNameList );
+        mItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mExerciseNameList );
 
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
@@ -101,13 +103,5 @@ public class ExerciseListActivity extends AppCompatActivity implements ExerciseL
             public void onCancelled( DatabaseError databaseError ) {
             }
         } );
-    }
-
-    /**
-     * Required for implementing OnFragmentInteractionListener
-     */
-    @Override
-    public void onFragmentInteraction( Uri uri ) {
-
     }
 }

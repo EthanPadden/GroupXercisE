@@ -1,8 +1,8 @@
 package com.nova.groupxercise;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity( intent );
         } else {
             // If there is a user logged in, go to the home screen
-            Intent intent = new Intent( MainActivity.this, HomeActivity.class );
+            Intent intent = new Intent( MainActivity.this, HomeScreenActivity.class );
             startActivity( intent );
         }
     }

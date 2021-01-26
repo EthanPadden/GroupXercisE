@@ -1,7 +1,5 @@
 package com.nova.groupxercise;
 
-import android.widget.Toast;
-
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
@@ -46,6 +44,7 @@ public class User {
 
     /**
      * Verifies user details are in the range expected
+     *
      * @return true if details are valid
      */
     public boolean detailsAreValid() {
@@ -62,7 +61,7 @@ public class User {
         // If male, weight should be in range 50-140
         if ( sex == Sex.MALE && ( weight < 50 || weight > 140 ) )
             validDetails = false;
-        // If female, weight should be in range 40-120
+            // If female, weight should be in range 40-120
         else if ( sex == Sex.FEMALE && ( weight < 40 || weight > 120 ) )
             validDetails = false;
 
