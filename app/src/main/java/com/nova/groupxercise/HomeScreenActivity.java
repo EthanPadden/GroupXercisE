@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,7 +21,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class HomeScreenActivity extends AppCompatActivity implements ExerciseListItemFragment.OnFragmentInteractionListener{
-    private TextView mTextMessage;
     private FirebaseAuth mAuth;
     private DrawerLayout mDrawerContainer;
     private NavigationView mDrawer;
@@ -37,20 +35,14 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
             switch ( item.getItemId() ) {
-                case R.id.navigation_home:
-                    mTextMessage.setText( R.string.title_home );
-                    HomeFragment homeFragment = new HomeFragment();
-                    ft.replace( R.id.frame_home_screen_fragment_placeholder, homeFragment );
-                    ft.commit();
-                    return true;
                 case R.id.navigation_dashboard:
-                    mTextMessage.setText( R.string.title_discoveries );
+                    getSupportActionBar().setTitle( R.string.title_discoveries );
                     DiscoveriesFragment discoveriesFragment = new DiscoveriesFragment();
                     ft.replace( R.id.frame_home_screen_fragment_placeholder, discoveriesFragment );
                     ft.commit();
                     return true;
                 case R.id.navigation_notifications:
-                    mTextMessage.setText( R.string.title_goals );
+                    getSupportActionBar().setTitle( R.string.title_goals );
                     GoalsFragment goalsFragment = new GoalsFragment();
                     ft.replace( R.id.frame_home_screen_fragment_placeholder, goalsFragment );
                     ft.commit();
@@ -78,7 +70,6 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
 
         // Initialise components
         BottomNavigationView navView = findViewById( R.id.nav_view );
-        mTextMessage = findViewById( R.id.message );
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         // Sets the Toolbar to act as the ActionBar for this Activity window.
         // Make sure the toolbar exists in the activity and is not null
@@ -90,13 +81,17 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         // Set event listeners
         navView.setOnNavigationItemSelectedListener( mOnNavigationItemSelectedListener );
 
-        // Create the home fragment
-        HomeFragment homeFragment = new HomeFragment();
+        // Create Discoveries Fragment
+        DiscoveriesFragment discoveriesFragment = new DiscoveriesFragment();
+
+        // Set the default toolbar title
+        getSupportActionBar().setTitle( R.string.title_discoveries );
 
         // Set the fragment to be displayed in the frame view
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace( R.id.frame_home_screen_fragment_placeholder, homeFragment );
+        ft.replace( R.id.frame_home_screen_fragment_placeholder, discoveriesFragment );
         ft.commit();
+
     }
 
     @Override
