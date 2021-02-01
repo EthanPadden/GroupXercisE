@@ -140,7 +140,8 @@ public class ExerciseListItemFragment extends Fragment {
                 if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
                     float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
                     goal = new Goal( mExerciseName, 0, target );
-                    Toast.makeText( getActivity(), goal.toString(), Toast.LENGTH_SHORT ).show();
+//                    Toast.makeText( getActivity(), goal.toString(), Toast.LENGTH_SHORT ).show();
+                    checkDoesUserHaveAnyGoals( goal );
                 } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
                     String targetStr = ( mManualGoalET.getText().toString() );
 
@@ -182,6 +183,40 @@ public class ExerciseListItemFragment extends Fragment {
 
         // Get the strength standards from the DB based on the user details
         retrieveStrengthStandards( mExerciseName );
+    }
+
+    private void checkDoesUserHaveAnyGoals(Goal goal) {
+        if(goal == null) {
+            Toast.makeText( getActivity(), "There was an error", Toast.LENGTH_SHORT ).show();
+        } else {
+            // Write a message to the database
+            // TODO: use the current user name
+            String tempUserName = "john_doe";
+            String path = "user_goals/" + tempUserName;
+
+            HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+            DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+
+            // Check if we have a set of goals for that particular user
+            childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange( DataSnapshot dataSnapshot ) {
+                    if(dataSnapshot.exists()){
+                        // This means there is a set of goals associated with the user
+                        // (this could be an empty list)
+                        Toast.makeText( getActivity(), "Goals found!", Toast.LENGTH_SHORT ).show();
+
+                    } else {
+                        // This is an error
+                        Toast.makeText( getActivity(), "Error: you have no goals", Toast.LENGTH_SHORT ).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled( DatabaseError databaseError ) {
+                }
+            } );
+        }
     }
 
     /**
