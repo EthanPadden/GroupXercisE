@@ -40,13 +40,6 @@ public class GoalsFragment extends Fragment {
         mListView = view.findViewById( R.id.goal_list );
         mLoadingText = view.findViewById( R.id.text_loading_exercise_list );
 
-        // TODO: Populate the array here - check discoveries fragment
-        // Temporary:
-        mGoalsList = new ArrayList<>();
-        mGoalsList.add( new Goal( "Bench Press", 30, 60 ) );
-        mGoalsList.add( new Goal( "Deadlift", 45, 75 ) );
-        mGoalsList.add( new Goal( "Squat", 20, 50 ) );
-
         // Set the list as the list for the items adapter
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mGoalsList );
 
@@ -88,7 +81,7 @@ public class GoalsFragment extends Fragment {
                     float target = 0.0f;
                     if ( targetStatusDataSnapshot.exists() ) {
                         Long targetLong = ( Long ) targetStatusDataSnapshot.getValue();
-                        currentStatus = targetLong.floatValue();
+                        target = targetLong.floatValue();
                     }
 
                     // Add the goal to the list

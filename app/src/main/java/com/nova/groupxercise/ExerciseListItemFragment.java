@@ -149,10 +149,10 @@ public class ExerciseListItemFragment extends Fragment {
                         goal = new Goal( mExerciseName, 0, target );
                         saveGoal( goal );
                     } else {
-                        Toast.makeText( getActivity(), "Enter a target", Toast.LENGTH_SHORT ).show();
+                        Toast.makeText( getActivity(), R.string.error_no_target_entered, Toast.LENGTH_SHORT ).show();
                     }
                 } else {
-                    Toast.makeText( getActivity(), "There was an error", Toast.LENGTH_SHORT ).show();
+                    Toast.makeText( getActivity(), R.string.error_generic, Toast.LENGTH_SHORT ).show();
                 }
 
             }
@@ -185,7 +185,7 @@ public class ExerciseListItemFragment extends Fragment {
 
     private void saveGoal( final Goal goal ) {
         if ( goal == null ) {
-            Toast.makeText( getActivity(), "There was an error in processing the goal", Toast.LENGTH_SHORT ).show();
+            Toast.makeText( getActivity(), R.string.error_goal_setting, Toast.LENGTH_SHORT ).show();
         } else {
             // TODO: use the current user name
             String tempUserName = "john_doe";
@@ -204,7 +204,6 @@ public class ExerciseListItemFragment extends Fragment {
                     if ( dataSnapshot.exists() ) {
                         // This means there is a set of goals associated with the user
                         // (this could be an empty list)
-                        Toast.makeText( getActivity(), "Goals found!", Toast.LENGTH_SHORT ).show();
 
                         // Get the DB object
                         GoalDBObject goalDBObject = goal.getmGoalDBObject();
@@ -212,11 +211,11 @@ public class ExerciseListItemFragment extends Fragment {
                         DataSnapshot exerciseDataSnapshot = dataSnapshot.child( goal.getmExerciseName() );
                         if(exerciseDataSnapshot.exists()) {
                             // The operation is an update
-                            Toast.makeText( getActivity(), "Updating your goal...", Toast.LENGTH_SHORT ).show();
+                            Toast.makeText( getActivity(), R.string.info_updating_goal, Toast.LENGTH_SHORT ).show();
 
                         } else  {
                             // The operation is a create
-                            Toast.makeText( getActivity(), "Creating your goal...", Toast.LENGTH_SHORT ).show();
+                            Toast.makeText( getActivity(), R.string.info_creating_goal, Toast.LENGTH_SHORT ).show();
                         }
 
                         // If no child exists, this will create a new one
@@ -224,7 +223,7 @@ public class ExerciseListItemFragment extends Fragment {
                         childRef.child( goal.getmExerciseName() ).setValue( goalDBObject );
                     } else {
                         // This is an error
-                        Toast.makeText( getActivity(), "Error: you have no goals", Toast.LENGTH_SHORT ).show();
+                        Toast.makeText( getActivity(), R.string.error_no_goalset_found, Toast.LENGTH_SHORT ).show();
                     }
                 }
 
