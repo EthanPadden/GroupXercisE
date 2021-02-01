@@ -11,6 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 
 
@@ -47,5 +52,55 @@ public class GoalsFragment extends Fragment {
 
         mLoadingText.setVisibility( View.INVISIBLE );
         mListView.setAdapter( mItemsAdapter );
+        retrieveGoals();
+    }
+
+    public void retrieveGoals() {
+        // TODO: use the current user name
+        String tempUserName = "john_doe";
+
+        // Path to the users goals
+        String path = "user_goals/" + tempUserName;
+
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+
+        // Create an empty list for the exercise names
+        mGoalsList = new ArrayList<>();
+
+        // Set the list as the list for the items adapter
+        mItemsAdapter = new GoalItemsAdapter( getActivity(), mGoalsList );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                for ( DataSnapshot exerciseDataSnapshot : dataSnapshot.getChildren() ) {
+                    String exerciseName = exerciseDataSnapshot.getKey();
+
+                    DataSnapshot currentStatusDataSnapshot = exerciseDataSnapshot.child( "current_status" );
+                    float currentStatus = 0.0f;
+                    if ( currentStatusDataSnapshot.exists() ) {
+                        Long currentStatusLong = ( Long ) currentStatusDataSnapshot.getValue();
+                        currentStatus = currentStatusLong.floatValue();
+                    }
+
+                    DataSnapshot targetStatusDataSnapshot = exerciseDataSnapshot.child( "target" );
+                    float target = 0.0f;
+                    if ( targetStatusDataSnapshot.exists() ) {
+                        Long targetLong = ( Long ) targetStatusDataSnapshot.getValue();
+                        currentStatus = targetLong.floatValue();
+                    }
+
+                    // Add the goal to the list
+                    mGoalsList.add( new Goal( exerciseName,currentStatus,target) );
+                }
+                mLoadingText.setVisibility( View.INVISIBLE );
+                mListView.setAdapter( mItemsAdapter );
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
     }
 }

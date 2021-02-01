@@ -154,7 +154,6 @@ public class ExerciseListItemFragment extends Fragment {
                 } else {
                     Toast.makeText( getActivity(), "There was an error", Toast.LENGTH_SHORT ).show();
                 }
-//                int selectedId = mGoalOptionsRadioGroup.getCheckedRadioButtonId();
 
             }
         } );
