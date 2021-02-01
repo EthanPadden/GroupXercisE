@@ -140,15 +140,14 @@ public class ExerciseListItemFragment extends Fragment {
                 if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
                     float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
                     goal = new Goal( mExerciseName, 0, target );
-//                    Toast.makeText( getActivity(), goal.toString(), Toast.LENGTH_SHORT ).show();
-                    checkDoesUserHaveAnyGoals( goal );
+                    saveGoal( goal );
                 } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
                     String targetStr = ( mManualGoalET.getText().toString() );
 
                     if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
                         float target = Float.parseFloat( targetStr );
                         goal = new Goal( mExerciseName, 0, target );
-                        Toast.makeText( getActivity(), goal.toString(), Toast.LENGTH_SHORT ).show();
+                        saveGoal( goal );
                     } else {
                         Toast.makeText( getActivity(), "Enter a target", Toast.LENGTH_SHORT ).show();
                     }
@@ -185,7 +184,7 @@ public class ExerciseListItemFragment extends Fragment {
         retrieveStrengthStandards( mExerciseName );
     }
 
-    private void checkDoesUserHaveAnyGoals( final Goal goal ) {
+    private void saveGoal( final Goal goal ) {
         if ( goal == null ) {
             Toast.makeText( getActivity(), "There was an error in processing the goal", Toast.LENGTH_SHORT ).show();
         } else {
@@ -235,34 +234,6 @@ public class ExerciseListItemFragment extends Fragment {
                 }
             } );
         }
-    }
-
-
-    private void saveGoal( Goal goal ) {
-        // Write a message to the database
-        // TODO: use the current user name
-        String tempUserName = "john_doe";
-        String path = "user_goals/" + tempUserName + "/" + "Shoulder Press";
-
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-
-        // Check if we have a set of goals for that particular user
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    Toast.makeText( getActivity(), "You have a goal for this exercise", Toast.LENGTH_SHORT ).show();
-
-                } else {
-                    Toast.makeText( getActivity(), "You have no goals", Toast.LENGTH_SHORT ).show();
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
     }
 
     /**
