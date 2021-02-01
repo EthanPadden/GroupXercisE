@@ -8,8 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -46,12 +49,18 @@ public class ExerciseListItemFragment extends Fragment {
     private Spinner mLevelSpinner;
     private String mSelectedLevel;
     private ArrayAdapter< CharSequence > mLevelSpinnerAdapter;
+    private Button mSetGoalBtn;
+    private RadioButton mGoalOptionsAutomaticRatioBtn;
+    private RadioButton mGoalOptionsManualRatioBtn;
 
     // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
 
     // DB root reference
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+
+    public enum GoalOption {AUTOMATIC, MANUAL}
+    private GoalOption mSelectedGoalOption;
 
 
     public ExerciseListItemFragment() {
@@ -92,12 +101,18 @@ public class ExerciseListItemFragment extends Fragment {
         mSetsText = view.findViewById( R.id.text_sets );
         mRepsText = view.findViewById( R.id.text_reps );
         mLevelSpinner = view.findViewById( R.id.spinner_level );
+        mSetGoalBtn = view.findViewById( R.id.btn_set_goal );
+        mGoalOptionsAutomaticRatioBtn = view.findViewById( R.id.radio_btn_goal_option_automatic );
+        mGoalOptionsManualRatioBtn = view.findViewById( R.id.radio_btn_goal_option_manual );
 
         // Set spinner adapter
         mLevelSpinner.setAdapter( mLevelSpinnerAdapter );
 
         // Set default level
         mSelectedLevel = getResources().getString( R.string.level_beginner );
+
+        mSelectedGoalOption = GoalOption.AUTOMATIC;
+        mGoalOptionsAutomaticRatioBtn.setChecked(true);
 
         // Set event listeners
         mLevelSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
@@ -113,6 +128,27 @@ public class ExerciseListItemFragment extends Fragment {
 
             public void onNothingSelected( AdapterView< ? > parent ) {
                 mSelectedLevel = null;
+            }
+        } );
+        mSetGoalBtn.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+//                Goal goal = new Goal( new Goal(  ) )
+//                int selectedId = mGoalOptionsRadioGroup.getCheckedRadioButtonId();
+                Toast.makeText(getActivity(), mSelectedGoalOption.toString(), Toast.LENGTH_SHORT).show();
+            }
+        } );
+        mGoalOptionsAutomaticRatioBtn.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                mSelectedGoalOption = GoalOption.AUTOMATIC;
+                mGoalOptionsAutomaticRatioBtn.setChecked(true);
+                mGoalOptionsManualRatioBtn.setChecked(false);
+            }
+        } );
+        mGoalOptionsManualRatioBtn.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                mSelectedGoalOption = GoalOption.MANUAL;
+                mGoalOptionsAutomaticRatioBtn.setChecked(false);
+                mGoalOptionsManualRatioBtn.setChecked(true);
             }
         } );
 

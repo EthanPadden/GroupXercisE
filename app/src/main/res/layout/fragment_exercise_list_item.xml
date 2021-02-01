@@ -47,6 +47,7 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/radio_btn_goal_option_automatic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -55,7 +56,6 @@
                 android:layout_height="wrap_content"
                 android:text="Based on your details:" />
         </LinearLayout>
-
 
     </TableRow>
 
@@ -99,6 +99,7 @@
             android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/radio_btn_goal_option_manual"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
