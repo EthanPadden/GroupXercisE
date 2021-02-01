@@ -187,15 +187,17 @@ public class ExerciseListItemFragment extends Fragment {
 
     private void checkDoesUserHaveAnyGoals( final Goal goal ) {
         if ( goal == null ) {
-            Toast.makeText( getActivity(), "There was an error", Toast.LENGTH_SHORT ).show();
+            Toast.makeText( getActivity(), "There was an error in processing the goal", Toast.LENGTH_SHORT ).show();
         } else {
-            // Write a message to the database
             // TODO: use the current user name
             String tempUserName = "john_doe";
+
+            // Path to the users goals
             String path = "user_goals/" + tempUserName;
 
+            // Get the DB reference
             HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-            DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+            final DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
 
             // Check if we have a set of goals for that particular user
             childRef.addListenerForSingleValueEvent( new ValueEventListener() {
@@ -205,7 +207,23 @@ public class ExerciseListItemFragment extends Fragment {
                         // This means there is a set of goals associated with the user
                         // (this could be an empty list)
                         Toast.makeText( getActivity(), "Goals found!", Toast.LENGTH_SHORT ).show();
-                        saveGoal( goal );
+
+                        // Get the DB object
+                        GoalDBObject goalDBObject = goal.getmGoalDBObject();
+
+                        DataSnapshot exerciseDataSnapshot = dataSnapshot.child( goal.getmExerciseName() );
+                        if(exerciseDataSnapshot.exists()) {
+                            // The operation is an update
+                            Toast.makeText( getActivity(), "Updating your goal...", Toast.LENGTH_SHORT ).show();
+
+                        } else  {
+                            // The operation is a create
+                            Toast.makeText( getActivity(), "Creating your goal...", Toast.LENGTH_SHORT ).show();
+                        }
+
+                        // If no child exists, this will create a new one
+                        // If one does, this will update it
+                        childRef.child( goal.getmExerciseName() ).setValue( goalDBObject );
                     } else {
                         // This is an error
                         Toast.makeText( getActivity(), "Error: you have no goals", Toast.LENGTH_SHORT ).show();
@@ -218,6 +236,7 @@ public class ExerciseListItemFragment extends Fragment {
             } );
         }
     }
+
 
     private void saveGoal( Goal goal ) {
         // Write a message to the database

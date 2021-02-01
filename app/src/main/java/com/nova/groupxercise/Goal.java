@@ -19,20 +19,6 @@ public class Goal {
         setmGoalDBObject( new GoalDBObject( mCurrentStatus, mTarget ) );
     }
 
-    @IgnoreExtraProperties
-    public class GoalDBObject {
-        private float current_status;
-        private float target;
-
-        public GoalDBObject() {
-        }
-
-        public GoalDBObject( float current_status, float target ) {
-            this.current_status = current_status;
-            this.target = target;
-        }
-    }
-
     @Override
     public String toString() {
         return String.format( "%s\nCurrent: %s\nTarget: %s", mExerciseName,mCurrentStatus,mTarget );
