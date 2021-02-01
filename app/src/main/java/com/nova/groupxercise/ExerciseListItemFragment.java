@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -52,6 +53,7 @@ public class ExerciseListItemFragment extends Fragment {
     private Button mSetGoalBtn;
     private RadioButton mGoalOptionsAutomaticRatioBtn;
     private RadioButton mGoalOptionsManualRatioBtn;
+    private EditText mManualGoalET;
 
     // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
@@ -60,6 +62,7 @@ public class ExerciseListItemFragment extends Fragment {
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
     public enum GoalOption {AUTOMATIC, MANUAL}
+
     private GoalOption mSelectedGoalOption;
 
 
@@ -104,6 +107,7 @@ public class ExerciseListItemFragment extends Fragment {
         mSetGoalBtn = view.findViewById( R.id.btn_set_goal );
         mGoalOptionsAutomaticRatioBtn = view.findViewById( R.id.radio_btn_goal_option_automatic );
         mGoalOptionsManualRatioBtn = view.findViewById( R.id.radio_btn_goal_option_manual );
+        mManualGoalET = view.findViewById( R.id.et_exercise_weight );
 
         // Set spinner adapter
         mLevelSpinner.setAdapter( mLevelSpinnerAdapter );
@@ -112,7 +116,7 @@ public class ExerciseListItemFragment extends Fragment {
         mSelectedLevel = getResources().getString( R.string.level_beginner );
 
         mSelectedGoalOption = GoalOption.AUTOMATIC;
-        mGoalOptionsAutomaticRatioBtn.setChecked(true);
+        mGoalOptionsAutomaticRatioBtn.setChecked( true );
 
         // Set event listeners
         mLevelSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
@@ -132,23 +136,40 @@ public class ExerciseListItemFragment extends Fragment {
         } );
         mSetGoalBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
-//                Goal goal = new Goal( new Goal(  ) )
+                Goal goal;
+                if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
+                    float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
+                    goal = new Goal( mExerciseName, 0, target );
+                    Toast.makeText( getActivity(), goal.toString(), Toast.LENGTH_SHORT ).show();
+                } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
+                    String targetStr = ( mManualGoalET.getText().toString() );
+
+                    if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
+                        float target = Float.parseFloat( targetStr );
+                        goal = new Goal( mExerciseName, 0, target );
+                        Toast.makeText( getActivity(), goal.toString(), Toast.LENGTH_SHORT ).show();
+                    } else {
+                        Toast.makeText( getActivity(), "Enter a target", Toast.LENGTH_SHORT ).show();
+                    }
+                } else {
+                    Toast.makeText( getActivity(), "There was an error", Toast.LENGTH_SHORT ).show();
+                }
 //                int selectedId = mGoalOptionsRadioGroup.getCheckedRadioButtonId();
-                Toast.makeText(getActivity(), mSelectedGoalOption.toString(), Toast.LENGTH_SHORT).show();
+
             }
         } );
         mGoalOptionsAutomaticRatioBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 mSelectedGoalOption = GoalOption.AUTOMATIC;
-                mGoalOptionsAutomaticRatioBtn.setChecked(true);
-                mGoalOptionsManualRatioBtn.setChecked(false);
+                mGoalOptionsAutomaticRatioBtn.setChecked( true );
+                mGoalOptionsManualRatioBtn.setChecked( false );
             }
         } );
         mGoalOptionsManualRatioBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 mSelectedGoalOption = GoalOption.MANUAL;
-                mGoalOptionsAutomaticRatioBtn.setChecked(false);
-                mGoalOptionsManualRatioBtn.setChecked(true);
+                mGoalOptionsAutomaticRatioBtn.setChecked( false );
+                mGoalOptionsManualRatioBtn.setChecked( true );
             }
         } );
 

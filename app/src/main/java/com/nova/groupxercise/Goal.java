@@ -15,6 +15,11 @@ public class Goal {
         setmTarget( mTarget );
     }
 
+    @Override
+    public String toString() {
+        return String.format( "%s\nCurrent: %s\nTarget: %s", mExerciseName,mCurrentStatus,mTarget );
+    }
+
     public void setmExerciseName( String mExerciseName ) {
         this.mExerciseName = mExerciseName;
     }
