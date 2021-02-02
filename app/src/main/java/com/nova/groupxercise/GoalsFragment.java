@@ -48,6 +48,9 @@ public class GoalsFragment extends Fragment {
         retrieveGoals();
     }
 
+    /**
+     * Gets the list of goals from the DB and makes the UI list visible when retrieved
+     */
     public void retrieveGoals() {
         // TODO: use the current user name
         String tempUserName = "john_doe";
@@ -55,10 +58,11 @@ public class GoalsFragment extends Fragment {
         // Path to the users goals
         String path = "user_goals/" + tempUserName;
 
+        // Get the DBr reference
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
         DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
 
-        // Create an empty list for the exercise names
+        // Create an empty list for the goals
         mGoalsList = new ArrayList<>();
 
         // Set the list as the list for the items adapter
@@ -68,8 +72,10 @@ public class GoalsFragment extends Fragment {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 for ( DataSnapshot exerciseDataSnapshot : dataSnapshot.getChildren() ) {
+                    // Get the exercise name
                     String exerciseName = exerciseDataSnapshot.getKey();
 
+                    // Get the current status as a float value
                     DataSnapshot currentStatusDataSnapshot = exerciseDataSnapshot.child( "current_status" );
                     float currentStatus = 0.0f;
                     if ( currentStatusDataSnapshot.exists() ) {
@@ -77,6 +83,7 @@ public class GoalsFragment extends Fragment {
                         currentStatus = currentStatusLong.floatValue();
                     }
 
+                    // Get the target as a float value
                     DataSnapshot targetStatusDataSnapshot = exerciseDataSnapshot.child( "target" );
                     float target = 0.0f;
                     if ( targetStatusDataSnapshot.exists() ) {
@@ -87,6 +94,8 @@ public class GoalsFragment extends Fragment {
                     // Add the goal to the list
                     mGoalsList.add( new Goal( exerciseName,currentStatus,target) );
                 }
+
+                // Update UI
                 mLoadingText.setVisibility( View.INVISIBLE );
                 mListView.setAdapter( mItemsAdapter );
             }

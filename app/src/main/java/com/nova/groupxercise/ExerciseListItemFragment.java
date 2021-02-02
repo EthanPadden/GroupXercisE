@@ -61,10 +61,9 @@ public class ExerciseListItemFragment extends Fragment {
     // DB root reference
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
+    // Goal option selection
     public enum GoalOption {AUTOMATIC, MANUAL}
-
     private GoalOption mSelectedGoalOption;
-
 
     public ExerciseListItemFragment() {
         // Required empty public constructor
@@ -112,9 +111,8 @@ public class ExerciseListItemFragment extends Fragment {
         // Set spinner adapter
         mLevelSpinner.setAdapter( mLevelSpinnerAdapter );
 
-        // Set default level
+        // Set default options
         mSelectedLevel = getResources().getString( R.string.level_beginner );
-
         mSelectedGoalOption = GoalOption.AUTOMATIC;
         mGoalOptionsAutomaticRatioBtn.setChecked( true );
 
@@ -136,37 +134,41 @@ public class ExerciseListItemFragment extends Fragment {
         } );
         mSetGoalBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
-                Goal goal;
                 if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
+                    // Automatic goal calculation option: use suggested goal
                     float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
-                    goal = new Goal( mExerciseName, 0, target );
-                    saveGoal( goal );
+                    saveGoal( new Goal( mExerciseName, 0, target ) );
                 } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
+                    // Manual goal calculation option: use user-set goal
                     String targetStr = ( mManualGoalET.getText().toString() );
 
                     if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
                         float target = Float.parseFloat( targetStr );
-                        goal = new Goal( mExerciseName, 0, target );
-                        saveGoal( goal );
+                        saveGoal( new Goal( mExerciseName, 0, target ) );
                     } else {
                         Toast.makeText( getActivity(), R.string.error_no_target_entered, Toast.LENGTH_SHORT ).show();
                     }
                 } else {
                     Toast.makeText( getActivity(), R.string.error_generic, Toast.LENGTH_SHORT ).show();
                 }
-
             }
         } );
         mGoalOptionsAutomaticRatioBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
+                // Select automatic option
                 mSelectedGoalOption = GoalOption.AUTOMATIC;
+
+                // Update UI
                 mGoalOptionsAutomaticRatioBtn.setChecked( true );
                 mGoalOptionsManualRatioBtn.setChecked( false );
             }
         } );
         mGoalOptionsManualRatioBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
+                // Select manual option
                 mSelectedGoalOption = GoalOption.MANUAL;
+
+                // Update UI
                 mGoalOptionsAutomaticRatioBtn.setChecked( false );
                 mGoalOptionsManualRatioBtn.setChecked( true );
             }
@@ -183,6 +185,13 @@ public class ExerciseListItemFragment extends Fragment {
         retrieveStrengthStandards( mExerciseName );
     }
 
+    /**
+     * Checks if there is a JSON subtree for the user's goals in the DB
+     * If so:
+     *      If a goal for that exercise already exists, update it
+     *      If not, create one for that exercise
+     * @param goal the goal object to save to the DB
+     */
     private void saveGoal( final Goal goal ) {
         if ( goal == null ) {
             Toast.makeText( getActivity(), R.string.error_goal_setting, Toast.LENGTH_SHORT ).show();
@@ -205,16 +214,16 @@ public class ExerciseListItemFragment extends Fragment {
                         // This means there is a set of goals associated with the user
                         // (this could be an empty list)
 
-                        // Get the DB object
+                        // Get the DB object for the goal
                         GoalDBObject goalDBObject = goal.getmGoalDBObject();
 
+                        // Check if a goal already exists for the exercise
                         DataSnapshot exerciseDataSnapshot = dataSnapshot.child( goal.getmExerciseName() );
                         if(exerciseDataSnapshot.exists()) {
-                            // The operation is an update
+                            // If so, the operation is an update
                             Toast.makeText( getActivity(), R.string.info_updating_goal, Toast.LENGTH_SHORT ).show();
-
                         } else  {
-                            // The operation is a create
+                            // If not, the operation is a create
                             Toast.makeText( getActivity(), R.string.info_creating_goal, Toast.LENGTH_SHORT ).show();
                         }
 
