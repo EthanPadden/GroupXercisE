@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +22,7 @@ public class ProfileActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private DrawerLayout mDrawerContainer;
     private NavigationView mDrawer;
+    private Button mEditBtn;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -38,6 +41,17 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Initialise components
         mToolbar = findViewById( R.id.toolbar );
+        mEditBtn = findViewById( R.id.btn_edit );
+
+        // Set event listeners
+        mEditBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View view ) {
+                // Go to edit details screen
+                Intent intent = new Intent( ProfileActivity.this, EditUserDetailsActivity.class );
+                startActivity( intent );
+            }
+        } );
 
         // Sets the Toolbar to act as the ActionBar for this Activity window.
         // Make sure the toolbar exists in the activity and is not null

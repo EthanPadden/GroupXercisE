@@ -269,5 +269,9 @@ public class EditUserDetailsActivity extends AppCompatActivity {
             Toast.makeText( EditUserDetailsActivity.this, R.string.error_invalid_user_details,
                     Toast.LENGTH_SHORT ).show();
         }
+
+        // Go to profile screen
+        Intent intent = new Intent( EditUserDetailsActivity.this, ProfileActivity.class );
+        startActivity( intent );
     }
 }
