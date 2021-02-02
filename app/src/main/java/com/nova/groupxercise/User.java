@@ -1,6 +1,7 @@
 package com.nova.groupxercise;
 
 import org.joda.time.DateTime;
+import org.joda.time.Instant;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -14,6 +15,7 @@ public class User {
     public enum Sex {MALE, FEMALE}
 
     private Sex sex;
+    private UserDetailsDBObject mUserDetailsDBObject;
 
     // Singleton class
     private static final User user = new User();
@@ -68,6 +70,21 @@ public class User {
         return validDetails;
     }
 
+    public void setUserDetails(String name, DateTime dob, float weight, Sex sex){
+        Instant dobInstant = dob.toInstant();
+        long dobTimeStamp = dobInstant.getMillis();
+        setName( name );
+        setDob( dob );
+        setWeight( weight );
+        setSex( sex );
+        mUserDetailsDBObject = new UserDetailsDBObject(
+                name,
+                dobTimeStamp,
+                weight,
+                sex.toString()
+        );
+    }
+
     // Accessor/Mutator methods
     public String getName() {
         return name;
@@ -99,5 +116,13 @@ public class User {
 
     public void setSex( Sex sex ) {
         this.sex = sex;
+    }
+
+    public UserDetailsDBObject getmUserDetailsDBObject() {
+        return mUserDetailsDBObject;
+    }
+
+    public void setmUserDetailsDBObject( UserDetailsDBObject mUserDetailsDBObject ) {
+        this.mUserDetailsDBObject = mUserDetailsDBObject;
     }
 }
