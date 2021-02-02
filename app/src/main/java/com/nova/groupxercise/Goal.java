@@ -21,7 +21,7 @@ public class Goal {
 
     @Override
     public String toString() {
-        return String.format( "%s\nCurrent: %s\nTarget: %s", mExerciseName,mCurrentStatus,mTarget );
+        return String.format( "%s\nCurrent: %s\nTarget: %s", mExerciseName, mCurrentStatus, mTarget );
     }
 
     public void setmExerciseName( String mExerciseName ) {

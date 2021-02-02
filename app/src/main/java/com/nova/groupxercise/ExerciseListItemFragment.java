@@ -62,7 +62,10 @@ public class ExerciseListItemFragment extends Fragment {
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
     // Goal option selection
-    public enum GoalOption {AUTOMATIC, MANUAL}
+    public enum GoalOption {
+        AUTOMATIC, MANUAL
+    }
+
     private GoalOption mSelectedGoalOption;
 
     public ExerciseListItemFragment() {
@@ -188,8 +191,9 @@ public class ExerciseListItemFragment extends Fragment {
     /**
      * Checks if there is a JSON subtree for the user's goals in the DB
      * If so:
-     *      If a goal for that exercise already exists, update it
-     *      If not, create one for that exercise
+     * If a goal for that exercise already exists, update it
+     * If not, create one for that exercise
+     *
      * @param goal the goal object to save to the DB
      */
     private void saveGoal( final Goal goal ) {
@@ -219,10 +223,10 @@ public class ExerciseListItemFragment extends Fragment {
 
                         // Check if a goal already exists for the exercise
                         DataSnapshot exerciseDataSnapshot = dataSnapshot.child( goal.getmExerciseName() );
-                        if(exerciseDataSnapshot.exists()) {
+                        if ( exerciseDataSnapshot.exists() ) {
                             // If so, the operation is an update
                             Toast.makeText( getActivity(), R.string.info_updating_goal, Toast.LENGTH_SHORT ).show();
-                        } else  {
+                        } else {
                             // If not, the operation is a create
                             Toast.makeText( getActivity(), R.string.info_creating_goal, Toast.LENGTH_SHORT ).show();
                         }

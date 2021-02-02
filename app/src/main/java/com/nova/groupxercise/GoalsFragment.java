@@ -92,7 +92,7 @@ public class GoalsFragment extends Fragment {
                     }
 
                     // Add the goal to the list
-                    mGoalsList.add( new Goal( exerciseName,currentStatus,target) );
+                    mGoalsList.add( new Goal( exerciseName, currentStatus, target ) );
                 }
 
                 // Update UI
