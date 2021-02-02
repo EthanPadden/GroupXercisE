@@ -44,7 +44,6 @@ public class GoalsFragment extends Fragment {
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mGoalsList );
 
         mLoadingText.setVisibility( View.INVISIBLE );
-        mListView.setAdapter( mItemsAdapter );
         retrieveGoals();
     }
 
