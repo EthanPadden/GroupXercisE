@@ -8,8 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -46,6 +50,10 @@ public class ExerciseListItemFragment extends Fragment {
     private Spinner mLevelSpinner;
     private String mSelectedLevel;
     private ArrayAdapter< CharSequence > mLevelSpinnerAdapter;
+    private Button mSetGoalBtn;
+    private RadioButton mGoalOptionsAutomaticRatioBtn;
+    private RadioButton mGoalOptionsManualRatioBtn;
+    private EditText mManualGoalET;
 
     // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
@@ -53,6 +61,12 @@ public class ExerciseListItemFragment extends Fragment {
     // DB root reference
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
+    // Goal option selection
+    public enum GoalOption {
+        AUTOMATIC, MANUAL
+    }
+
+    private GoalOption mSelectedGoalOption;
 
     public ExerciseListItemFragment() {
         // Required empty public constructor
@@ -92,12 +106,18 @@ public class ExerciseListItemFragment extends Fragment {
         mSetsText = view.findViewById( R.id.text_sets );
         mRepsText = view.findViewById( R.id.text_reps );
         mLevelSpinner = view.findViewById( R.id.spinner_level );
+        mSetGoalBtn = view.findViewById( R.id.btn_set_goal );
+        mGoalOptionsAutomaticRatioBtn = view.findViewById( R.id.radio_btn_goal_option_automatic );
+        mGoalOptionsManualRatioBtn = view.findViewById( R.id.radio_btn_goal_option_manual );
+        mManualGoalET = view.findViewById( R.id.et_exercise_weight );
 
         // Set spinner adapter
         mLevelSpinner.setAdapter( mLevelSpinnerAdapter );
 
-        // Set default level
+        // Set default options
         mSelectedLevel = getResources().getString( R.string.level_beginner );
+        mSelectedGoalOption = GoalOption.AUTOMATIC;
+        mGoalOptionsAutomaticRatioBtn.setChecked( true );
 
         // Set event listeners
         mLevelSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
@@ -115,6 +135,47 @@ public class ExerciseListItemFragment extends Fragment {
                 mSelectedLevel = null;
             }
         } );
+        mSetGoalBtn.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
+                    // Automatic goal calculation option: use suggested goal
+                    float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
+                    saveGoal( new Goal( mExerciseName, 0, target ) );
+                } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
+                    // Manual goal calculation option: use user-set goal
+                    String targetStr = ( mManualGoalET.getText().toString() );
+
+                    if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
+                        float target = Float.parseFloat( targetStr );
+                        saveGoal( new Goal( mExerciseName, 0, target ) );
+                    } else {
+                        Toast.makeText( getActivity(), R.string.error_no_target_entered, Toast.LENGTH_SHORT ).show();
+                    }
+                } else {
+                    Toast.makeText( getActivity(), R.string.error_generic, Toast.LENGTH_SHORT ).show();
+                }
+            }
+        } );
+        mGoalOptionsAutomaticRatioBtn.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                // Select automatic option
+                mSelectedGoalOption = GoalOption.AUTOMATIC;
+
+                // Update UI
+                mGoalOptionsAutomaticRatioBtn.setChecked( true );
+                mGoalOptionsManualRatioBtn.setChecked( false );
+            }
+        } );
+        mGoalOptionsManualRatioBtn.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                // Select manual option
+                mSelectedGoalOption = GoalOption.MANUAL;
+
+                // Update UI
+                mGoalOptionsAutomaticRatioBtn.setChecked( false );
+                mGoalOptionsManualRatioBtn.setChecked( true );
+            }
+        } );
 
         // Set the fragment title
         mSetGoalTitleText.setText( R.string.set_goal_title + mExerciseName );
@@ -125,6 +186,65 @@ public class ExerciseListItemFragment extends Fragment {
 
         // Get the strength standards from the DB based on the user details
         retrieveStrengthStandards( mExerciseName );
+    }
+
+    /**
+     * Checks if there is a JSON subtree for the user's goals in the DB
+     * If so:
+     * If a goal for that exercise already exists, update it
+     * If not, create one for that exercise
+     *
+     * @param goal the goal object to save to the DB
+     */
+    private void saveGoal( final Goal goal ) {
+        if ( goal == null ) {
+            Toast.makeText( getActivity(), R.string.error_goal_setting, Toast.LENGTH_SHORT ).show();
+        } else {
+            // TODO: use the current user name
+            String tempUserName = "john_doe";
+
+            // Path to the users goals
+            String path = "user_goals/" + tempUserName;
+
+            // Get the DB reference
+            HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+            final DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+
+            // Check if we have a set of goals for that particular user
+            childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange( DataSnapshot dataSnapshot ) {
+                    if ( dataSnapshot.exists() ) {
+                        // This means there is a set of goals associated with the user
+                        // (this could be an empty list)
+
+                        // Get the DB object for the goal
+                        GoalDBObject goalDBObject = goal.getmGoalDBObject();
+
+                        // Check if a goal already exists for the exercise
+                        DataSnapshot exerciseDataSnapshot = dataSnapshot.child( goal.getmExerciseName() );
+                        if ( exerciseDataSnapshot.exists() ) {
+                            // If so, the operation is an update
+                            Toast.makeText( getActivity(), R.string.info_updating_goal, Toast.LENGTH_SHORT ).show();
+                        } else {
+                            // If not, the operation is a create
+                            Toast.makeText( getActivity(), R.string.info_creating_goal, Toast.LENGTH_SHORT ).show();
+                        }
+
+                        // If no child exists, this will create a new one
+                        // If one does, this will update it
+                        childRef.child( goal.getmExerciseName() ).setValue( goalDBObject );
+                    } else {
+                        // This is an error
+                        Toast.makeText( getActivity(), R.string.error_no_goalset_found, Toast.LENGTH_SHORT ).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled( DatabaseError databaseError ) {
+                }
+            } );
+        }
     }
 
     /**
