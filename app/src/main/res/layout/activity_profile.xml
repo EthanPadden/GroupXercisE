@@ -28,7 +28,7 @@
             android:layout_below="@+id/toolbar"
             android:stretchColumns="1">
 
-            <TableRow>
+            <TableRow android:layout_margin="5dp">
 
                 <TextView
                     android:layout_weight="1"
@@ -37,7 +37,7 @@
                     android:text="About you" />
             </TableRow>
 
-            <TableRow>
+            <TableRow android:layout_margin="5dp">
 
                 <TextView
                     android:gravity="center"
@@ -48,7 +48,7 @@
                     android:gravity="center"/>
             </TableRow>
 
-            <TableRow>
+            <TableRow android:layout_margin="5dp">
 
                 <TextView
                     android:gravity="center"
@@ -59,7 +59,7 @@
 
             </TableRow>
 
-            <TableRow>
+            <TableRow android:layout_margin="5dp">
 
                 <TextView
                     android:gravity="center"
@@ -75,7 +75,7 @@
 
             </TableRow>
 
-            <TableRow>
+            <TableRow android:layout_margin="5dp">
 
                 <TextView
                     android:gravity="center"
@@ -86,7 +86,7 @@
                     android:gravity="center"/>
             </TableRow>
 
-            <TableRow>
+            <TableRow android:layout_margin="5dp">
 
                 <Button
                     android:id="@+id/btn_edit"
