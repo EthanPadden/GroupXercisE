@@ -32,6 +32,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.joda.time.DateTime;
+import org.joda.time.Instant;
 
 import java.util.Calendar;
 
@@ -48,7 +49,6 @@ public class EditUserDetailsActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-
 
 
     @Override
@@ -99,7 +99,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         /** Set event listeners */
         mUpdateBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
-                setUserDetails();
+                validateEnteredDetails();
             }
         } );
         mSexSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
@@ -243,7 +243,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
     }
 
     // TODO: replace setLocalUserDetails with this
-    private void setUserDetails () {
+    private void validateEnteredDetails() {
         boolean detailsCanBeSet = true;
 
         // Get name
@@ -259,19 +259,18 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         if ( weightStr == null || weightStr.compareTo( "" ) == 0 ) detailsCanBeSet = false;
         else {
             weight = Float.parseFloat( mWeightEt.getText().toString() );
+            if ( mSelectedSex == User.Sex.MALE && ( weight < 50 || weight > 140 ) )
+                detailsCanBeSet = false;
+                // If female, weight should be in range 40-120
+            else if ( mSelectedSex == User.Sex.FEMALE && ( weight < 40 || weight > 120 ) )
+                detailsCanBeSet = false;
         }
 
         if ( detailsCanBeSet ) {
-            User localUser = User.getInstance();
-            localUser.setUserDetails( name, dob, weight, mSelectedSex );
-
-            /// TODO: send to DB
-            // Temporary:
-            Toast.makeText( EditUserDetailsActivity.this, "USER DETAILS SET:\n" + localUser,
-                    Toast.LENGTH_SHORT ).show();
-
-            saveUserDetailsToDB();
-
+            // To avoid a difference between the locally stored details
+            // and the details stored in the DB, save to the DB first and update
+            // the locally stored details if successful
+            saveUserDetailsToDB( name, dob, weight );
         } else {
             Toast.makeText( EditUserDetailsActivity.this, R.string.error_invalid_user_details,
                     Toast.LENGTH_SHORT ).show();
@@ -283,87 +282,61 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         startActivity( intent );
     }
 
-    private void saveUserDetailsToDB() {
-        final User localUser = User.getInstance();
+    private void saveUserDetailsToDB( final String name, final DateTime dob, final float weight ) {
+        // Path to the users details
+        final String userID = mAuth.getCurrentUser().getUid();
+        String path = "user_details";
 
-        if ( localUser.getmUserDetailsDBObject() == null ) {
-            Toast.makeText( this, "Could not set details", Toast.LENGTH_SHORT ).show();
-        } else {
-            // Path to the users details
-            final String userID = mAuth.getCurrentUser().getUid();
-            String path = "user_details";
+        // Get the DB reference
+        final DatabaseReference childRef = mRootRef.child( path );
 
-            // Get the DB reference
-            final DatabaseReference childRef = mRootRef.child( path );
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-            childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                @Override
-                public void onDataChange( DataSnapshot dataSnapshot ) {
-                    if ( dataSnapshot.exists() ) {
-                        // Get the DB object for the goal
-                        UserDetailsDBObject userDetailsDBObject = localUser.getmUserDetailsDBObject();
+                    // Create user DB object
+                    Instant dobInstant = dob.toInstant();
+                    long dobTimeStamp = dobInstant.getMillis();
+                    UserDetailsDBObject userDetailsDBObject = new UserDetailsDBObject( name, dobTimeStamp, weight, mSelectedSex.toString() );
 
-                        // Check if details already exists for the exercise
-                        DataSnapshot userDetailsSnapshot = dataSnapshot.child( userID );
-                        if ( userDetailsSnapshot.exists() ) {
-                            // If so, the operation is an update
-                            Toast.makeText( EditUserDetailsActivity.this, "Updating your details...", Toast.LENGTH_SHORT ).show();
-                        } else {
-                            // If not, the operation is a create
-                            Toast.makeText( EditUserDetailsActivity.this, "Setting your details...", Toast.LENGTH_SHORT ).show();
-                        }
+                    // Check if details already exists for the user
+                    DataSnapshot userDetailsSnapshot = dataSnapshot.child( userID );
+                    if ( userDetailsSnapshot.exists() ) {
+                        // If so, the operation is an update
+                        Toast.makeText( EditUserDetailsActivity.this, "Updating your details...", Toast.LENGTH_SHORT ).show();
 
-                        // If no child exists, this will create a new one
-                        // If one does, this will update it
-                        childRef.child( userID ).setValue( userDetailsDBObject );
                     } else {
-                        // This is an error
-                        Toast.makeText( EditUserDetailsActivity.this, "Could not save details", Toast.LENGTH_SHORT ).show();
+                        // If not, the operation is a create
+                        Toast.makeText( EditUserDetailsActivity.this, "Setting your details...", Toast.LENGTH_SHORT ).show();
                     }
-                }
 
-                @Override
-                public void onCancelled( DatabaseError databaseError ) {
+                    // If no child exists, this will create a new one
+                    // If one does, this will update it
+                    childRef.child( userID ).setValue( userDetailsDBObject );
+
+                    setLocalUserDetails(name, dob, weight );
+                } else {
+                    // This is an error
+                    Toast.makeText( EditUserDetailsActivity.this, "Could not save details", Toast.LENGTH_SHORT ).show();
                 }
-            } );
-        }
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+
     }
 
-    /**
-     * Checks if the user has entered valid details
-     * If so, updates the singleton instance of the user (locally stored)
-     */
-    private void setLocalUserDetails() {
-        boolean detailsCanBeSet = true;
 
-        // Get name
-        String name = mNameEt.getText().toString();
-        if ( name == null || name.compareTo( "" ) == 0 ) detailsCanBeSet = false;
-
-        // Get DOB
-        DateTime dob = new DateTime( mSelectedDob.getTime() );
-
-        // Get weight
-        String weightStr = mWeightEt.getText().toString();
-        float weight = 50;
-        if ( weightStr == null || weightStr.compareTo( "" ) == 0 ) detailsCanBeSet = false;
-        else {
-            weight = Float.parseFloat( mWeightEt.getText().toString() );
-        }
-
-        if ( detailsCanBeSet ) {
-            User localUser = User.getInstance();
-            localUser.setName( name );
-            localUser.setDob( dob );
-            localUser.setWeight( weight );
-            localUser.setSex( mSelectedSex );
-            // Temporary:
-            Toast.makeText( EditUserDetailsActivity.this, "USER DETAILS SET:\n" + localUser,
-                    Toast.LENGTH_SHORT ).show();
-        } else {
-            Toast.makeText( EditUserDetailsActivity.this, R.string.error_invalid_user_details,
-                    Toast.LENGTH_SHORT ).show();
-        }
+    private void setLocalUserDetails( String name, DateTime dob, float weight ) {
+        User localUser = User.getInstance();
+        localUser.setName( name );
+        localUser.setDob( dob );
+        localUser.setWeight( weight );
+        localUser.setSex( mSelectedSex );
 
         // Go to profile screen
         Intent intent = new Intent( EditUserDetailsActivity.this, ProfileActivity.class );

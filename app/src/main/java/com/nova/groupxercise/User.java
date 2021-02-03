@@ -19,11 +19,9 @@ public class User {
     private DateTime dob  = null;
     private float weight = -1f;
 
-
     public enum Sex {MALE, FEMALE}
 
     private Sex sex;
-    private UserDetailsDBObject mUserDetailsDBObject;
 
     private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     private boolean userDetailsAreSet = false;
@@ -88,12 +86,6 @@ public class User {
         setDob( dob );
         setWeight( weight );
         setSex( sex );
-        mUserDetailsDBObject = new UserDetailsDBObject(
-                name,
-                dobTimeStamp,
-                weight,
-                sex.toString()
-        );
     }
 
     public void retreiveUserDetails() {
@@ -150,12 +142,6 @@ public class User {
                             setDob( dbDob );
                             setWeight( dbWeight );
                             setSex( dbSex );
-                            mUserDetailsDBObject = new UserDetailsDBObject(
-                                    dbName,
-                                    dbDobTimestamp,
-                                    dbWeight,
-                                    dbSex.toString()
-                            );
                         }
 
                     }
@@ -205,27 +191,7 @@ public class User {
         this.sex = sex;
     }
 
-    public UserDetailsDBObject getmUserDetailsDBObject() {
-        return mUserDetailsDBObject;
-    }
-
-    public void setmUserDetailsDBObject( UserDetailsDBObject mUserDetailsDBObject ) {
-        this.mUserDetailsDBObject = mUserDetailsDBObject;
-    }
-
-    public DatabaseReference getmRootRef() {
-        return mRootRef;
-    }
-
-    public void setmRootRef( DatabaseReference mRootRef ) {
-        this.mRootRef = mRootRef;
-    }
-
     public boolean isUserDetailsAreSet() {
         return userDetailsAreSet;
-    }
-
-    public void setUserDetailsAreSet( boolean userDetailsAreSet ) {
-        this.userDetailsAreSet = userDetailsAreSet;
     }
 }
