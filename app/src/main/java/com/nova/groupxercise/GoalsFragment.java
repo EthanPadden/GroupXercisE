@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,11 +52,9 @@ public class GoalsFragment extends Fragment {
      * Gets the list of goals from the DB and makes the UI list visible when retrieved
      */
     public void retrieveGoals() {
-        // TODO: use the current user name
-        String tempUserName = "john_doe";
-
         // Path to the users goals
-        String path = "user_goals/" + tempUserName;
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String path = "user_goals/" + userId;
 
         // Get the DBr reference
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
