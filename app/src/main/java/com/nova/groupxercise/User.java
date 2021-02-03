@@ -10,16 +10,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
-import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 public class User {
     // Instance variables
-    private String name;
-    private DateTime dob;
-    private float weight;
-    private FirebaseAuth mAuth;
+    private String name = null;
+    private DateTime dob  = null;
+    private float weight = -1f;
 
 
     public enum Sex {MALE, FEMALE}
@@ -35,8 +33,7 @@ public class User {
 
     // Constructors
     public User() {
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
+
     }
 
     public static User getInstance() {
@@ -64,24 +61,24 @@ public class User {
      * @return true if details are valid
      */
     public boolean detailsAreValid() {
-        boolean validDetails = true;
-
         // Validate name
-        if ( name == null || name.compareTo( "" ) == 0 ) validDetails = false;
+        if ( name == null || name.compareTo( "" ) == 0 ) return false;
 
         // Validate DOB
-        Period period = new Period( dob, DateTime.now() );
-        int age = period.getYears();
-        if ( age < 14 || age > 89 ) validDetails = false;
+        // TODO: Age not used yet
+//        Period period = new Period( dob, DateTime.now() );
+//        int age = period.getYears();
+//        if ( age < 14 || age > 89 ) validDetails = false;
 
+        if(sex == null) return false;
         // If male, weight should be in range 50-140
         if ( sex == Sex.MALE && ( weight < 50 || weight > 140 ) )
-            validDetails = false;
+            return false;
             // If female, weight should be in range 40-120
         else if ( sex == Sex.FEMALE && ( weight < 40 || weight > 120 ) )
-            validDetails = false;
+            return false;
 
-        return validDetails;
+        return true;
     }
 
     public void setUserDetails(String name, DateTime dob, float weight, Sex sex){

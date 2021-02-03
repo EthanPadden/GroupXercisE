@@ -23,8 +23,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.joda.time.DateTime;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -263,40 +261,36 @@ public class ExerciseListItemFragment extends Fragment {
      */
     public void retrieveStrengthStandards( String exerciseName ) {
         // Get the current user
-        User user = User.getInstance();
+        User currentUser = User.getInstance();
 
-        // Set the loading messave
+        // Set the loading message
         mSuggestedGoalText.setText( R.string.loading );
 
         // Check if all user details are set correctly
-        User testUser = new User();
+        if ( currentUser.detailsAreValid() ) {
+            // Build the path and retrieve the strength standards
+            int weightClass = getWeightClass( currentUser.getWeight() );
+            String path = "strength_standards/" + exerciseName + "/" + currentUser.getSex().toString() + "/" + weightClass;
 
-        if ( !user.detailsAreValid() ) {
-            // TODO: replace with returning null with toast message
-            testUser.setName( "John Doe" );
-            testUser.setSex( User.Sex.MALE );
-            testUser.setWeight( 68 );
-            testUser.setDob( new DateTime( 1990, 9, 1, 0, 0 ) );
+            DatabaseReference childRef = mRootRef.child( path );
+            childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange( DataSnapshot dataSnapshot ) {
+                    // Store the standards in memory so that they do not have to be retrieved again
+                    mStrengthStandards = dataSnapshot;
+
+                    // Display the current suggested weight
+                    calculateSuggestedWeight();
+                }
+
+                @Override
+                public void onCancelled( DatabaseError databaseError ) {
+                }
+            } );
+        } else {
+            Toast.makeText(getActivity(), "Error: your details are not valid",  Toast.LENGTH_SHORT ).show();
+            mSuggestedGoalText.setText( "Invalid details" );
         }
-
-        // Build the path and retrieve the strength standards
-        int weightClass = getWeightClass( testUser.getWeight() );
-        String path = "strength_standards/" + exerciseName + "/" + testUser.getSex().toString() + "/" + weightClass;
-        DatabaseReference childRef = mRootRef.child( path );
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                // Store the standards in memory so that they do not have to be retrieved again
-                mStrengthStandards = dataSnapshot;
-
-                // Display the current suggested weight
-                calculateSuggestedWeight();
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
     }
 
     /**
