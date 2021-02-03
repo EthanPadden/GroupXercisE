@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +25,12 @@ public class ProfileActivity extends AppCompatActivity {
     private DrawerLayout mDrawerContainer;
     private NavigationView mDrawer;
     private Button mEditBtn;
+    private TextView mInfoText;
     private TextView mNameText;
+    private TextView mDobText;
+    private TextView mWeightText;
+    private TextView mSexText;
+    private TableLayout mUserDetailsTable;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -44,7 +50,12 @@ public class ProfileActivity extends AppCompatActivity {
         // Initialise components
         mToolbar = findViewById( R.id.toolbar );
         mEditBtn = findViewById( R.id.btn_edit );
+        mInfoText = findViewById( R.id.text_info );
         mNameText = findViewById( R.id.text_name );
+        mDobText = findViewById( R.id.text_dob );
+        mWeightText = findViewById( R.id.text_weight );
+        mSexText = findViewById( R.id.text_sex );
+        mUserDetailsTable = findViewById( R.id.table_user_details );
 
         // Set event listeners
         mEditBtn.setOnClickListener( new View.OnClickListener() {
@@ -65,13 +76,29 @@ public class ProfileActivity extends AppCompatActivity {
         mDrawer = findViewById( R.id.drawer );
         setupDrawerContent();
 
-        if(User.getInstance().isUserDetailsAreSet()) {
-            mNameText.setText( "User details found" );
-        } else {
-            mNameText.setText( "No user details found" );
-        }
+        displayUserDetails();
     }
 
+    private void displayUserDetails() {
+        User currentUser = User.getInstance();
+        if(currentUser.isUserDetailsAreSet()) {
+            mInfoText.setVisibility( View.INVISIBLE );
+            mNameText.setText( currentUser.getName() );
+
+            int dobDay =currentUser.getDob().getDayOfMonth();
+            int dobMonth =currentUser.getDob().getMonthOfYear();
+            int dobYear =currentUser.getDob().getYear();
+
+            mDobText.setText( String.format( "%d/%d/%d", dobDay, dobMonth + 1, dobYear ));
+
+            mWeightText.setText( Float.toString(  currentUser.getWeight()) );
+            mSexText.setText( currentUser.getSex().toString() );
+
+            mUserDetailsTable.setVisibility( View.VISIBLE );
+        } else {
+            mInfoText.setText( "No user details found" );
+        }
+    }
     /**
      * Sets the event listeners for the navigation drawer
      */

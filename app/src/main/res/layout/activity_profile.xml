@@ -22,11 +22,22 @@
 
         </androidx.appcompat.widget.Toolbar>
 
+        <TextView
+            android:id="@+id/text_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="20dp"
+            android:layout_below="@+id/toolbar"
+            android:text="Loading..." />
+
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/toolbar"
-            android:stretchColumns="1">
+            android:layout_below="@+id/text_info"
+            android:stretchColumns="1"
+            android:id="@+id/table_user_details"
+            android:visibility="invisible">
 
             <TableRow android:layout_margin="5dp">
 
@@ -55,6 +66,7 @@
                     android:text="DOB" />
 
                 <TextView
+                    android:id="@+id/text_dob"
                     android:gravity="center"/>
 
             </TableRow>
@@ -67,6 +79,7 @@
 
 
                 <TextView
+                    android:id="@+id/text_weight"
                     android:gravity="center"/>
 
                 <TextView
@@ -83,6 +96,7 @@
 
 
                 <TextView
+                    android:id="@+id/text_sex"
                     android:gravity="center"/>
             </TableRow>
 
