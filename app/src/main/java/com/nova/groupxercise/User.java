@@ -194,4 +194,8 @@ public class User {
     public boolean isUserDetailsAreSet() {
         return userDetailsAreSet;
     }
+
+    public void setUserDetailsAreSet( boolean userDetailsAreSet ) {
+        this.userDetailsAreSet = userDetailsAreSet;
+    }
 }

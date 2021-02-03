@@ -338,6 +338,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         localUser.setWeight( weight );
         localUser.setSex( mSelectedSex );
 
+        localUser.setUserDetailsAreSet( true );
         // Go to profile screen
         Intent intent = new Intent( EditUserDetailsActivity.this, ProfileActivity.class );
         startActivity( intent );

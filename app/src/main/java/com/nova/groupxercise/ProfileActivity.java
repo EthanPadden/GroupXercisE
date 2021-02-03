@@ -82,7 +82,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void displayUserDetails() {
         User currentUser = User.getInstance();
         if(currentUser.isUserDetailsAreSet()) {
-            mInfoText.setVisibility( View.INVISIBLE );
+            mInfoText.setVisibility( View.GONE );
             mNameText.setText( currentUser.getName() );
 
             int dobDay =currentUser.getDob().getDayOfMonth();
