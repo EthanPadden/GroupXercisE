@@ -288,8 +288,9 @@ public class EditUserDetailsActivity extends AppCompatActivity {
      * If no details are set for the user, it creates a set
      * If details exist, it updates them
      * If successful, it sets the local user details to be the values
-     * @param name name of the user as a string
-     * @param dob date of birth of user
+     *
+     * @param name   name of the user as a string
+     * @param dob    date of birth of user
      * @param weight weight of user
      */
     private void saveUserDetailsToDB( final String name, final DateTime dob, final float weight ) {
@@ -324,7 +325,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
                     // If one does, this will update it
                     childRef.child( userID ).setValue( userDetailsDBObject );
 
-                    setLocalUserDetails(name, dob, weight );
+                    setLocalUserDetails( name, dob, weight );
                 } else {
                     // This is an error
                     Toast.makeText( EditUserDetailsActivity.this, R.string.error_db_user_details, Toast.LENGTH_SHORT ).show();
@@ -340,8 +341,9 @@ public class EditUserDetailsActivity extends AppCompatActivity {
 
     /**
      * Sets the singleton instance of the user details locally
-     * @param name name of the user as a string
-     * @param dob date of birth of user
+     *
+     * @param name   name of the user as a string
+     * @param dob    date of birth of user
      * @param weight weight of user
      */
     private void setLocalUserDetails( String name, DateTime dob, float weight ) {

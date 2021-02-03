@@ -287,7 +287,7 @@ public class ExerciseListItemFragment extends Fragment {
                 }
             } );
         } else {
-            Toast.makeText(getActivity(), R.string.error_invalid_user_details,  Toast.LENGTH_SHORT ).show();
+            Toast.makeText( getActivity(), R.string.error_invalid_user_details, Toast.LENGTH_SHORT ).show();
             mSuggestedGoalText.setText( R.string.error_invalid_user_details );
         }
     }

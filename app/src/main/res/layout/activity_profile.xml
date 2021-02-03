@@ -56,7 +56,7 @@
 
                 <TextView
                     android:id="@+id/text_name"
-                    android:gravity="center"/>
+                    android:gravity="center" />
             </TableRow>
 
             <TableRow android:layout_margin="5dp">
@@ -67,7 +67,7 @@
 
                 <TextView
                     android:id="@+id/text_dob"
-                    android:gravity="center"/>
+                    android:gravity="center" />
 
             </TableRow>
 
@@ -80,7 +80,7 @@
 
                 <TextView
                     android:id="@+id/text_weight"
-                    android:gravity="center"/>
+                    android:gravity="center" />
 
                 <TextView
                     android:gravity="center"
@@ -97,10 +97,11 @@
 
                 <TextView
                     android:id="@+id/text_sex"
-                    android:gravity="center"/>
+                    android:gravity="center" />
             </TableRow>
 
         </TableLayout>
+
         <Button
             android:id="@+id/btn_edit"
             android:layout_below="@+id/table_user_details"

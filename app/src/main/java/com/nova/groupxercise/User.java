@@ -15,7 +15,7 @@ import org.joda.time.format.DateTimeFormatter;
 public class User {
     // Instance variables
     private String name = null;
-    private DateTime dob  = null;
+    private DateTime dob = null;
     private float weight = -1f;
 
     public enum Sex {MALE, FEMALE}
@@ -67,15 +67,13 @@ public class User {
 //        int age = period.getYears();
 //        if ( age < 14 || age > 89 ) validDetails = false;
 
-        if(sex == null) return false;
+        if ( sex == null ) return false;
         // If male, weight should be in range 50-140
         if ( sex == Sex.MALE && ( weight < 50 || weight > 140 ) )
             return false;
             // If female, weight should be in range 40-120
-        else if ( sex == Sex.FEMALE && ( weight < 40 || weight > 120 ) )
-            return false;
+        else return sex != Sex.FEMALE || ( !( weight < 40 ) && !( weight > 120 ) );
 
-        return true;
     }
 
     /**
@@ -84,68 +82,68 @@ public class User {
      * If there are, it sets the values of the object to match those in the DB
      */
     public void retreiveUserDetails() {
-            // Path to the user details
-            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-            String path = "user_details/" + firebaseUser.getUid();
+        // Path to the user details
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        String path = "user_details/" + firebaseUser.getUid();
 
-            // Get the DB reference
-            DatabaseReference childRef = mRootRef.child( path );
+        // Get the DB reference
+        DatabaseReference childRef = mRootRef.child( path );
 
-            childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                @Override
-                public void onDataChange( DataSnapshot dataSnapshot ) {
-                    if(dataSnapshot.exists()) {
-                        // There are user details in the DB for this user
-                        String dbName = null;
-                        DateTime dbDob = null;
-                        float dbWeight = -1f;
-                        Sex dbSex = null;
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    // There are user details in the DB for this user
+                    String dbName = null;
+                    DateTime dbDob = null;
+                    float dbWeight = -1f;
+                    Sex dbSex = null;
 
-                        // Get the user name
-                        DataSnapshot nameDataSnapshot = dataSnapshot.child( "name" );
-                        if ( nameDataSnapshot.exists() ) {
-                            dbName = nameDataSnapshot.getValue().toString();
-                        }
+                    // Get the user name
+                    DataSnapshot nameDataSnapshot = dataSnapshot.child( "name" );
+                    if ( nameDataSnapshot.exists() ) {
+                        dbName = nameDataSnapshot.getValue().toString();
+                    }
 
-                        // Get the user dob
-                        DataSnapshot dobDataSnapshot = dataSnapshot.child( "dob" );
-                        long dbDobTimestamp = -1;
-                        if ( dobDataSnapshot.exists() ) {
-                            dbDobTimestamp = (( Long ) dobDataSnapshot.getValue()).longValue();
-                            dbDob = new DateTime( dbDobTimestamp );
-                        }
+                    // Get the user dob
+                    DataSnapshot dobDataSnapshot = dataSnapshot.child( "dob" );
+                    long dbDobTimestamp = -1;
+                    if ( dobDataSnapshot.exists() ) {
+                        dbDobTimestamp = ( ( Long ) dobDataSnapshot.getValue() ).longValue();
+                        dbDob = new DateTime( dbDobTimestamp );
+                    }
 
-                        // Get the user weight
-                        DataSnapshot weightDataSnapshot = dataSnapshot.child( "weight" );
-                        if ( weightDataSnapshot.exists() ) {
-                            dbWeight = ( (Long ) weightDataSnapshot.getValue()).floatValue();
-                        }
+                    // Get the user weight
+                    DataSnapshot weightDataSnapshot = dataSnapshot.child( "weight" );
+                    if ( weightDataSnapshot.exists() ) {
+                        dbWeight = ( ( Long ) weightDataSnapshot.getValue() ).floatValue();
+                    }
 
-                        // Get the user sex
-                        DataSnapshot sexDataSnapshot = dataSnapshot.child( "sex" );
-                        if ( sexDataSnapshot.exists() ) {
-                            String dbSexStr = sexDataSnapshot.getValue().toString();
-                            for(Sex sex : Sex.values()) {
-                                if(dbSexStr.compareTo( sex.toString() ) == 0) dbSex = sex;
-                            }
-                        }
-
-                        if(dbName != null && dbDob != null && dbDobTimestamp != -1 && dbWeight != -1 && dbSex != null) {
-                            userDetailsAreSet = true;
-                            setName( dbName );
-                            setDob( dbDob );
-                            setWeight( dbWeight );
-                            setSex( dbSex );
+                    // Get the user sex
+                    DataSnapshot sexDataSnapshot = dataSnapshot.child( "sex" );
+                    if ( sexDataSnapshot.exists() ) {
+                        String dbSexStr = sexDataSnapshot.getValue().toString();
+                        for ( Sex sex : Sex.values() ) {
+                            if ( dbSexStr.compareTo( sex.toString() ) == 0 ) dbSex = sex;
                         }
                     }
 
-                    // Otherwise, do nothing
+                    if ( dbName != null && dbDob != null && dbDobTimestamp != -1 && dbWeight != -1 && dbSex != null ) {
+                        userDetailsAreSet = true;
+                        setName( dbName );
+                        setDob( dbDob );
+                        setWeight( dbWeight );
+                        setSex( dbSex );
+                    }
                 }
 
-                @Override
-                public void onCancelled( DatabaseError databaseError ) {
-                }
-            } );
+                // Otherwise, do nothing
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
 
 
     }

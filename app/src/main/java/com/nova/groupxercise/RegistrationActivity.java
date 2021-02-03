@@ -100,7 +100,7 @@ public class RegistrationActivity extends AppCompatActivity {
                     @Override
                     public void onComplete( @NonNull Task< AuthResult > task ) {
                         if ( task.isSuccessful() ) {
-                            createEmptyDBGoalset(mAuth.getCurrentUser().getUid());
+                            createEmptyDBGoalset( mAuth.getCurrentUser().getUid() );
                             Intent intent = new Intent( RegistrationActivity.this, HomeScreenActivity.class );
                             startActivity( intent );
                         } else {
@@ -114,12 +114,13 @@ public class RegistrationActivity extends AppCompatActivity {
 
     /**
      * Creates a child node in the DB to store the user goals
+     *
      * @param userId the Firebase user ID
      */
-    private void createEmptyDBGoalset(String userId) {
+    private void createEmptyDBGoalset( String userId ) {
         String path = "user_goals/";
         DatabaseReference childRef = mRootRef.child( path );
-        childRef.child( userId ).child( getResources().getString( R.string.sample_goal_name )  ).setValue( new GoalDBObject( 20f, 50f ));
+        childRef.child( userId ).child( getResources().getString( R.string.sample_goal_name ) ).setValue( new GoalDBObject( 20f, 50f ) );
 
     }
 }

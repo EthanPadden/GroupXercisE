@@ -84,17 +84,17 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private void displayUserDetails() {
         User currentUser = User.getInstance();
-        if(currentUser.isUserDetailsAreSet()) {
+        if ( currentUser.isUserDetailsAreSet() ) {
             mInfoText.setVisibility( View.GONE );
             mNameText.setText( currentUser.getName() );
 
-            int dobDay =currentUser.getDob().getDayOfMonth();
-            int dobMonth =currentUser.getDob().getMonthOfYear();
-            int dobYear =currentUser.getDob().getYear();
+            int dobDay = currentUser.getDob().getDayOfMonth();
+            int dobMonth = currentUser.getDob().getMonthOfYear();
+            int dobYear = currentUser.getDob().getYear();
 
-            mDobText.setText( String.format( "%d/%d/%d", dobDay, dobMonth + 1, dobYear ));
+            mDobText.setText( String.format( "%d/%d/%d", dobDay, dobMonth + 1, dobYear ) );
 
-            mWeightText.setText( Float.toString(  currentUser.getWeight()) );
+            mWeightText.setText( Float.toString( currentUser.getWeight() ) );
             mSexText.setText( currentUser.getSex().toString() );
 
             mUserDetailsTable.setVisibility( View.VISIBLE );

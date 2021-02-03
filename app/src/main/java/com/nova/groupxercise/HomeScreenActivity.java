@@ -97,7 +97,7 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
 
         // If the user details are not set locally, retrieve them from the database
         User currentUser = User.getInstance();
-        if(!currentUser.isUserDetailsAreSet()) {
+        if ( !currentUser.isUserDetailsAreSet() ) {
             currentUser.retreiveUserDetails();
         }
     }
