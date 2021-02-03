@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +24,7 @@ public class ProfileActivity extends AppCompatActivity {
     private DrawerLayout mDrawerContainer;
     private NavigationView mDrawer;
     private Button mEditBtn;
+    private TextView mNameText;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -42,6 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
         // Initialise components
         mToolbar = findViewById( R.id.toolbar );
         mEditBtn = findViewById( R.id.btn_edit );
+        mNameText = findViewById( R.id.text_name );
 
         // Set event listeners
         mEditBtn.setOnClickListener( new View.OnClickListener() {
@@ -61,6 +64,12 @@ public class ProfileActivity extends AppCompatActivity {
         mDrawerContainer = findViewById( R.id.drawer_container );
         mDrawer = findViewById( R.id.drawer );
         setupDrawerContent();
+
+        if(User.getInstance().isUserDetailsAreSet()) {
+            mNameText.setText( "User details found" );
+        } else {
+            mNameText.setText( "No user details found" );
+        }
     }
 
     /**

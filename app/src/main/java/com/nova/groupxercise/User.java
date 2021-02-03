@@ -1,5 +1,13 @@
 package com.nova.groupxercise;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.Period;
@@ -11,18 +19,24 @@ public class User {
     private String name;
     private DateTime dob;
     private float weight;
+    private FirebaseAuth mAuth;
+
 
     public enum Sex {MALE, FEMALE}
 
     private Sex sex;
     private UserDetailsDBObject mUserDetailsDBObject;
 
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private boolean userDetailsAreSet = false;
+
     // Singleton class
     private static final User user = new User();
 
     // Constructors
     public User() {
-
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
     }
 
     public static User getInstance() {
@@ -85,6 +99,82 @@ public class User {
         );
     }
 
+    public void retreiveUserDetails() {
+
+            // Path to the user details
+            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            String path = "user_details/" + firebaseUser.getUid();
+
+            // Get the DB reference
+            DatabaseReference childRef = mRootRef.child( path );
+
+            childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange( DataSnapshot dataSnapshot ) {
+                    if(dataSnapshot.exists()) {
+                        // There are user details in the DB for this user
+                        String dbName = null;
+                        DateTime dbDob = null;
+                        float dbWeight = -1f;
+                        Sex dbSex = null;
+
+                        // Get the user name
+                        DataSnapshot nameDataSnapshot = dataSnapshot.child( "name" );
+                        if ( nameDataSnapshot.exists() ) {
+                            dbName = nameDataSnapshot.getValue().toString();
+                        }
+
+                        // Get the user dob
+                        DataSnapshot dobDataSnapshot = dataSnapshot.child( "dob" );
+                        long dbDobTimestamp = -1;
+                        if ( dobDataSnapshot.exists() ) {
+                            dbDobTimestamp = (( Long ) dobDataSnapshot.getValue()).longValue();
+                            dbDob = new DateTime( dbDobTimestamp );
+                        }
+
+                        // Get the user weight
+                        DataSnapshot weightDataSnapshot = dataSnapshot.child( "weight" );
+                        if ( weightDataSnapshot.exists() ) {
+                            dbWeight = ( (Long ) weightDataSnapshot.getValue()).floatValue();
+                        }
+
+                        // Get the user sex
+                        DataSnapshot sexDataSnapshot = dataSnapshot.child( "sex" );
+                        if ( sexDataSnapshot.exists() ) {
+                            String dbSexStr = sexDataSnapshot.getValue().toString();
+                            for(Sex sex : Sex.values()) {
+                                if(dbSexStr.compareTo( sex.toString() ) == 0) dbSex = sex;
+                            }
+                        }
+
+                        if(dbName != null && dbDob != null && dbDobTimestamp != -1 && dbWeight != -1 && dbSex != null) {
+                            userDetailsAreSet = true;
+                            setName( dbName );
+                            setDob( dbDob );
+                            setWeight( dbWeight );
+                            setSex( dbSex );
+                            mUserDetailsDBObject = new UserDetailsDBObject(
+                                    dbName,
+                                    dbDobTimestamp,
+                                    dbWeight,
+                                    dbSex.toString()
+                            );
+                        }
+
+                    }
+
+                    // Otherwise, do nothing
+
+                }
+
+                @Override
+                public void onCancelled( DatabaseError databaseError ) {
+                }
+            } );
+
+
+    }
+
     // Accessor/Mutator methods
     public String getName() {
         return name;
@@ -124,5 +214,21 @@ public class User {
 
     public void setmUserDetailsDBObject( UserDetailsDBObject mUserDetailsDBObject ) {
         this.mUserDetailsDBObject = mUserDetailsDBObject;
+    }
+
+    public DatabaseReference getmRootRef() {
+        return mRootRef;
+    }
+
+    public void setmRootRef( DatabaseReference mRootRef ) {
+        this.mRootRef = mRootRef;
+    }
+
+    public boolean isUserDetailsAreSet() {
+        return userDetailsAreSet;
+    }
+
+    public void setUserDetailsAreSet( boolean userDetailsAreSet ) {
+        this.userDetailsAreSet = userDetailsAreSet;
     }
 }

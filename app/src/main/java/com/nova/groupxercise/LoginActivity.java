@@ -75,6 +75,9 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onComplete( @NonNull Task< AuthResult > task ) {
                             if ( task.isSuccessful() ) {
+                               // Retrieve user details
+                                User.getInstance().retreiveUserDetails();
+
                                 // Go to the home screen
                                 Intent intent = new Intent( LoginActivity.this, HomeScreenActivity.class );
                                 startActivity( intent );
