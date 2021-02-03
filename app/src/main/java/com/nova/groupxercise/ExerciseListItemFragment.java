@@ -195,54 +195,51 @@ public class ExerciseListItemFragment extends Fragment {
      * @param goal the goal object to save to the DB
      */
     private void saveGoal( final Goal goal ) {
-        if ( goal == null ) {
-            Toast.makeText( getActivity(), R.string.error_goal_setting, Toast.LENGTH_SHORT ).show();
-        } else {
-            // TODO: use the current user name
-            String tempUserName = "john_doe";
-
-            // Path to the users goals
-            String path = "user_goals/" + tempUserName;
-
-            // Get the DB reference
-            HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-            final DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-
-            // Check if we have a set of goals for that particular user
-            childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                @Override
-                public void onDataChange( DataSnapshot dataSnapshot ) {
-                    if ( dataSnapshot.exists() ) {
-                        // This means there is a set of goals associated with the user
-                        // (this could be an empty list)
-
-                        // Get the DB object for the goal
-                        GoalDBObject goalDBObject = goal.getmGoalDBObject();
-
-                        // Check if a goal already exists for the exercise
-                        DataSnapshot exerciseDataSnapshot = dataSnapshot.child( goal.getmExerciseName() );
-                        if ( exerciseDataSnapshot.exists() ) {
-                            // If so, the operation is an update
-                            Toast.makeText( getActivity(), R.string.info_updating_goal, Toast.LENGTH_SHORT ).show();
-                        } else {
-                            // If not, the operation is a create
-                            Toast.makeText( getActivity(), R.string.info_creating_goal, Toast.LENGTH_SHORT ).show();
-                        }
-
-                        // If no child exists, this will create a new one
-                        // If one does, this will update it
-                        childRef.child( goal.getmExerciseName() ).setValue( goalDBObject );
-                    } else {
-                        // This is an error
-                        Toast.makeText( getActivity(), R.string.error_no_goalset_found, Toast.LENGTH_SHORT ).show();
-                    }
-                }
-
-                @Override
-                public void onCancelled( DatabaseError databaseError ) {
-                }
-            } );
-        }
+//        if ( goal == null ) {
+//            Toast.makeText( getActivity(), R.string.error_goal_setting, Toast.LENGTH_SHORT ).show();
+//        } else {
+//            // Path to the users goals
+//            String path = "user_goals/" + tempUserName;
+//
+//            // Get the DB reference
+//            HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+//            final DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+//
+//            // Check if we have a set of goals for that particular user
+//            childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+//                @Override
+//                public void onDataChange( DataSnapshot dataSnapshot ) {
+//                    if ( dataSnapshot.exists() ) {
+//                        // This means there is a set of goals associated with the user
+//                        // (this could be an empty list)
+//
+//                        // Get the DB object for the goal
+//                        GoalDBObject goalDBObject = goal.getmGoalDBObject();
+//
+//                        // Check if a goal already exists for the exercise
+//                        DataSnapshot exerciseDataSnapshot = dataSnapshot.child( goal.getmExerciseName() );
+//                        if ( exerciseDataSnapshot.exists() ) {
+//                            // If so, the operation is an update
+//                            Toast.makeText( getActivity(), R.string.info_updating_goal, Toast.LENGTH_SHORT ).show();
+//                        } else {
+//                            // If not, the operation is a create
+//                            Toast.makeText( getActivity(), R.string.info_creating_goal, Toast.LENGTH_SHORT ).show();
+//                        }
+//
+//                        // If no child exists, this will create a new one
+//                        // If one does, this will update it
+//                        childRef.child( goal.getmExerciseName() ).setValue( goalDBObject );
+//                    } else {
+//                        // This is an error
+//                        Toast.makeText( getActivity(), R.string.error_no_goalset_found, Toast.LENGTH_SHORT ).show();
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled( DatabaseError databaseError ) {
+//                }
+//            } );
+//        }
     }
 
     /**

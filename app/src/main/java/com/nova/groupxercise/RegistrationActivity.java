@@ -15,6 +15,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegistrationActivity extends AppCompatActivity {
     private Button mRegistrationBtn;
@@ -22,6 +24,7 @@ public class RegistrationActivity extends AppCompatActivity {
     private EditText mEmailEt;
     private EditText mPasswordEt;
     private FirebaseAuth mAuth;
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -97,6 +100,7 @@ public class RegistrationActivity extends AppCompatActivity {
                     @Override
                     public void onComplete( @NonNull Task< AuthResult > task ) {
                         if ( task.isSuccessful() ) {
+                            createEmptyDBGoalset(mAuth.getCurrentUser().getUid());
                             Intent intent = new Intent( RegistrationActivity.this, HomeScreenActivity.class );
                             startActivity( intent );
                         } else {
@@ -106,5 +110,12 @@ public class RegistrationActivity extends AppCompatActivity {
                         }
                     }
                 } );
+    }
+
+    private void createEmptyDBGoalset(String userId) {
+        String path = "user_goals/";
+        DatabaseReference childRef = mRootRef.child( path );
+        childRef.child( userId ).child( "Sample Goal" ).setValue( new GoalDBObject( 20f, 50f ));
+
     }
 }
