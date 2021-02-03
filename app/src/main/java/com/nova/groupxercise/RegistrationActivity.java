@@ -115,7 +115,7 @@ public class RegistrationActivity extends AppCompatActivity {
     private void createEmptyDBGoalset(String userId) {
         String path = "user_goals/";
         DatabaseReference childRef = mRootRef.child( path );
-        childRef.child( userId ).child( "Sample Goal" ).setValue( new GoalDBObject( 20f, 50f ));
+        childRef.child( userId ).child( getResources().getString( R.string.sample_goal_name )  ).setValue( new GoalDBObject( 20f, 50f ));
 
     }
 }

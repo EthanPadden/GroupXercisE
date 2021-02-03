@@ -6,11 +6,13 @@
     <string name="error_no_email_entered">Enter an email address</string>
     <string name="error_no_psw_entered">Enter a password</string>
     <string name="error_invalid_email">Please enter a valid email</string>
-    <string name="error_invalid_user_details">There was an error setting your details</string>
-    <string name="error_no_target_entered">Enter a target</string>#
+    <string name="error_invalid_user_details">Invalid details</string>
+    <string name="error_no_target_entered">Enter a target</string>
     <string name="error_generic">There was an error</string>
     <string name="error_goal_setting">Could not set the goal</string>
-    <string name="error_no_goalset_found">Could find a goalset for this user</string>
+    <string name="error_no_goalset_found">Could not find a goalset for this user</string>
+    <string name="error_db_user_details">Could not save details</string>
+    <string name="error_no_details_found">No user details found</string>
 
     // General messages
     <string name="loading">Loading...</string>
@@ -22,6 +24,8 @@
         <item>@string/sex_male</item>
         <item>@string/sex_female</item>
     </string-array>
+    <string name="info_updating_details">Updating your details...</string>
+    <string name="info_setting_details">Setting your details...</string>
 
     // Goal setting
     <string name="set_goal_title">Set Goal: </string>
@@ -39,6 +43,7 @@
     </string-array>
     <string name="info_updating_goal">Updating your goal...</string>
     <string name="info_creating_goal">Creating your goal...</string>
+    <string name="sample_goal_name">Sample Goal</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

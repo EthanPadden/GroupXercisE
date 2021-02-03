@@ -305,11 +305,11 @@ public class EditUserDetailsActivity extends AppCompatActivity {
                     DataSnapshot userDetailsSnapshot = dataSnapshot.child( userID );
                     if ( userDetailsSnapshot.exists() ) {
                         // If so, the operation is an update
-                        Toast.makeText( EditUserDetailsActivity.this, "Updating your details...", Toast.LENGTH_SHORT ).show();
+                        Toast.makeText( EditUserDetailsActivity.this, R.string.info_updating_details, Toast.LENGTH_SHORT ).show();
 
                     } else {
                         // If not, the operation is a create
-                        Toast.makeText( EditUserDetailsActivity.this, "Setting your details...", Toast.LENGTH_SHORT ).show();
+                        Toast.makeText( EditUserDetailsActivity.this, R.string.info_setting_details, Toast.LENGTH_SHORT ).show();
                     }
 
                     // If no child exists, this will create a new one
@@ -319,7 +319,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
                     setLocalUserDetails(name, dob, weight );
                 } else {
                     // This is an error
-                    Toast.makeText( EditUserDetailsActivity.this, "Could not save details", Toast.LENGTH_SHORT ).show();
+                    Toast.makeText( EditUserDetailsActivity.this, R.string.error_db_user_details, Toast.LENGTH_SHORT ).show();
                 }
             }
 

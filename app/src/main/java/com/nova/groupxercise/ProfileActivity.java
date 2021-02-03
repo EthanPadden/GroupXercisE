@@ -96,7 +96,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             mUserDetailsTable.setVisibility( View.VISIBLE );
         } else {
-            mInfoText.setText( "No user details found" );
+            mInfoText.setText( R.string.error_no_details_found );
         }
     }
     /**
