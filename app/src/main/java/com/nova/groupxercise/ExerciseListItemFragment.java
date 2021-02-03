@@ -266,7 +266,7 @@ public class ExerciseListItemFragment extends Fragment {
         mSuggestedGoalText.setText( R.string.loading );
 
         // Check if all user details are set correctly
-        if ( currentUser.detailsAreValid() ) {
+        if ( currentUser.isUserDetailsAreSet() && currentUser.detailsAreValid() ) {
             // Build the path and retrieve the strength standards
             int weightClass = getWeightClass( currentUser.getWeight() );
             String path = "strength_standards/" + exerciseName + "/" + currentUser.getSex().toString() + "/" + weightClass;

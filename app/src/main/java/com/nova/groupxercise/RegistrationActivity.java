@@ -101,6 +101,7 @@ public class RegistrationActivity extends AppCompatActivity {
                     public void onComplete( @NonNull Task< AuthResult > task ) {
                         if ( task.isSuccessful() ) {
                             createEmptyDBGoalset( mAuth.getCurrentUser().getUid() );
+                            User.getInstance().setUserDetailsAreSet( false );
                             Intent intent = new Intent( RegistrationActivity.this, HomeScreenActivity.class );
                             startActivity( intent );
                         } else {

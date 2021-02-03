@@ -135,9 +135,9 @@ public class User {
                         setWeight( dbWeight );
                         setSex( dbSex );
                     }
+                } else {
+                    user.setUserDetailsAreSet( false );
                 }
-
-                // Otherwise, do nothing
             }
 
             @Override
