@@ -79,6 +79,9 @@ public class ProfileActivity extends AppCompatActivity {
         displayUserDetails();
     }
 
+    /**
+     * Updates the UI with the details from the locally stored user object
+     */
     private void displayUserDetails() {
         User currentUser = User.getInstance();
         if(currentUser.isUserDetailsAreSet()) {
@@ -99,6 +102,7 @@ public class ProfileActivity extends AppCompatActivity {
             mInfoText.setText( R.string.error_no_details_found );
         }
     }
+
     /**
      * Sets the event listeners for the navigation drawer
      */
@@ -155,5 +159,4 @@ public class ProfileActivity extends AppCompatActivity {
         Intent intent = new Intent( ProfileActivity.this, LoginActivity.class );
         startActivity( intent );
     }
-
 }

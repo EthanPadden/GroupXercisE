@@ -112,6 +112,10 @@ public class RegistrationActivity extends AppCompatActivity {
                 } );
     }
 
+    /**
+     * Creates a child node in the DB to store the user goals
+     * @param userId the Firebase user ID
+     */
     private void createEmptyDBGoalset(String userId) {
         String path = "user_goals/";
         DatabaseReference childRef = mRootRef.child( path );

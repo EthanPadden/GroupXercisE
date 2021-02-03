@@ -9,7 +9,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.joda.time.DateTime;
-import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -79,17 +78,12 @@ public class User {
         return true;
     }
 
-    public void setUserDetails(String name, DateTime dob, float weight, Sex sex){
-        Instant dobInstant = dob.toInstant();
-        long dobTimeStamp = dobInstant.getMillis();
-        setName( name );
-        setDob( dob );
-        setWeight( weight );
-        setSex( sex );
-    }
-
+    /**
+     * Retrieves the user details from the DB
+     * If there are no details saved in the DB, it does nothing
+     * If there are, it sets the values of the object to match those in the DB
+     */
     public void retreiveUserDetails() {
-
             // Path to the user details
             FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
             String path = "user_details/" + firebaseUser.getUid();
@@ -143,11 +137,9 @@ public class User {
                             setWeight( dbWeight );
                             setSex( dbSex );
                         }
-
                     }
 
                     // Otherwise, do nothing
-
                 }
 
                 @Override

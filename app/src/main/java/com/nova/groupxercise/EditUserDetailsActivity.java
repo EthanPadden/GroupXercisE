@@ -47,9 +47,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
     private DrawerLayout mDrawerContainer;
     private NavigationView mDrawer;
     private FirebaseAuth mAuth;
-
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -242,7 +240,10 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         }
     }
 
-    // TODO: replace setLocalUserDetails with this
+    /**
+     * Checks that the details entered by the user are valid
+     * If so, calls method to save them to the DB
+     */
     private void validateEnteredDetails() {
         boolean detailsCanBeSet = true;
 
@@ -282,6 +283,15 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         startActivity( intent );
     }
 
+    /**
+     * Saves the details in the arguments to the database
+     * If no details are set for the user, it creates a set
+     * If details exist, it updates them
+     * If successful, it sets the local user details to be the values
+     * @param name name of the user as a string
+     * @param dob date of birth of user
+     * @param weight weight of user
+     */
     private void saveUserDetailsToDB( final String name, final DateTime dob, final float weight ) {
         // Path to the users details
         final String userID = mAuth.getCurrentUser().getUid();
@@ -294,8 +304,6 @@ public class EditUserDetailsActivity extends AppCompatActivity {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 if ( dataSnapshot.exists() ) {
-                    String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
                     // Create user DB object
                     Instant dobInstant = dob.toInstant();
                     long dobTimeStamp = dobInstant.getMillis();
@@ -330,7 +338,12 @@ public class EditUserDetailsActivity extends AppCompatActivity {
 
     }
 
-
+    /**
+     * Sets the singleton instance of the user details locally
+     * @param name name of the user as a string
+     * @param dob date of birth of user
+     * @param weight weight of user
+     */
     private void setLocalUserDetails( String name, DateTime dob, float weight ) {
         User localUser = User.getInstance();
         localUser.setName( name );
