@@ -95,6 +95,10 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         ft.replace( R.id.frame_home_screen_fragment_placeholder, discoveriesFragment );
         ft.commit();
 
+        User currentUser = User.getInstance();
+        if(!currentUser.isUserDetailsAreSet()) {
+            currentUser.retreiveUserDetails();
+        }
     }
 
     @Override
