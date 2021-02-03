@@ -17,13 +17,12 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import org.joda.time.DateTime;
 
 
 /**
@@ -200,11 +199,9 @@ public class ExerciseListItemFragment extends Fragment {
         if ( goal == null ) {
             Toast.makeText( getActivity(), R.string.error_goal_setting, Toast.LENGTH_SHORT ).show();
         } else {
-            // TODO: use the current user name
-            String tempUserName = "john_doe";
-
             // Path to the users goals
-            String path = "user_goals/" + tempUserName;
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            String path = "user_goals/" + userId;
 
             // Get the DB reference
             HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
@@ -263,40 +260,36 @@ public class ExerciseListItemFragment extends Fragment {
      */
     public void retrieveStrengthStandards( String exerciseName ) {
         // Get the current user
-        User user = User.getInstance();
+        User currentUser = User.getInstance();
 
-        // Set the loading messave
+        // Set the loading message
         mSuggestedGoalText.setText( R.string.loading );
 
         // Check if all user details are set correctly
-        User testUser = new User();
+        if ( currentUser.isUserDetailsAreSet() && currentUser.detailsAreValid() ) {
+            // Build the path and retrieve the strength standards
+            int weightClass = getWeightClass( currentUser.getWeight() );
+            String path = "strength_standards/" + exerciseName + "/" + currentUser.getSex().toString() + "/" + weightClass;
 
-        if ( !user.detailsAreValid() ) {
-            // TODO: replace with returning null with toast message
-            testUser.setName( "John Doe" );
-            testUser.setSex( User.Sex.MALE );
-            testUser.setWeight( 68 );
-            testUser.setDob( new DateTime( 1990, 9, 1, 0, 0 ) );
+            DatabaseReference childRef = mRootRef.child( path );
+            childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange( DataSnapshot dataSnapshot ) {
+                    // Store the standards in memory so that they do not have to be retrieved again
+                    mStrengthStandards = dataSnapshot;
+
+                    // Display the current suggested weight
+                    calculateSuggestedWeight();
+                }
+
+                @Override
+                public void onCancelled( DatabaseError databaseError ) {
+                }
+            } );
+        } else {
+            Toast.makeText( getActivity(), R.string.error_invalid_user_details, Toast.LENGTH_SHORT ).show();
+            mSuggestedGoalText.setText( R.string.error_invalid_user_details );
         }
-
-        // Build the path and retrieve the strength standards
-        int weightClass = getWeightClass( testUser.getWeight() );
-        String path = "strength_standards/" + exerciseName + "/" + testUser.getSex().toString() + "/" + weightClass;
-        DatabaseReference childRef = mRootRef.child( path );
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                // Store the standards in memory so that they do not have to be retrieved again
-                mStrengthStandards = dataSnapshot;
-
-                // Display the current suggested weight
-                calculateSuggestedWeight();
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
     }
 
     /**

@@ -95,6 +95,11 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         ft.replace( R.id.frame_home_screen_fragment_placeholder, discoveriesFragment );
         ft.commit();
 
+        // If the user details are not set locally, retrieve them from the database
+        User currentUser = User.getInstance();
+        if ( !currentUser.isUserDetailsAreSet() ) {
+            currentUser.retreiveUserDetails();
+        }
     }
 
     @Override
@@ -151,7 +156,7 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
             public boolean onNavigationItemSelected( @NonNull MenuItem item ) {
                 if ( item.getItemId() == R.id.drawer_profile ) {
                     // Go to edit details screen
-                    Intent intent = new Intent( HomeScreenActivity.this, EditUserDetailsActivity.class );
+                    Intent intent = new Intent( HomeScreenActivity.this, ProfileActivity.class );
                     startActivity( intent );
                 } else if ( item.getItemId() == R.id.drawer_logout ) {
                     signOutUser();
