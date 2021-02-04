@@ -30,6 +30,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView mWeightText;
     private TextView mSexText;
     private TableLayout mUserDetailsTable;
+    private TextView mUsernameText;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -54,6 +55,7 @@ public class ProfileActivity extends AppCompatActivity {
         mWeightText = findViewById( R.id.text_weight );
         mSexText = findViewById( R.id.text_sex );
         mUserDetailsTable = findViewById( R.id.table_user_details );
+        mUsernameText = findViewById( R.id.text_username );
 
         // Set event listeners
         mEditBtn.setOnClickListener( new View.OnClickListener() {
@@ -75,6 +77,12 @@ public class ProfileActivity extends AppCompatActivity {
         setupDrawerContent();
 
         displayUserDetails();
+        displayUsername();
+    }
+
+    private void displayUsername() {
+        User currentUser = User.getInstance();
+        mUsernameText.setText( currentUser.getUsername() );
     }
 
     /**
@@ -146,6 +154,8 @@ public class ProfileActivity extends AppCompatActivity {
     protected void signOutUser() {
         // Check if there is a user currently logged in
         if ( mAuth.getCurrentUser() != null ) {
+            User.getInstance().setUserDetailsAreSet( false );
+            User.getInstance().setUsername( null );
             mAuth.signOut();
         } else {
             Toast.makeText( ProfileActivity.this, R.string.error_user_not_logged_in,

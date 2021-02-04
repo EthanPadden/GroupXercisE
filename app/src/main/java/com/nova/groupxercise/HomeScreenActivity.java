@@ -133,6 +133,8 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
     protected void signOutUser() {
         // Check if there is a user currently logged in
         if ( mAuth.getCurrentUser() != null ) {
+            User.getInstance().setUserDetailsAreSet( false );
+            User.getInstance().setUsername( null );
             mAuth.signOut();
         } else {
             Toast.makeText( HomeScreenActivity.this, R.string.error_user_not_logged_in,

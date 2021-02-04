@@ -82,12 +82,12 @@ public class User {
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
-                String usernameFound = null;
                 for ( DataSnapshot usernameDataSnapshot : dataSnapshot.getChildren() ) {
                     String dbUserId = usernameDataSnapshot.getValue().toString();
                     String thisUserId = FirebaseAuth.getInstance().getUid();
                     if ( dbUserId.compareTo( thisUserId ) == 0 ) {
-                        usernameFound = usernameDataSnapshot.getKey();
+                        String usernameFound = usernameDataSnapshot.getKey();
+                        setUsername( usernameFound );
                     }
                 }
 
