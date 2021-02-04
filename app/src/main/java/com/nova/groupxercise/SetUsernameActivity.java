@@ -1,5 +1,6 @@
 package com.nova.groupxercise;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -68,6 +69,10 @@ public class SetUsernameActivity extends AppCompatActivity {
                     // If not, set the username
                     String userId = mAuth.getCurrentUser().getUid();
                     childRef.child( username ).setValue( userId );
+
+                    // Go to the home screen
+                    Intent intent = new Intent( SetUsernameActivity.this, HomeScreenActivity.class );
+                    startActivity( intent );
                 }
             }
 
