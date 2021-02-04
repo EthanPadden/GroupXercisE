@@ -80,6 +80,9 @@ public class ProfileActivity extends AppCompatActivity {
         displayUsername();
     }
 
+    /**
+     * Updates the UI with the username from the locally stored user object
+     */
     private void displayUsername() {
         User currentUser = User.getInstance();
         mUsernameText.setText( currentUser.getUsername() );
@@ -154,6 +157,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void signOutUser() {
         // Check if there is a user currently logged in
         if ( mAuth.getCurrentUser() != null ) {
+            // Reset the local user instance
             User.getInstance().setUserDetailsAreSet( false );
             User.getInstance().setUsername( null );
             mAuth.signOut();

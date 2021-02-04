@@ -44,6 +44,11 @@ public class SetUsernameActivity extends AppCompatActivity {
         } );
     }
 
+    /**
+     * Checks that the argument username is a valid username
+     * If so, calls checkIfUsernameIsAvailable
+     * @param username the username to check
+     */
     private void checkIfUsernameIsValid( String username ) {
         if ( username == null || username.compareTo( "" ) == 0 ) {
             Toast.makeText( SetUsernameActivity.this, "Invalid username", Toast.LENGTH_SHORT ).show();
@@ -52,6 +57,12 @@ public class SetUsernameActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks if another user already has the argument username
+     * If so, display an error message
+     * If not, save the username as the username for this user and go to the home screen
+     * @param username the username to check
+     */
     private void checkIfUsernameIsAvailable( final String username ) {
         // Path to the username child
         String path = "usernames/";

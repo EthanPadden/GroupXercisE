@@ -73,6 +73,11 @@ public class User {
 
     }
 
+    /**
+     * Retrieves the username for the user currently logged in from the DB
+     * If there is no username saved in the DB, it does nothing
+     * If there is, it sets the value of the object username to match the username in the DB
+     */
     public void retrieveUsername() {
         // Path to the username child
         String path = "usernames/";
