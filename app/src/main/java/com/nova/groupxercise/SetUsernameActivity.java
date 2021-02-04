@@ -70,6 +70,10 @@ public class SetUsernameActivity extends AppCompatActivity {
                     String userId = mAuth.getCurrentUser().getUid();
                     childRef.child( username ).setValue( userId );
 
+                    // Set the username on the local user object
+                    User currentUser = User.getInstance();
+                    currentUser.setUsername( username );
+
                     // Go to the home screen
                     Intent intent = new Intent( SetUsernameActivity.this, HomeScreenActivity.class );
                     startActivity( intent );

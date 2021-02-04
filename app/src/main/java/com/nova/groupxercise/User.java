@@ -14,6 +14,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class User {
     // Instance variables
+    private String username = null;
     private DateTime dob = null;
     private float weight = -1f;
 
@@ -42,7 +43,8 @@ public class User {
         DateTimeFormatter dtf = DateTimeFormat.forPattern( "MM/dd/yyyy HH:mm:ss" );
 
         return String.format(
-                "DOB: " + dtf.print( dob )
+                "Username: " + username
+                        + "DOB: " + dtf.print( dob )
                         + "\nWeight: " + weight
                         + "\nSex: " + sex
         );
@@ -51,7 +53,7 @@ public class User {
     // Other methods
 
     /**
-     * Verifies user details are in the range expected
+     * Verifies user details are in the range expected (excluding username)
      *
      * @return true if details are valid
      */
@@ -68,6 +70,35 @@ public class User {
             return false;
             // If female, weight should be in range 40-120
         else return sex != Sex.FEMALE || ( !( weight < 40 ) && !( weight > 120 ) );
+
+    }
+
+    public void retrieveUsername() {
+        // Path to the username child
+        String path = "usernames/";
+
+        final DatabaseReference childRef = mRootRef.child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                String usernameFound = null;
+                for ( DataSnapshot usernameDataSnapshot : dataSnapshot.getChildren() ) {
+                    String dbUserId = usernameDataSnapshot.getValue().toString();
+                    String thisUserId = FirebaseAuth.getInstance().getUid();
+                    if ( dbUserId.compareTo( thisUserId ) == 0 ) {
+                        usernameFound = usernameDataSnapshot.getKey();
+                    }
+                }
+
+                // If no username is found, this will do nothing
+                // Checking if getUsername() is null is the check whether the username was found for the user
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
 
     }
 
@@ -136,7 +167,17 @@ public class User {
     }
 
     // Accessor/Mutator methods
-   public DateTime getDob() {
+
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername( String username ) {
+        this.username = username;
+    }
+
+    public DateTime getDob() {
         return dob;
     }
 
