@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,9 +25,19 @@ public class SetUsernameActivity extends AppCompatActivity {
         mSetUsernameBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 String username = mUsernameEt.getText().toString();
-
-                // Check if the username exists
+                checkIfUsernameIsValid( username );
             }
         } );
+    }
+
+    private void checkIfUsernameIsValid(String username) {
+        if(username == null || username.compareTo( "" ) == 0) {
+            Toast.makeText( SetUsernameActivity.this, "Invalid username", Toast.LENGTH_SHORT ).show();
+        } else {
+            checkIfUsernameIsAvailable( username );
+        }
+    }
+    private void checkIfUsernameIsAvailable(String username) {
+
     }
 }

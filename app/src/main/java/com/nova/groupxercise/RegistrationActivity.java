@@ -102,7 +102,7 @@ public class RegistrationActivity extends AppCompatActivity {
                         if ( task.isSuccessful() ) {
                             createEmptyDBGoalset( mAuth.getCurrentUser().getUid() );
                             User.getInstance().setUserDetailsAreSet( false );
-                            Intent intent = new Intent( RegistrationActivity.this, HomeScreenActivity.class );
+                            Intent intent = new Intent( RegistrationActivity.this, SetUsernameActivity.class );
                             startActivity( intent );
                         } else {
                             String errorMsg = task.getException().getMessage();
