@@ -100,6 +100,11 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         if ( !currentUser.isUserDetailsAreSet() ) {
             currentUser.retreiveUserDetails();
         }
+
+        // If the username is not set locally, retrieve it from the database
+        if(currentUser.getUsername() == null) {
+            currentUser.retrieveUsername();
+        }
     }
 
     @Override
@@ -128,6 +133,9 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
     protected void signOutUser() {
         // Check if there is a user currently logged in
         if ( mAuth.getCurrentUser() != null ) {
+            // Reset the local user instance
+            User.getInstance().setUserDetailsAreSet( false );
+            User.getInstance().setUsername( null );
             mAuth.signOut();
         } else {
             Toast.makeText( HomeScreenActivity.this, R.string.error_user_not_logged_in,

@@ -37,7 +37,6 @@ import org.joda.time.Instant;
 import java.util.Calendar;
 
 public class EditUserDetailsActivity extends AppCompatActivity {
-    private EditText mNameEt;
     private TextView mDobText;
     private EditText mWeightEt;
     private Spinner mSexSpinner;
@@ -65,7 +64,6 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         setContentView( R.layout.activity_edit_user_details );
 
         // Initialise components
-        mNameEt = findViewById( R.id.et_name );
         mDobText = findViewById( R.id.text_dob );
         mWeightEt = findViewById( R.id.et_weight );
         mSexSpinner = findViewById( R.id.spinner_sex );
@@ -165,6 +163,9 @@ public class EditUserDetailsActivity extends AppCompatActivity {
     protected void signOutUser() {
         // Check if there is a user currently logged in
         if ( mAuth.getCurrentUser() != null ) {
+            // Reset the local user instance
+            User.getInstance().setUserDetailsAreSet( false );
+            User.getInstance().setUsername( null );
             mAuth.signOut();
         } else {
             Toast.makeText( EditUserDetailsActivity.this, R.string.error_user_not_logged_in,
@@ -247,10 +248,6 @@ public class EditUserDetailsActivity extends AppCompatActivity {
     private void validateEnteredDetails() {
         boolean detailsCanBeSet = true;
 
-        // Get name
-        String name = mNameEt.getText().toString();
-        if ( name == null || name.compareTo( "" ) == 0 ) detailsCanBeSet = false;
-
         // Get DOB
         DateTime dob = new DateTime( mSelectedDob.getTime() );
 
@@ -271,7 +268,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
             // To avoid a difference between the locally stored details
             // and the details stored in the DB, save to the DB first and update
             // the locally stored details if successful
-            saveUserDetailsToDB( name, dob, weight );
+            saveUserDetailsToDB( dob, weight );
         } else {
             Toast.makeText( EditUserDetailsActivity.this, R.string.error_invalid_user_details,
                     Toast.LENGTH_SHORT ).show();
@@ -289,11 +286,10 @@ public class EditUserDetailsActivity extends AppCompatActivity {
      * If details exist, it updates them
      * If successful, it sets the local user details to be the values
      *
-     * @param name   name of the user as a string
      * @param dob    date of birth of user
      * @param weight weight of user
      */
-    private void saveUserDetailsToDB( final String name, final DateTime dob, final float weight ) {
+    private void saveUserDetailsToDB( final DateTime dob, final float weight ) {
         // Path to the users details
         final String userID = mAuth.getCurrentUser().getUid();
         String path = "user_details";
@@ -308,7 +304,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
                     // Create user DB object
                     Instant dobInstant = dob.toInstant();
                     long dobTimeStamp = dobInstant.getMillis();
-                    UserDetailsDBObject userDetailsDBObject = new UserDetailsDBObject( name, dobTimeStamp, weight, mSelectedSex.toString() );
+                    UserDetailsDBObject userDetailsDBObject = new UserDetailsDBObject( dobTimeStamp, weight, mSelectedSex.toString() );
 
                     // Check if details already exists for the user
                     DataSnapshot userDetailsSnapshot = dataSnapshot.child( userID );
@@ -325,7 +321,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
                     // If one does, this will update it
                     childRef.child( userID ).setValue( userDetailsDBObject );
 
-                    setLocalUserDetails( name, dob, weight );
+                    setLocalUserDetails( dob, weight );
                 } else {
                     // This is an error
                     Toast.makeText( EditUserDetailsActivity.this, R.string.error_db_user_details, Toast.LENGTH_SHORT ).show();
@@ -342,13 +338,11 @@ public class EditUserDetailsActivity extends AppCompatActivity {
     /**
      * Sets the singleton instance of the user details locally
      *
-     * @param name   name of the user as a string
      * @param dob    date of birth of user
      * @param weight weight of user
      */
-    private void setLocalUserDetails( String name, DateTime dob, float weight ) {
+    private void setLocalUserDetails( DateTime dob, float weight ) {
         User localUser = User.getInstance();
-        localUser.setName( name );
         localUser.setDob( dob );
         localUser.setWeight( weight );
         localUser.setSex( mSelectedSex );

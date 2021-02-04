@@ -14,7 +14,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class User {
     // Instance variables
-    private String name = null;
+    private String username = null;
     private DateTime dob = null;
     private float weight = -1f;
 
@@ -43,8 +43,8 @@ public class User {
         DateTimeFormatter dtf = DateTimeFormat.forPattern( "MM/dd/yyyy HH:mm:ss" );
 
         return String.format(
-                "Name: " + name
-                        + "\nDOB: " + dtf.print( dob )
+                "Username: " + username
+                        + "DOB: " + dtf.print( dob )
                         + "\nWeight: " + weight
                         + "\nSex: " + sex
         );
@@ -53,14 +53,11 @@ public class User {
     // Other methods
 
     /**
-     * Verifies user details are in the range expected
+     * Verifies user details are in the range expected (excluding username)
      *
      * @return true if details are valid
      */
     public boolean detailsAreValid() {
-        // Validate name
-        if ( name == null || name.compareTo( "" ) == 0 ) return false;
-
         // Validate DOB
         // TODO: Age not used yet
 //        Period period = new Period( dob, DateTime.now() );
@@ -73,6 +70,40 @@ public class User {
             return false;
             // If female, weight should be in range 40-120
         else return sex != Sex.FEMALE || ( !( weight < 40 ) && !( weight > 120 ) );
+
+    }
+
+    /**
+     * Retrieves the username for the user currently logged in from the DB
+     * If there is no username saved in the DB, it does nothing
+     * If there is, it sets the value of the object username to match the username in the DB
+     */
+    public void retrieveUsername() {
+        // Path to the username child
+        String path = "usernames/";
+
+        final DatabaseReference childRef = mRootRef.child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                for ( DataSnapshot usernameDataSnapshot : dataSnapshot.getChildren() ) {
+                    String dbUserId = usernameDataSnapshot.getValue().toString();
+                    String thisUserId = FirebaseAuth.getInstance().getUid();
+                    if ( dbUserId.compareTo( thisUserId ) == 0 ) {
+                        String usernameFound = usernameDataSnapshot.getKey();
+                        setUsername( usernameFound );
+                    }
+                }
+
+                // If no username is found, this will do nothing
+                // Checking if getUsername() is null is the check whether the username was found for the user
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
 
     }
 
@@ -94,16 +125,9 @@ public class User {
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 if ( dataSnapshot.exists() ) {
                     // There are user details in the DB for this user
-                    String dbName = null;
                     DateTime dbDob = null;
                     float dbWeight = -1f;
                     Sex dbSex = null;
-
-                    // Get the user name
-                    DataSnapshot nameDataSnapshot = dataSnapshot.child( "name" );
-                    if ( nameDataSnapshot.exists() ) {
-                        dbName = nameDataSnapshot.getValue().toString();
-                    }
 
                     // Get the user dob
                     DataSnapshot dobDataSnapshot = dataSnapshot.child( "dob" );
@@ -128,9 +152,8 @@ public class User {
                         }
                     }
 
-                    if ( dbName != null && dbDob != null && dbDobTimestamp != -1 && dbWeight != -1 && dbSex != null ) {
+                    if ( dbDob != null && dbDobTimestamp != -1 && dbWeight != -1 && dbSex != null ) {
                         userDetailsAreSet = true;
-                        setName( dbName );
                         setDob( dbDob );
                         setWeight( dbWeight );
                         setSex( dbSex );
@@ -149,12 +172,14 @@ public class User {
     }
 
     // Accessor/Mutator methods
-    public String getName() {
-        return name;
+
+
+    public String getUsername() {
+        return username;
     }
 
-    public void setName( String name ) {
-        this.name = name;
+    public void setUsername( String username ) {
+        this.username = username;
     }
 
     public DateTime getDob() {

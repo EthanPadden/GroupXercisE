@@ -26,11 +26,11 @@ public class ProfileActivity extends AppCompatActivity {
     private NavigationView mDrawer;
     private Button mEditBtn;
     private TextView mInfoText;
-    private TextView mNameText;
     private TextView mDobText;
     private TextView mWeightText;
     private TextView mSexText;
     private TableLayout mUserDetailsTable;
+    private TextView mUsernameText;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -51,11 +51,11 @@ public class ProfileActivity extends AppCompatActivity {
         mToolbar = findViewById( R.id.toolbar );
         mEditBtn = findViewById( R.id.btn_edit );
         mInfoText = findViewById( R.id.text_info );
-        mNameText = findViewById( R.id.text_name );
         mDobText = findViewById( R.id.text_dob );
         mWeightText = findViewById( R.id.text_weight );
         mSexText = findViewById( R.id.text_sex );
         mUserDetailsTable = findViewById( R.id.table_user_details );
+        mUsernameText = findViewById( R.id.text_username );
 
         // Set event listeners
         mEditBtn.setOnClickListener( new View.OnClickListener() {
@@ -77,6 +77,15 @@ public class ProfileActivity extends AppCompatActivity {
         setupDrawerContent();
 
         displayUserDetails();
+        displayUsername();
+    }
+
+    /**
+     * Updates the UI with the username from the locally stored user object
+     */
+    private void displayUsername() {
+        User currentUser = User.getInstance();
+        mUsernameText.setText( currentUser.getUsername() );
     }
 
     /**
@@ -86,7 +95,6 @@ public class ProfileActivity extends AppCompatActivity {
         User currentUser = User.getInstance();
         if ( currentUser.isUserDetailsAreSet() ) {
             mInfoText.setVisibility( View.GONE );
-            mNameText.setText( currentUser.getName() );
 
             int dobDay = currentUser.getDob().getDayOfMonth();
             int dobMonth = currentUser.getDob().getMonthOfYear();
@@ -149,6 +157,9 @@ public class ProfileActivity extends AppCompatActivity {
     protected void signOutUser() {
         // Check if there is a user currently logged in
         if ( mAuth.getCurrentUser() != null ) {
+            // Reset the local user instance
+            User.getInstance().setUserDetailsAreSet( false );
+            User.getInstance().setUsername( null );
             mAuth.signOut();
         } else {
             Toast.makeText( ProfileActivity.this, R.string.error_user_not_logged_in,
