@@ -52,17 +52,6 @@
 
                 <TextView
                     android:gravity="center"
-                    android:text="Name: " />
-
-                <TextView
-                    android:id="@+id/text_name"
-                    android:gravity="center" />
-            </TableRow>
-
-            <TableRow android:layout_margin="5dp">
-
-                <TextView
-                    android:gravity="center"
                     android:text="DOB" />
 
                 <TextView

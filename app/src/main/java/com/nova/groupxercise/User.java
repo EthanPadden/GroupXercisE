@@ -14,7 +14,6 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class User {
     // Instance variables
-    private String name = null;
     private DateTime dob = null;
     private float weight = -1f;
 
@@ -43,8 +42,7 @@ public class User {
         DateTimeFormatter dtf = DateTimeFormat.forPattern( "MM/dd/yyyy HH:mm:ss" );
 
         return String.format(
-                "Name: " + name
-                        + "\nDOB: " + dtf.print( dob )
+                "DOB: " + dtf.print( dob )
                         + "\nWeight: " + weight
                         + "\nSex: " + sex
         );
@@ -58,9 +56,6 @@ public class User {
      * @return true if details are valid
      */
     public boolean detailsAreValid() {
-        // Validate name
-        if ( name == null || name.compareTo( "" ) == 0 ) return false;
-
         // Validate DOB
         // TODO: Age not used yet
 //        Period period = new Period( dob, DateTime.now() );
@@ -94,16 +89,9 @@ public class User {
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 if ( dataSnapshot.exists() ) {
                     // There are user details in the DB for this user
-                    String dbName = null;
                     DateTime dbDob = null;
                     float dbWeight = -1f;
                     Sex dbSex = null;
-
-                    // Get the user name
-                    DataSnapshot nameDataSnapshot = dataSnapshot.child( "name" );
-                    if ( nameDataSnapshot.exists() ) {
-                        dbName = nameDataSnapshot.getValue().toString();
-                    }
 
                     // Get the user dob
                     DataSnapshot dobDataSnapshot = dataSnapshot.child( "dob" );
@@ -128,9 +116,8 @@ public class User {
                         }
                     }
 
-                    if ( dbName != null && dbDob != null && dbDobTimestamp != -1 && dbWeight != -1 && dbSex != null ) {
+                    if ( dbDob != null && dbDobTimestamp != -1 && dbWeight != -1 && dbSex != null ) {
                         userDetailsAreSet = true;
-                        setName( dbName );
                         setDob( dbDob );
                         setWeight( dbWeight );
                         setSex( dbSex );
@@ -149,15 +136,7 @@ public class User {
     }
 
     // Accessor/Mutator methods
-    public String getName() {
-        return name;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    public DateTime getDob() {
+   public DateTime getDob() {
         return dob;
     }
 
