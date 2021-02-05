@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -64,9 +65,9 @@ public class GroupFragment extends Fragment {
             @Override
             public void onClick( View view ) {
                 String username = mMemberNameEt.getText().toString();
-                if(checkIfUsernameIsValid( username ) ) {
-                    checkIfUserExists(username);
-                } else{
+                if ( checkIfUsernameIsValid( username ) ) {
+                    checkIfUserExists( username );
+                } else {
                     Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
                 }
             }
@@ -75,9 +76,15 @@ public class GroupFragment extends Fragment {
             @Override
             public void onClick( View view ) {
                 String username = mMemberNameEt.getText().toString();
-                if(checkIfUsernameIsValid( username ) ) {
-                    removeMember(username);
-                } else{
+                if ( checkIfUsernameIsValid( username ) ) {
+                    // You cannot remove the group creator
+
+                    if ( mGroup.getmGroupCreator().compareTo( username ) == 0 ) {
+                        Toast.makeText( getActivity(), "You cannot remove the creator", Toast.LENGTH_SHORT ).show();
+                    } else {
+                        removeMember( username );
+                    }
+                } else {
                     Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
                 }
             }
@@ -93,16 +100,29 @@ public class GroupFragment extends Fragment {
     }
 
     private void deleteGroup() {
-        // For all members, delete from the user_groups subtree
+        // Remove all members
+        for ( String memberUsername : mGroup.getMembers() ) {
+            removeMember( memberUsername );
+        }
 
         // Delete group subtree
+        String groupPath = "groups/" + mGroupId;
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference groupRef = homeScreenActivity.getmRootRef().child( groupPath );
+        groupRef.removeValue();
+
+        // Set the fragment to be the my groups fragment
+        FragmentTransaction ft = homeScreenActivity.getSupportFragmentManager().beginTransaction();
+        MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
+        ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
+        ft.commit();
     }
 
     private boolean checkIfUsernameIsValid( String username ) {
         return username != null && username.compareTo( "" ) != 0;
     }
 
-    private void checkIfUserExists( final String username) {
+    private void checkIfUserExists( final String username ) {
         Toast.makeText( getActivity(), "Searching for user: " + username, Toast.LENGTH_SHORT ).show();
 
         // Path to the username child
@@ -115,7 +135,7 @@ public class GroupFragment extends Fragment {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 if ( dataSnapshot.exists() ) {
-                    Toast.makeText( getActivity(), "User found: "+ username, Toast.LENGTH_SHORT ).show();
+                    Toast.makeText( getActivity(), "User found: " + username, Toast.LENGTH_SHORT ).show();
                     String userId = dataSnapshot.getValue().toString();
                     addUserToGroup( username, userId );
                 } else {
@@ -129,7 +149,7 @@ public class GroupFragment extends Fragment {
         } );
     }
 
-    private void addUserToGroup(String username, String userId) {
+    private void addUserToGroup( String username, String userId ) {
         /** Updating groups subtree */
         // Path to this groups members child
         String thisGroupMembersPath = "groups/" + mGroupId + "/members";
@@ -150,23 +170,18 @@ public class GroupFragment extends Fragment {
         mGroup.getMembers().add( username );
     }
 
-    private void removeMember(final String username) {
-        // You cannot remove the group creator
+    private void removeMember( final String username ) {
 
-        if(mGroup.getmGroupCreator().compareTo( username ) == 0) {
-            Toast.makeText( getActivity(), "You cannot remove the creator", Toast.LENGTH_SHORT ).show();
-        } else {
-            /** Updating groups subtree */
-            // Path to this groups members child
-            String thisGroupMembersPath = "groups/" + mGroupId + "/members";
+        /** Updating groups subtree */
+        // Path to this groups members child
+        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
 
-            HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-            DatabaseReference groupsChildRef = homeScreenActivity.getmRootRef().child( thisGroupMembersPath );
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference groupsChildRef = homeScreenActivity.getmRootRef().child( thisGroupMembersPath );
 
-            // TODO: check if the user is already a member - error?
-            // TODO: what if that user is not a member? = error?
-            groupsChildRef.child( username ).removeValue();
-
+        // TODO: check if the user is already a member - error?
+        // TODO: what if that user is not a member? = error?
+        groupsChildRef.child( username ).removeValue();
 
 
         /** Updating user_groups subtree */
@@ -176,7 +191,7 @@ public class GroupFragment extends Fragment {
         usernameChildRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
-               String userId = dataSnapshot.getValue().toString();
+                String userId = dataSnapshot.getValue().toString();
 
                 String userGroupsPath = "user_groups/" + userId;
                 DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
@@ -190,7 +205,7 @@ public class GroupFragment extends Fragment {
             @Override
             public void onCancelled( DatabaseError databaseError ) {
             }
-        } );}
+        } );
     }
 
     /**
@@ -211,8 +226,8 @@ public class GroupFragment extends Fragment {
                 String dbGroupName = dataSnapshot.child( "name" ).getValue().toString();
                 String dbGroupCreator = dataSnapshot.child( "creator" ).getValue().toString();
                 DataSnapshot membersDataSnapshot = dataSnapshot.child( "members" );
-                ArrayList<String> dbMembers = new ArrayList<>(  );
-                for(DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren()) {
+                ArrayList< String > dbMembers = new ArrayList<>();
+                for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
                     dbMembers.add( memberDataSnapshot.getKey() );
                 }
 
@@ -229,7 +244,7 @@ public class GroupFragment extends Fragment {
 
                 User currentUser = User.getInstance();
                 String currentUsername = currentUser.getUsername();
-                if(mGroup.getmGroupCreator().compareTo( currentUsername ) == 0){
+                if ( mGroup.getmGroupCreator().compareTo( currentUsername ) == 0 ) {
                     mAddMemberBtn.setVisibility( View.VISIBLE );
                     mMemberNameEt.setVisibility( View.VISIBLE );
                     mDeleteGroupBtn.setVisibility( View.VISIBLE );
