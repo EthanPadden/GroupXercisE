@@ -89,6 +89,8 @@ public class GroupFragment extends Fragment {
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 if ( dataSnapshot.exists() ) {
                     Toast.makeText( getActivity(), "Adding user: "+ username, Toast.LENGTH_SHORT ).show();
+                    String userId = dataSnapshot.getValue().toString();
+                    addUserToGroup( username, userId );
                 } else {
                     Toast.makeText( getActivity(), "Username not found", Toast.LENGTH_SHORT ).show();
                 }
@@ -99,6 +101,27 @@ public class GroupFragment extends Fragment {
             }
         } );
     }
+
+    private void addUserToGroup(String username, String userId) {
+        /** Updating groups subtree */
+        // Path to this groups members child
+        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
+
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference groupsChildRef = homeScreenActivity.getmRootRef().child( thisGroupMembersPath );
+
+        // TODO: check if the user is already a member - error?
+
+        groupsChildRef.child( username ).setValue( false );
+
+        /** Updating user_groups subtree */
+        String userGroupsPath = "user_groups/" + userId;
+        DatabaseReference userGroupsChildRef = homeScreenActivity.getmRootRef().child( userGroupsPath );
+        userGroupsChildRef.child( mGroupId ).setValue( false );
+
+
+    }
+
     /**
      * Gets the group information from the DB using the group ID
      */
