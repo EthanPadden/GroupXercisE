@@ -155,6 +155,13 @@ public class GroupFragment extends Fragment {
                 mGroupCreatorText.setText( mGroup.getmGroupCreator() );
                 mItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mGroup.getMembers() );
                 mGroupMembersList.setAdapter( mItemsAdapter );
+
+                User currentUser = User.getInstance();
+                String currentUsername = currentUser.getUsername();
+                if(mGroup.getmGroupCreator().compareTo( currentUsername ) == 0){
+                    mAddMemberBtn.setVisibility( View.VISIBLE );
+                    mMemberNameEt.setVisibility( View.VISIBLE );
+                }
             }
 
             @Override
