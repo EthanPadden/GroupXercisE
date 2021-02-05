@@ -78,7 +78,6 @@ public class GroupFragment extends Fragment {
                 String username = mMemberNameEt.getText().toString();
                 if ( checkIfUsernameIsValid( username ) ) {
                     // You cannot remove the group creator
-
                     if ( mGroup.getmGroupCreator().compareTo( username ) == 0 ) {
                         Toast.makeText( getActivity(), "You cannot remove the creator", Toast.LENGTH_SHORT ).show();
                     } else {
@@ -99,6 +98,11 @@ public class GroupFragment extends Fragment {
         retrieveGroupInfo();
     }
 
+    /**
+     * Removes all members from the group (including the creator)
+     * Deletes the group
+     * Sets the fragment to be the my groups fragment
+     */
     private void deleteGroup() {
         // Remove all members
         for ( String memberUsername : mGroup.getMembers() ) {
@@ -118,10 +122,21 @@ public class GroupFragment extends Fragment {
         ft.commit();
     }
 
+    /**
+     * Checks the argument string is a valid username
+     * @param username the username to check
+     * @return true if the username is valid
+     */
     private boolean checkIfUsernameIsValid( String username ) {
         return username != null && username.compareTo( "" ) != 0;
     }
 
+    /**
+     * Checks if there is a user with the argument username
+     * If not, show error message
+     * If so, find the user ID and call addUserToGroup
+     * @param username
+     */
     private void checkIfUserExists( final String username ) {
         Toast.makeText( getActivity(), "Searching for user: " + username, Toast.LENGTH_SHORT ).show();
 
@@ -149,6 +164,11 @@ public class GroupFragment extends Fragment {
         } );
     }
 
+    /**
+     * Adds a user to the group, updating both the groups and user_groups subtrees
+     * @param username the username of the user to add
+     * @param userId the ID of the user to add
+     */
     private void addUserToGroup( String username, String userId ) {
         /** Updating groups subtree */
         // Path to this groups members child
@@ -170,6 +190,10 @@ public class GroupFragment extends Fragment {
         mGroup.getMembers().add( username );
     }
 
+    /**
+     * Removes a user from the group, updating both the groups and user_groups subtrees
+     * @param username the username of the user to remove
+     */
     private void removeMember( final String username ) {
 
         /** Updating groups subtree */
@@ -242,6 +266,7 @@ public class GroupFragment extends Fragment {
                 mItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mGroup.getMembers() );
                 mGroupMembersList.setAdapter( mItemsAdapter );
 
+                // If the user is the creator, show the components that allows the user admin controls
                 User currentUser = User.getInstance();
                 String currentUsername = currentUser.getUsername();
                 if ( mGroup.getmGroupCreator().compareTo( currentUsername ) == 0 ) {
