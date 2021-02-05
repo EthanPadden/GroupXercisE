@@ -74,8 +74,12 @@ public class GroupFragment extends Fragment {
         mRemoveMemberBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
-//                String username = mMemberNameEt.getText().toString();
-//                checkIfUsernameIsValid( username );
+                String username = mMemberNameEt.getText().toString();
+                if(checkIfUsernameIsValid( username ) ) {
+                    removeMember(username);
+                } else{
+                    Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
+                }
             }
         } );
         mDeleteGroupBtn.setOnClickListener( new View.OnClickListener() {
@@ -111,7 +115,7 @@ public class GroupFragment extends Fragment {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 if ( dataSnapshot.exists() ) {
-                    Toast.makeText( getActivity(), "Adding user: "+ username, Toast.LENGTH_SHORT ).show();
+                    Toast.makeText( getActivity(), "User found: "+ username, Toast.LENGTH_SHORT ).show();
                     String userId = dataSnapshot.getValue().toString();
                     addUserToGroup( username, userId );
                 } else {
@@ -144,6 +148,49 @@ public class GroupFragment extends Fragment {
 
         /** Updating group in memory and UI */
         mGroup.getMembers().add( username );
+    }
+
+    private void removeMember(final String username) {
+        // You cannot remove the group creator
+
+        if(mGroup.getmGroupCreator().compareTo( username ) == 0) {
+            Toast.makeText( getActivity(), "You cannot remove the creator", Toast.LENGTH_SHORT ).show();
+        } else {
+            /** Updating groups subtree */
+            // Path to this groups members child
+            String thisGroupMembersPath = "groups/" + mGroupId + "/members";
+
+            HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+            DatabaseReference groupsChildRef = homeScreenActivity.getmRootRef().child( thisGroupMembersPath );
+
+            // TODO: check if the user is already a member - error?
+            // TODO: what if that user is not a member? = error?
+            groupsChildRef.child( username ).removeValue();
+
+
+
+        /** Updating user_groups subtree */
+        String usernamePath = "usernames/" + username;
+        final DatabaseReference rootRef = homeScreenActivity.getmRootRef();
+        DatabaseReference usernameChildRef = rootRef.child( usernamePath );
+        usernameChildRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+               String userId = dataSnapshot.getValue().toString();
+
+                String userGroupsPath = "user_groups/" + userId;
+                DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
+                userGroupsChildRef.child( mGroupId ).removeValue();
+
+                /** Updating group in memory and UI */
+                mGroup.getMembers().remove( username );
+            }
+
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );}
     }
 
     /**
