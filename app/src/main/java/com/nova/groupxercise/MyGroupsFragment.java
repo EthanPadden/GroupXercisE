@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 public class MyGroupsFragment extends Fragment {
     private Button mCreateGroupBtn;
-    private ArrayList<String> mGroupNames;
+    private ArrayList<Group> mGroups;
     private ArrayAdapter< String > mItemsAdapter;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     private TextView mLoadingText;
@@ -93,13 +93,13 @@ public class MyGroupsFragment extends Fragment {
 
     private void retrieveGroupNames(ArrayList<String> groupIds) {
 // Create an empty list for the group names
-        mGroupNames = new ArrayList<>();
+        mGroups = new ArrayList<>();
 
         // Set the list as the list for the items adapter
-        mItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mGroupNames );
+        mItemsAdapter = new GroupItemsAdapter( getActivity(),  mGroups );
 
         final int expectedSize = groupIds.size();
-        for(String groupId : groupIds) {
+        for( final String groupId : groupIds) {
             String groupPath = "groups/" + groupId;
             DatabaseReference groupRef = mRootRef.child( groupPath );
 
@@ -107,8 +107,8 @@ public class MyGroupsFragment extends Fragment {
                 @Override
                 public void onDataChange( DataSnapshot dataSnapshot ) {
                     String groupName = dataSnapshot.child( "name" ).getValue().toString();
-                    mGroupNames.add( groupName );
-                    if(mGroupNames.size() == expectedSize) {
+                    mGroups.add( new Group( groupName, groupId ) );
+                    if(mGroups.size() == expectedSize) {
                         setupGroupsList();
                     }
                 }
@@ -118,7 +118,7 @@ public class MyGroupsFragment extends Fragment {
                 }
             } );
         }
-        if(mGroupNames.size() == 0) {
+        if(mGroups.size() == 0) {
             mLoadingText.setText( "You have no groups" );
         }
 
