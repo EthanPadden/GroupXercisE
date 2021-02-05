@@ -35,16 +35,22 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
             switch ( item.getItemId() ) {
-                case R.id.navigation_dashboard:
+                case R.id.navigation_discoveries:
                     getSupportActionBar().setTitle( R.string.title_discoveries );
                     DiscoveriesFragment discoveriesFragment = new DiscoveriesFragment();
                     ft.replace( R.id.frame_home_screen_fragment_placeholder, discoveriesFragment );
                     ft.commit();
                     return true;
-                case R.id.navigation_notifications:
+                case R.id.navigation_goals:
                     getSupportActionBar().setTitle( R.string.title_goals );
                     GoalsFragment goalsFragment = new GoalsFragment();
                     ft.replace( R.id.frame_home_screen_fragment_placeholder, goalsFragment );
+                    ft.commit();
+                    return true;
+                case R.id.navigation_groups:
+                    getSupportActionBar().setTitle( "Groups" );
+                    MyGroupsFragment groupsFragment = new MyGroupsFragment();
+                    ft.replace( R.id.frame_home_screen_fragment_placeholder, groupsFragment );
                     ft.commit();
                     return true;
             }
