@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,6 +24,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 
 /**
@@ -53,6 +56,10 @@ public class ExerciseListItemFragment extends Fragment {
     private RadioButton mGoalOptionsAutomaticRatioBtn;
     private RadioButton mGoalOptionsManualRatioBtn;
     private EditText mManualGoalET;
+    private ArrayAdapter mItemsAdapter;
+    private ArrayList mAdminGroupNames;
+    private ListView mListView;
+    private TextView mLoadingText;
 
     // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
@@ -109,6 +116,9 @@ public class ExerciseListItemFragment extends Fragment {
         mGoalOptionsAutomaticRatioBtn = view.findViewById( R.id.radio_btn_goal_option_automatic );
         mGoalOptionsManualRatioBtn = view.findViewById( R.id.radio_btn_goal_option_manual );
         mManualGoalET = view.findViewById( R.id.et_exercise_weight );
+        mListView = view.findViewById( R.id.goal_groups_list );
+        mLoadingText = view.findViewById( R.id.text_loading_group_list );
+
 
         // Set spinner adapter
         mLevelSpinner.setAdapter( mLevelSpinnerAdapter );
@@ -185,6 +195,89 @@ public class ExerciseListItemFragment extends Fragment {
 
         // Get the strength standards from the DB based on the user details
         retrieveStrengthStandards( mExerciseName );
+        retrieveGroupIds();
+    }
+
+    private void retrieveGroupIds() {
+        // Create empty list for the group IDs that the user is an admin of
+        final ArrayList<String> groupIds = new ArrayList<>(  );
+
+        // Get the current user ID
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Path to the reference
+        final String usersGroupPath = "user_groups/" + currentUserId;
+        DatabaseReference childRef = mRootRef.child( usersGroupPath );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
+                    Boolean isAdmin = (Boolean) usersGroupsDataSnapshot.getValue();
+                    if(isAdmin.booleanValue() == true) {
+                        // If the current user is an admin of the group
+                        groupIds.add(  usersGroupsDataSnapshot.getKey());
+                    }
+                }
+
+                retrieveGroupNames( groupIds );
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    private void retrieveGroupNames(ArrayList<String> groupIds) {
+        // Create an empty list for the group names
+        mAdminGroupNames = new ArrayList<>();
+
+        // Set the list as the list for the items adapter
+        mItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mAdminGroupNames );
+
+        // The UI is updated when all of the group names have been added
+        // Necessary because of the async call within the for loop
+        final int expectedSize = groupIds.size();
+
+        for( final String groupId : groupIds) {
+            String groupPath = "groups/" + groupId;
+            DatabaseReference groupRef = mRootRef.child( groupPath );
+
+            groupRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange( DataSnapshot dataSnapshot ) {
+                    String groupName = dataSnapshot.child( "name" ).getValue().toString();
+                    mAdminGroupNames.add( groupName );
+                    if(mAdminGroupNames.size() == expectedSize) {
+                        // When we have all the group names retrieved
+                        setupGroupsList();
+                    }
+                }
+
+                @Override
+                public void onCancelled( DatabaseError databaseError ) {
+                }
+            } );
+        }
+        if(mAdminGroupNames.size() == 0) {
+            mLoadingText.setText( "You are the admin of no groups" );
+        }
+    }
+    private void setupGroupsList() {
+        mLoadingText.setVisibility( View.GONE );
+        mListView.setAdapter( mItemsAdapter );
+
+        // Set event listeners
+        mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
+                String selectedGroupName = mListView.getItemAtPosition( i ).toString();
+                Toast.makeText( getActivity(), selectedGroupName,Toast.LENGTH_SHORT ).show();
+            }
+        } );
+
+        mListView.setVisibility( View.VISIBLE );
     }
 
     /**
