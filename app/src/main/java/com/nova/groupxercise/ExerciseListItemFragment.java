@@ -200,7 +200,7 @@ public class ExerciseListItemFragment extends Fragment {
 
     private void retrieveGroupIds() {
         // Create empty list for the group IDs that the user is an admin of
-        final ArrayList<String> groupIds = new ArrayList<>(  );
+        final ArrayList< String > groupIds = new ArrayList<>();
 
         // Get the current user ID
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -213,10 +213,10 @@ public class ExerciseListItemFragment extends Fragment {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
-                    Boolean isAdmin = (Boolean) usersGroupsDataSnapshot.getValue();
-                    if(isAdmin.booleanValue() == true) {
+                    Boolean isAdmin = ( Boolean ) usersGroupsDataSnapshot.getValue();
+                    if ( isAdmin.booleanValue() == true ) {
                         // If the current user is an admin of the group
-                        groupIds.add(  usersGroupsDataSnapshot.getKey());
+                        groupIds.add( usersGroupsDataSnapshot.getKey() );
                     }
                 }
 
@@ -229,18 +229,18 @@ public class ExerciseListItemFragment extends Fragment {
         } );
     }
 
-    private void retrieveGroupNames(ArrayList<String> groupIds) {
+    private void retrieveGroupNames( ArrayList< String > groupIds ) {
         // Create an empty list for the group names
         mAdminGroups = new ArrayList<>();
 
         // Set the list as the list for the items adapter
-        mItemsAdapter = new GroupItemsAdapter( getActivity(),  mAdminGroups );
+        mItemsAdapter = new GroupItemsAdapter( getActivity(), mAdminGroups );
 
         // The UI is updated when all of the group names have been added
         // Necessary because of the async call within the for loop
         final int expectedSize = groupIds.size();
 
-        for( final String groupId : groupIds) {
+        for ( final String groupId : groupIds ) {
             String groupPath = "groups/" + groupId;
             DatabaseReference groupRef = mRootRef.child( groupPath );
 
@@ -249,7 +249,7 @@ public class ExerciseListItemFragment extends Fragment {
                 public void onDataChange( DataSnapshot dataSnapshot ) {
                     String groupName = dataSnapshot.child( "name" ).getValue().toString();
                     mAdminGroups.add( new Group( groupName, groupId ) );
-                    if(mAdminGroups.size() == expectedSize) {
+                    if ( mAdminGroups.size() == expectedSize ) {
                         // When we have all the group names retrieved
                         setupGroupsList();
                     }
@@ -260,10 +260,11 @@ public class ExerciseListItemFragment extends Fragment {
                 }
             } );
         }
-        if(mAdminGroups.size() == 0) {
+        if ( mAdminGroups.size() == 0 ) {
             mLoadingText.setText( "You are the admin of no groups" );
         }
     }
+
     private void setupGroupsList() {
         mLoadingText.setVisibility( View.GONE );
         mListView.setAdapter( mItemsAdapter );
@@ -272,12 +273,58 @@ public class ExerciseListItemFragment extends Fragment {
         mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
-                String selectedGroupName = mListView.getItemAtPosition( i ).toString();
-                Toast.makeText( getActivity(), selectedGroupName,Toast.LENGTH_SHORT ).show();
+                Group selectedGroup = ( Group ) mListView.getItemAtPosition( i );
+                String groupId = selectedGroup.getmGroupId();
+
+                if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
+                    // Automatic goal calculation option: use suggested goal
+                    float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
+                    saveGroupGoal( groupId, new Goal( mExerciseName, 0, target ) );
+                } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
+                    // Manual goal calculation option: use user-set goal
+                    String targetStr = ( mManualGoalET.getText().toString() );
+
+                    if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
+                        float target = Float.parseFloat( targetStr );
+                        saveGroupGoal(groupId, new Goal( mExerciseName, 0, target ) );
+                    } else {
+                        Toast.makeText( getActivity(), R.string.error_no_target_entered, Toast.LENGTH_SHORT ).show();
+                    }
+                } else {
+                    Toast.makeText( getActivity(), R.string.error_generic, Toast.LENGTH_SHORT ).show();
+                }
             }
         } );
 
         mListView.setVisibility( View.VISIBLE );
+    }
+
+    private void saveGroupGoal( String groupId, final Goal goal ) {
+        // Path to the group goal
+        String path = "groups/" + groupId + "/goals/" + goal.getmExerciseName();
+
+        // Get the DB reference
+        final DatabaseReference childRef = mRootRef.child( path );
+
+        // Check if we have a set of goals for that particular user
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
+
+                } else {
+                    Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
+
+                }
+                childRef.setValue( goal.getmTarget() );
+
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
     }
 
     /**
