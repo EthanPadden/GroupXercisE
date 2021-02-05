@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -21,10 +22,11 @@ import java.util.ArrayList;
 public class GroupFragment extends Fragment {
     private Group mGroup;
     private String mGroupId;
-    private ArrayList<String> mGroupMembers;
     private TextView mGroupNameText;
     private TextView mGroupCreatorText;
     private ListView mGroupMembersList;
+    private ArrayAdapter< String > mItemsAdapter;
+
 
     public GroupFragment( String mGroupId ) {
         this.mGroupId = mGroupId;
@@ -46,6 +48,8 @@ public class GroupFragment extends Fragment {
         mGroupCreatorText = view.findViewById( R.id.text_creator );
         mGroupMembersList = view.findViewById( R.id.list_members );
 
+        retrieveGroupInfo();
+
     }
 
     private void retrieveGroupInfo() {
@@ -55,6 +59,8 @@ public class GroupFragment extends Fragment {
         // Get the DB reference
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
         DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+
+
 
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
@@ -67,9 +73,16 @@ public class GroupFragment extends Fragment {
                     dbMembers.add( memberDataSnapshot.getKey() );
                 }
 
-                mGroup = new Group( mGroupId, dbGroupName );
+                mGroup = new Group( dbGroupName, mGroupId );
                 mGroup.setmGroupCreator( dbGroupCreator );
                 mGroup.setMembers( dbMembers );
+
+                mGroupNameText.setText( mGroup.getmGroupName() );
+                mGroupCreatorText.setText( mGroup.getmGroupCreator() );
+
+                mItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mGroup.getMembers() );
+                mGroupMembersList.setAdapter( mItemsAdapter );
+
             }
 
             @Override
