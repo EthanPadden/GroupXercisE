@@ -11,15 +11,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 
 public class GroupFragment extends Fragment {
-    private String mGroupName;
-    private String mGroupCreator;
+    private Group mGroup;
+    private String mGroupId;
     private ArrayList<String> mGroupMembers;
     private TextView mGroupNameText;
     private TextView mGroupCreatorText;
     private ListView mGroupMembersList;
+
+    public GroupFragment( String mGroupId ) {
+        this.mGroupId = mGroupId;
+    }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
@@ -36,5 +45,36 @@ public class GroupFragment extends Fragment {
         mGroupNameText = view.findViewById( R.id.text_group_name );
         mGroupCreatorText = view.findViewById( R.id.text_creator );
         mGroupMembersList = view.findViewById( R.id.list_members );
+
+    }
+
+    private void retrieveGroupInfo() {
+        // Path to the group
+        String path = "groups/" + mGroupId;
+
+        // Get the DB reference
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                String dbGroupName = dataSnapshot.child( "name" ).getValue().toString();
+                String dbGroupCreator = dataSnapshot.child( "creator" ).getValue().toString();
+                DataSnapshot membersDataSnapshot = dataSnapshot.child( "members" );
+                ArrayList<String> dbMembers = new ArrayList<>(  );
+                for(DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren()) {
+                    dbMembers.add( memberDataSnapshot.getKey() );
+                }
+
+                mGroup = new Group( mGroupId, dbGroupName );
+                mGroup.setmGroupCreator( dbGroupCreator );
+                mGroup.setMembers( dbMembers );
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
     }
 }
