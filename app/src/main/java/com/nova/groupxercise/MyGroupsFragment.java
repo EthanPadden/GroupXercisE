@@ -24,7 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 
-public class GroupsFragment extends Fragment {
+public class MyGroupsFragment extends Fragment {
     private Button mCreateGroupBtn;
     private ArrayList<String> mGroupNames;
     private ArrayAdapter< String > mItemsAdapter;
@@ -43,7 +43,7 @@ public class GroupsFragment extends Fragment {
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
         // Inflate the layout for this fragment
-        return inflater.inflate( R.layout.fragment_groups, container, false );
+        return inflater.inflate( R.layout.fragment_my_groups, container, false );
 
 
     }

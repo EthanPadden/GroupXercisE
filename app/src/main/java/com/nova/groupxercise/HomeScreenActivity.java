@@ -49,7 +49,7 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
                     return true;
                 case R.id.navigation_groups:
                     getSupportActionBar().setTitle( "Groups" );
-                    GroupsFragment groupsFragment = new GroupsFragment();
+                    MyGroupsFragment groupsFragment = new MyGroupsFragment();
                     ft.replace( R.id.frame_home_screen_fragment_placeholder, groupsFragment );
                     ft.commit();
                     return true;
