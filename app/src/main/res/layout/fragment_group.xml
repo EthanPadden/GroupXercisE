@@ -62,6 +62,37 @@
             android:layout_below="@id/table_group_details"
             tools:context="com.nova.groupxercise.HomeScreenActivity" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:id="@+id/btn_add_member"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/list_members"
+            android:text="Add Member"
+            android:visibility="gone"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_add_member"
+            android:id="@+id/et_member_name"
+            android:visibility="gone"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:id="@+id/btn_delete_group"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_member_name"
+            android:text="Delete Group"
+            android:visibility="gone"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:id="@+id/btn_remove_member"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_delete_group"
+            android:text="Remove Member"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 
 </FrameLayout>
