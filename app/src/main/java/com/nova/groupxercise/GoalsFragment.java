@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,6 +47,42 @@ public class GoalsFragment extends Fragment {
 
         mLoadingText.setVisibility( View.INVISIBLE );
         retrieveGoals();
+        retrieveGroupIds();
+    }
+
+    private void retrieveGroupIds() {
+        // Create empty list for the group IDs
+        final ArrayList<String> groupIds = new ArrayList<>(  );
+
+        // Get the current user ID
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Path to the reference
+        String usersGroupPath = "user_groups/" + currentUserId;
+        // Get the DBr reference
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( usersGroupPath );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
+                    groupIds.add(  usersGroupsDataSnapshot.getKey());
+                }
+
+                retrieveGroupGoals(groupIds);
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    private void retrieveGroupGoals(ArrayList<String> groupIds) {
+        for(String id : groupIds) {
+            Toast.makeText( getActivity(), id, Toast.LENGTH_SHORT ).show();
+        }
     }
 
     /**
@@ -102,5 +139,9 @@ public class GoalsFragment extends Fragment {
             public void onCancelled( DatabaseError databaseError ) {
             }
         } );
+    }
+
+    private void retreiveGroupGoals() {
+
     }
 }
