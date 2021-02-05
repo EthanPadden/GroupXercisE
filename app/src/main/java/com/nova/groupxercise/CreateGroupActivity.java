@@ -19,8 +19,6 @@ public class CreateGroupActivity extends AppCompatActivity {
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     private FirebaseAuth mAuth;
 
-
-
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
@@ -41,6 +39,12 @@ public class CreateGroupActivity extends AppCompatActivity {
         } );
     }
 
+    /**
+     * Check if the argument string is a valid group name
+     * If so, calls createGroup
+     * If not, shows error message
+     * @param groupName the group name to be checked
+     */
     private void checkIfGroupNameIsValid( String groupName ) {
         if ( groupName == null || groupName.compareTo( "" ) == 0 ) {
             Toast.makeText( CreateGroupActivity.this, "Invalid group name", Toast.LENGTH_SHORT ).show();
@@ -49,6 +53,13 @@ public class CreateGroupActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Creates a group in the DB:
+     *      Creates child in the groups subtree
+     *      Creates child in the user_groups subtree
+     * Navigates to the home screen
+     * @param groupName the name of the group to be created
+     */
     private void createGroup( String groupName ) {
         // Path to the groups child
         String groupsPath = "groups/";

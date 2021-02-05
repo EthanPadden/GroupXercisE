@@ -46,18 +46,18 @@ public class MyGroupsFragment extends Fragment {
                               Bundle savedInstanceState ) {
         // Inflate the layout for this fragment
         return inflater.inflate( R.layout.fragment_my_groups, container, false );
-
-
     }
 
     @Override
     public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
         super.onViewCreated( view, savedInstanceState );
 
+        // Initialise components
         mListView = view.findViewById( R.id.groups_list );
         mCreateGroupBtn = view.findViewById( R.id.btn_create_group );
         mLoadingText = view.findViewById( R.id.info_groups );
 
+        // Set event listeners
         mCreateGroupBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
@@ -69,12 +69,19 @@ public class MyGroupsFragment extends Fragment {
         retrieveGroupIds();
     }
 
+    /**
+     * Gets the IDs of the groups that the current user is a part of
+     * Calls retrieveGroupNames
+     */
     private void retrieveGroupIds() {
+        // Create empty list for the group IDs
         final ArrayList<String> groupIds = new ArrayList<>(  );
 
+        // Get the current user ID
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String usersGroupPath = "user_groups/" + currentUserId;
 
+        // Path to the reference
+        String usersGroupPath = "user_groups/" + currentUserId;
         DatabaseReference childRef = mRootRef.child( usersGroupPath );
 
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
@@ -93,14 +100,22 @@ public class MyGroupsFragment extends Fragment {
         } );
     }
 
+    /**
+     * Sets the list of group names using the list of group IDs
+     * Calls setupGroupsList
+     * @param groupIds the list of group IDs
+     */
     private void retrieveGroupNames(ArrayList<String> groupIds) {
-// Create an empty list for the group names
+        // Create an empty list for the group names
         mGroups = new ArrayList<>();
 
         // Set the list as the list for the items adapter
         mItemsAdapter = new GroupItemsAdapter( getActivity(),  mGroups );
 
+        // The UI is updated when all of the group names have been added
+        // Necessary because of the async call within the for loop
         final int expectedSize = groupIds.size();
+
         for( final String groupId : groupIds) {
             String groupPath = "groups/" + groupId;
             DatabaseReference groupRef = mRootRef.child( groupPath );
@@ -111,6 +126,7 @@ public class MyGroupsFragment extends Fragment {
                     String groupName = dataSnapshot.child( "name" ).getValue().toString();
                     mGroups.add( new Group( groupName, groupId ) );
                     if(mGroups.size() == expectedSize) {
+                        // When we have all the group names retrieved
                         setupGroupsList();
                     }
                 }
@@ -126,6 +142,9 @@ public class MyGroupsFragment extends Fragment {
 
     }
 
+    /**
+     * Updates the UI with the group names and sets event listeners for the list items
+     */
     private void setupGroupsList() {
         mLoadingText.setVisibility( View.GONE );
         mListView.setAdapter( mItemsAdapter );

@@ -49,9 +49,11 @@ public class GroupFragment extends Fragment {
         mGroupMembersList = view.findViewById( R.id.list_members );
 
         retrieveGroupInfo();
-
     }
 
+    /**
+     * Gets the group information from the DB using the group ID
+     */
     private void retrieveGroupInfo() {
         // Path to the group
         String path = "groups/" + mGroupId;
@@ -60,11 +62,10 @@ public class GroupFragment extends Fragment {
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
         DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
 
-
-
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
+                // Get values
                 String dbGroupName = dataSnapshot.child( "name" ).getValue().toString();
                 String dbGroupCreator = dataSnapshot.child( "creator" ).getValue().toString();
                 DataSnapshot membersDataSnapshot = dataSnapshot.child( "members" );
@@ -73,16 +74,16 @@ public class GroupFragment extends Fragment {
                     dbMembers.add( memberDataSnapshot.getKey() );
                 }
 
+                // Create group object
                 mGroup = new Group( dbGroupName, mGroupId );
                 mGroup.setmGroupCreator( dbGroupCreator );
                 mGroup.setMembers( dbMembers );
 
+                // Update UI
                 mGroupNameText.setText( mGroup.getmGroupName() );
                 mGroupCreatorText.setText( mGroup.getmGroupCreator() );
-
                 mItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mGroup.getMembers() );
                 mGroupMembersList.setAdapter( mItemsAdapter );
-
             }
 
             @Override
