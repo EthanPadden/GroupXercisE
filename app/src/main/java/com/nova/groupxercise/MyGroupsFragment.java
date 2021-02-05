@@ -109,8 +109,7 @@ public class MyGroupsFragment extends Fragment {
                     String groupName = dataSnapshot.child( "name" ).getValue().toString();
                     mGroupNames.add( groupName );
                     if(mGroupNames.size() == expectedSize) {
-                        mLoadingText.setVisibility( View.GONE );
-                        mListView.setAdapter( mItemsAdapter );
+                        setupGroupsList();
                     }
                 }
 
@@ -123,6 +122,11 @@ public class MyGroupsFragment extends Fragment {
             mLoadingText.setText( "You have no groups" );
         }
 
+    }
+
+    private void setupGroupsList() {
+        mLoadingText.setVisibility( View.GONE );
+        mListView.setAdapter( mItemsAdapter );
     }
 
 }
