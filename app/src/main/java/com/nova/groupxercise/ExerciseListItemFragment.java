@@ -57,7 +57,7 @@ public class ExerciseListItemFragment extends Fragment {
     private RadioButton mGoalOptionsManualRatioBtn;
     private EditText mManualGoalET;
     private ArrayAdapter mItemsAdapter;
-    private ArrayList mAdminGroupNames;
+    private ArrayList mAdminGroups;
     private ListView mListView;
     private TextView mLoadingText;
 
@@ -231,10 +231,10 @@ public class ExerciseListItemFragment extends Fragment {
 
     private void retrieveGroupNames(ArrayList<String> groupIds) {
         // Create an empty list for the group names
-        mAdminGroupNames = new ArrayList<>();
+        mAdminGroups = new ArrayList<>();
 
         // Set the list as the list for the items adapter
-        mItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mAdminGroupNames );
+        mItemsAdapter = new GroupItemsAdapter( getActivity(),  mAdminGroups );
 
         // The UI is updated when all of the group names have been added
         // Necessary because of the async call within the for loop
@@ -248,8 +248,8 @@ public class ExerciseListItemFragment extends Fragment {
                 @Override
                 public void onDataChange( DataSnapshot dataSnapshot ) {
                     String groupName = dataSnapshot.child( "name" ).getValue().toString();
-                    mAdminGroupNames.add( groupName );
-                    if(mAdminGroupNames.size() == expectedSize) {
+                    mAdminGroups.add( new Group( groupName, groupId ) );
+                    if(mAdminGroups.size() == expectedSize) {
                         // When we have all the group names retrieved
                         setupGroupsList();
                     }
@@ -260,7 +260,7 @@ public class ExerciseListItemFragment extends Fragment {
                 }
             } );
         }
-        if(mAdminGroupNames.size() == 0) {
+        if(mAdminGroups.size() == 0) {
             mLoadingText.setText( "You are the admin of no groups" );
         }
     }
