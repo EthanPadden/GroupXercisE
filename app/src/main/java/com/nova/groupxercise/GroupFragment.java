@@ -30,10 +30,14 @@ public class GroupFragment extends Fragment {
     private TextView mGroupCreatorText;
     private ListView mGroupMembersList;
     private ArrayAdapter< String > mItemsAdapter;
+    private ArrayAdapter< String > mGoalsAdapter;
     private Button mAddMemberBtn;
     private Button mDeleteGroupBtn;
     private Button mRemoveMemberBtn;
     private EditText mMemberNameEt;
+    private ListView mGroupGoalsList;
+    private TextView mGroupGoalsLoadingText;
+    private ArrayList mGroupGoals;
 
 
     public GroupFragment( String mGroupId ) {
@@ -59,6 +63,8 @@ public class GroupFragment extends Fragment {
         mMemberNameEt = view.findViewById( R.id.et_member_name );
         mDeleteGroupBtn = view.findViewById( R.id.btn_delete_group );
         mRemoveMemberBtn = view.findViewById( R.id.btn_remove_member );
+        mGroupGoalsList = view.findViewById( R.id.list_group_goals );
+        mGroupGoalsLoadingText = view.findViewById( R.id.text_group_goals_loading );
 
         // Set event listeners
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
@@ -96,6 +102,41 @@ public class GroupFragment extends Fragment {
         } );
 
         retrieveGroupInfo();
+        retrieveGroupGoals();
+    }
+
+    private void retrieveGroupGoals() {
+        // Path to group goals
+        String path = "groups/" + mGroupId + "/goals";
+
+        // Get the DB reference
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+               if(dataSnapshot.exists()) {
+                   mGroupGoals = new ArrayList(  );
+                    for(DataSnapshot goalDataSnapshot : dataSnapshot.getChildren()) {
+                        String exerciseName = goalDataSnapshot.getKey();
+                        String target = goalDataSnapshot.getValue().toString();
+                        mGroupGoals.add( exerciseName + ": " + target );
+                        mGroupGoalsLoadingText.setVisibility( View.GONE );
+                        mGoalsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mGroupGoals );
+                        mGroupGoalsList.setAdapter( mGoalsAdapter );
+                        mGroupGoalsList.setVisibility( View.VISIBLE );
+
+                    }
+               } else {
+                   mGroupGoalsLoadingText.setText( "No goals" );
+               }
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
     }
 
     /**
