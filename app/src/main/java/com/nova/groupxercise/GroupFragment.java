@@ -30,6 +30,8 @@ public class GroupFragment extends Fragment {
     private ListView mGroupMembersList;
     private ArrayAdapter< String > mItemsAdapter;
     private Button mAddMemberBtn;
+    private Button mDeleteGroupBtn;
+    private Button mRemoveMemberBtn;
     private EditText mMemberNameEt;
 
 
@@ -54,25 +56,46 @@ public class GroupFragment extends Fragment {
         mGroupMembersList = view.findViewById( R.id.list_members );
         mAddMemberBtn = view.findViewById( R.id.btn_add_member );
         mMemberNameEt = view.findViewById( R.id.et_member_name );
+        mDeleteGroupBtn = view.findViewById( R.id.btn_delete_group );
+        mRemoveMemberBtn = view.findViewById( R.id.btn_remove_member );
 
         // Set event listeners
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
                 String username = mMemberNameEt.getText().toString();
-                checkIfUsernameIsValid( username );
+                if(checkIfUsernameIsValid( username ) ) {
+                    checkIfUserExists(username);
+                } else{
+                    Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
+                }
+            }
+        } );
+        mRemoveMemberBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View view ) {
+//                String username = mMemberNameEt.getText().toString();
+//                checkIfUsernameIsValid( username );
+            }
+        } );
+        mDeleteGroupBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View view ) {
+                deleteGroup();
             }
         } );
 
         retrieveGroupInfo();
     }
 
-    private void checkIfUsernameIsValid( String username ) {
-        if ( username == null || username.compareTo( "" ) == 0 ) {
-            Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
-        } else {
-            checkIfUserExists(username);
-        }
+    private void deleteGroup() {
+        // For all members, delete from the user_groups subtree
+
+        // Delete group subtree
+    }
+
+    private boolean checkIfUsernameIsValid( String username ) {
+        return username != null && username.compareTo( "" ) != 0;
     }
 
     private void checkIfUserExists( final String username) {
@@ -119,7 +142,8 @@ public class GroupFragment extends Fragment {
         DatabaseReference userGroupsChildRef = homeScreenActivity.getmRootRef().child( userGroupsPath );
         userGroupsChildRef.child( mGroupId ).setValue( false );
 
-
+        /** Updating group in memory and UI */
+        mGroup.getMembers().add( username );
     }
 
     /**
@@ -161,6 +185,8 @@ public class GroupFragment extends Fragment {
                 if(mGroup.getmGroupCreator().compareTo( currentUsername ) == 0){
                     mAddMemberBtn.setVisibility( View.VISIBLE );
                     mMemberNameEt.setVisibility( View.VISIBLE );
+                    mDeleteGroupBtn.setVisibility( View.VISIBLE );
+                    mRemoveMemberBtn.setVisibility( View.VISIBLE );
                 }
             }
 
