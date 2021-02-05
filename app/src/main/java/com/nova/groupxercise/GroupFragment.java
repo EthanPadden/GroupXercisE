@@ -71,8 +71,33 @@ public class GroupFragment extends Fragment {
         if ( username == null || username.compareTo( "" ) == 0 ) {
             Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
         } else {
-            Toast.makeText( getActivity(), "Searching for user: " + username, Toast.LENGTH_SHORT ).show();
+            checkIfUserExists(username);
         }
+    }
+
+    private void checkIfUserExists( final String username) {
+        Toast.makeText( getActivity(), "Searching for user: " + username, Toast.LENGTH_SHORT ).show();
+
+        // Path to the username child
+        String path = "usernames/" + username;
+
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    Toast.makeText( getActivity(), "Adding user: "+ username, Toast.LENGTH_SHORT ).show();
+                } else {
+                    Toast.makeText( getActivity(), "Username not found", Toast.LENGTH_SHORT ).show();
+                }
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
     }
     /**
      * Gets the group information from the DB using the group ID
