@@ -5,8 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +29,8 @@ public class GroupFragment extends Fragment {
     private TextView mGroupCreatorText;
     private ListView mGroupMembersList;
     private ArrayAdapter< String > mItemsAdapter;
+    private Button mAddMemberBtn;
+    private EditText mMemberNameEt;
 
 
     public GroupFragment( String mGroupId ) {
@@ -47,10 +52,28 @@ public class GroupFragment extends Fragment {
         mGroupNameText = view.findViewById( R.id.text_group_name );
         mGroupCreatorText = view.findViewById( R.id.text_creator );
         mGroupMembersList = view.findViewById( R.id.list_members );
+        mAddMemberBtn = view.findViewById( R.id.btn_add_member );
+        mMemberNameEt = view.findViewById( R.id.et_member_name );
+
+        // Set event listeners
+        mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View view ) {
+                String username = mMemberNameEt.getText().toString();
+                checkIfUsernameIsValid( username );
+            }
+        } );
 
         retrieveGroupInfo();
     }
 
+    private void checkIfUsernameIsValid( String username ) {
+        if ( username == null || username.compareTo( "" ) == 0 ) {
+            Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
+        } else {
+            Toast.makeText( getActivity(), "Searching for user: " + username, Toast.LENGTH_SHORT ).show();
+        }
+    }
     /**
      * Gets the group information from the DB using the group ID
      */

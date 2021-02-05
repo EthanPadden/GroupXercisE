@@ -62,6 +62,19 @@
             android:layout_below="@id/table_group_details"
             tools:context="com.nova.groupxercise.HomeScreenActivity" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:id="@+id/btn_add_member"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/list_members"
+            android:text="Add Member"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_add_member"
+            android:id="@+id/et_member_name"/>
+
     </RelativeLayout>
 
 </FrameLayout>
