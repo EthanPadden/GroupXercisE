@@ -147,9 +147,14 @@ public class ExerciseListItemFragment extends Fragment {
         mSetGoalBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
-                    // Automatic goal calculation option: use suggested goal
-                    float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
-                    saveGoal( new Goal( mExerciseName, 0, target ) );
+                    User currentUser = User.getInstance();
+                    if(currentUser.isUserDetailsAreSet()) {
+                        // Automatic goal calculation option: use suggested goal
+                        float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
+                        saveGoal( new Goal( mExerciseName, 0, target ) );
+                    } else {
+                        Toast.makeText( getActivity(), "Invalid details", Toast.LENGTH_SHORT ).show();
+                    }
                 } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
                     // Manual goal calculation option: use user-set goal
                     String targetStr = ( mManualGoalET.getText().toString() );
@@ -287,9 +292,14 @@ public class ExerciseListItemFragment extends Fragment {
                 String groupId = selectedGroup.getmGroupId();
 
                 if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
-                    // Automatic goal calculation option: use suggested goal
-                    float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
-                    saveGroupGoal( groupId, new Goal( mExerciseName, 0, target ) );
+                    User currentUser = User.getInstance();
+                    if(currentUser.isUserDetailsAreSet()) {
+                        // Automatic goal calculation option: use suggested goal
+                        float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
+                        saveGroupGoal( groupId, new Goal( mExerciseName, 0, target ) );
+                    } else {
+                        Toast.makeText( getActivity(), "Invalid details", Toast.LENGTH_SHORT ).show();
+                    }
                 } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
                     // Manual goal calculation option: use user-set goal
                     String targetStr = ( mManualGoalET.getText().toString() );
