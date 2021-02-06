@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,6 +27,7 @@ public class GoalsFragment extends Fragment {
     private ListView mListView;
     private TextView mLoadingText;
     private ArrayList< Group > mGroups;
+    private LinearLayout mGroupGoalsLayout;
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
@@ -41,6 +43,7 @@ public class GoalsFragment extends Fragment {
         // Initialise components
         mListView = view.findViewById( R.id.goal_list );
         mLoadingText = view.findViewById( R.id.text_loading_exercise_list );
+        mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
 
         // Set the list as the list for the items adapter
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mGoalsList );
@@ -136,7 +139,35 @@ public class GoalsFragment extends Fragment {
     }
 
     private void displayGroupGoals() {
+        for(Group group : mGroups) {
+            // Group title
+            TextView groupTitleText = new TextView( getActivity() );
+            groupTitleText.setText( group.getmGroupName().toUpperCase() );
+            mGroupGoalsLayout.addView( groupTitleText );
 
+            if(group.getGoals() != null) {
+                ListView groupListView = createGroupGoalsListView( group );
+
+                // Append to layout
+                mGroupGoalsLayout.addView( groupListView );
+
+            } else {
+                // Display that the group has no goals
+                TextView noGoalsText = new TextView( getActivity() );
+                noGoalsText.setText( "No goals" );
+                mGroupGoalsLayout.addView( noGoalsText );
+            }
+        }
+
+        // Redraw
+        mGroupGoalsLayout.invalidate();
+    }
+
+    private ListView createGroupGoalsListView(Group group) {
+        ListView listView = new ListView( getActivity() );
+        GoalItemsAdapter itemsAdapter = new GoalItemsAdapter( getActivity(), group.getGoals() );
+        listView.setAdapter( itemsAdapter );
+        return listView;
     }
 
     /**
@@ -185,7 +216,7 @@ public class GoalsFragment extends Fragment {
                 }
 
                 // Update UI
-                mLoadingText.setVisibility( View.INVISIBLE );
+                mLoadingText.setVisibility( View.GONE );
                 mListView.setAdapter( mItemsAdapter );
             }
 
