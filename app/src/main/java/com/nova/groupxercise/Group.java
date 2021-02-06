@@ -7,6 +7,7 @@ public class Group {
     private String mGroupId;
     private String mGroupCreator;
     private ArrayList<String> members;
+    private ArrayList<Goal> goals;
 
     public Group( String mGroupName, String mGroupId ) {
         this.mGroupName = mGroupName;
@@ -43,5 +44,13 @@ public class Group {
 
     public void setmGroupCreator( String mGroupCreator ) {
         this.mGroupCreator = mGroupCreator;
+    }
+
+    public ArrayList< Goal > getGoals() {
+        return goals;
+    }
+
+    public void setGoals( ArrayList< Goal > goals ) {
+        this.goals = goals;
     }
 }

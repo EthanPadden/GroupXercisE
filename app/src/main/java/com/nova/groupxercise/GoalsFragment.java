@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +25,7 @@ public class GoalsFragment extends Fragment {
     private GoalItemsAdapter mItemsAdapter;
     private ListView mListView;
     private TextView mLoadingText;
+    private ArrayList< Group > mGroups;
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
@@ -79,10 +79,64 @@ public class GoalsFragment extends Fragment {
         } );
     }
 
-    private void retrieveGroupGoals(ArrayList<String> groupIds) {
-        for(String id : groupIds) {
-            Toast.makeText( getActivity(), id, Toast.LENGTH_SHORT ).show();
+    private void retrieveGroupGoals( ArrayList<String> groupIds) {
+        // Create an empty list for the groups
+        mGroups = new ArrayList<>();
+
+        // The UI is updated when all of the group names have been added
+        // Necessary because of the async call within the for loop
+        final int expectedSize = groupIds.size();
+
+        for( final String groupId : groupIds) {
+            String groupPath = "groups/" + groupId;
+            // Get the DBr reference
+            HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+            DatabaseReference groupRef = homeScreenActivity.getmRootRef().child( groupPath );
+
+            groupRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange( DataSnapshot dataSnapshot ) {
+                    String groupName = dataSnapshot.child( "name" ).getValue().toString();
+
+                    Group group = new Group( groupName, groupId );
+                    DataSnapshot groupGoalsDataSnapshot = dataSnapshot.child( "goals" );
+
+                    // If the group has goals
+                    if(groupGoalsDataSnapshot.exists()) {
+                        ArrayList<Goal> groupGoals = new ArrayList<>(  );
+
+                        for(DataSnapshot groupGoalDataSnapshot : groupGoalsDataSnapshot.getChildren()){
+                            String exerciseName = groupGoalDataSnapshot.getKey();
+                            String targetStr = groupGoalDataSnapshot.getValue().toString();
+                            float target = Float.parseFloat( targetStr );
+                            Goal goal = new Goal( exerciseName , 0, target );
+                            groupGoals.add( goal );
+                        }
+
+                        group.setGoals( groupGoals );
+                    }
+
+                    mGroups.add( group );
+
+
+                    if(mGroups.size() == expectedSize) {
+                        displayGroupGoals();
+                    }
+                }
+
+                @Override
+                public void onCancelled( DatabaseError databaseError ) {
+                }
+            } );
         }
+        if(mGroups.size() == 0) {
+            mLoadingText.setText( "You have no groups" );
+        }
+
+    }
+
+    private void displayGroupGoals() {
+
     }
 
     /**
