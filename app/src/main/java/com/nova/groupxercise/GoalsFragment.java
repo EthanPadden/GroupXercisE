@@ -53,6 +53,9 @@ public class GoalsFragment extends Fragment {
         retrieveGroupIds();
     }
 
+    /**
+     * Retrieves the group IDs of the groups that the user is a member of from the DB
+     */
     private void retrieveGroupIds() {
         // Create empty list for the group IDs
         final ArrayList<String> groupIds = new ArrayList<>(  );
@@ -82,6 +85,10 @@ public class GoalsFragment extends Fragment {
         } );
     }
 
+    /**
+     * Given a list of group IDs, retrieve the group goals from the DB
+     * @param groupIds the list of group IDs
+     */
     private void retrieveGroupGoals( ArrayList<String> groupIds) {
         // Create an empty list for the groups
         mGroups = new ArrayList<>();
@@ -138,6 +145,9 @@ public class GoalsFragment extends Fragment {
 
     }
 
+    /**
+     * Builds a list for every group to display the group goals
+     */
     private void displayGroupGoals() {
         for(Group group : mGroups) {
             // Group title

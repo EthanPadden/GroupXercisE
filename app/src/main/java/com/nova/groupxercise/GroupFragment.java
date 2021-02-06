@@ -105,6 +105,9 @@ public class GroupFragment extends Fragment {
         retrieveGroupGoals();
     }
 
+    /**
+     * Retrieves the group goals from the DB
+     */
     private void retrieveGroupGoals() {
         // Path to group goals
         String path = "groups/" + mGroupId + "/goals";

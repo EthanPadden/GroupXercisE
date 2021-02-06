@@ -198,6 +198,9 @@ public class ExerciseListItemFragment extends Fragment {
         retrieveGroupIds();
     }
 
+    /**
+     * Retrieves the group IDs that the user is an admin of from the DB
+     */
     private void retrieveGroupIds() {
         // Create empty list for the group IDs that the user is an admin of
         final ArrayList< String > groupIds = new ArrayList<>();
@@ -229,6 +232,10 @@ public class ExerciseListItemFragment extends Fragment {
         } );
     }
 
+    /**
+     * Given a list of group IDs, retrieves the group names from the DB
+     * @param groupIds list of group IDs
+     */
     private void retrieveGroupNames( ArrayList< String > groupIds ) {
         // Create an empty list for the group names
         mAdminGroups = new ArrayList<>();
@@ -265,6 +272,9 @@ public class ExerciseListItemFragment extends Fragment {
         }
     }
 
+    /**
+     * Builds the listview to display group names
+     */
     private void setupGroupsList() {
         mLoadingText.setVisibility( View.GONE );
         mListView.setAdapter( mItemsAdapter );
@@ -299,6 +309,12 @@ public class ExerciseListItemFragment extends Fragment {
         mListView.setVisibility( View.VISIBLE );
     }
 
+    /**
+     * Saves the argument goal as a goal for the group with the argument group ID
+     * This updates the group goal if the group already has a goal for the exercise
+     * @param groupId the group ID of the group to set the goal
+     * @param goal the goal object
+     */
     private void saveGroupGoal( String groupId, final Goal goal ) {
         // Path to the group goal
         String path = "groups/" + groupId + "/goals/" + goal.getmExerciseName();
