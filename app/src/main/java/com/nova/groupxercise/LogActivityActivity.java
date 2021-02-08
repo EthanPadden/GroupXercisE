@@ -66,8 +66,8 @@ public class LogActivityActivity extends AppCompatActivity {
         if ( levelStr != null && levelStr.compareTo( "" ) != 0 ) {
             float level = Float.parseFloat( levelStr );
             if ( mSelectedGoal != null ) {
-                Activity activity = new Activity( mSelectedGoal.getmExerciseName(), DateTime.now(), level );
-                logActivity( activity );
+                ExerciseActivity exerciseActivity = new ExerciseActivity( mSelectedGoal.getmExerciseName(), DateTime.now(), level );
+                logActivity( exerciseActivity );
             } else {
                 Toast.makeText( LogActivityActivity.this, "Choose a goal", Toast.LENGTH_SHORT ).show();
             }
@@ -76,20 +76,20 @@ public class LogActivityActivity extends AppCompatActivity {
         }
     }
 
-    private void logActivity( Activity activity ) {
-        Toast.makeText( LogActivityActivity.this, activity.toString(), Toast.LENGTH_SHORT ).show();
+    private void logActivity( ExerciseActivity exerciseActivity ) {
+        Toast.makeText( LogActivityActivity.this, exerciseActivity.toString(), Toast.LENGTH_SHORT ).show();
 
         // Path to the subtree
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         String currentUserId = currentUser.getUid();
-        String userActivitiesPath = "activities/" + currentUserId + "/" + activity.getmExerciseName();
+        String userActivitiesPath = "activities/" + currentUserId + "/" + exerciseActivity.getmExerciseName();
         final DatabaseReference childRef = mRootRef.child( userActivitiesPath );
 
-        Instant activityInstant = activity.getmTime().toInstant();
+        Instant activityInstant = exerciseActivity.getmTime().toInstant();
         long activityTimeStamp = activityInstant.getMillis();
         String activityTimeStampStr = Long.toString( activityTimeStamp );
 
-        childRef.child( activityTimeStampStr ).setValue( activity.getmLevel() );
+        childRef.child( activityTimeStampStr ).setValue( exerciseActivity.getmLevel() );
 
         Intent intent = new Intent( LogActivityActivity.this, HomeScreenActivity.class );
         startActivity( intent );

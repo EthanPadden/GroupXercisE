@@ -84,7 +84,7 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         BottomNavigationView navView = findViewById( R.id.nav_view );
         Toolbar toolbar = findViewById( R.id.toolbar );
 
-        // Sets the Toolbar to act as the ActionBar for this Activity window.
+        // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
         // Make sure the toolbar exists in the activity and is not null
         setSupportActionBar( toolbar );
 
