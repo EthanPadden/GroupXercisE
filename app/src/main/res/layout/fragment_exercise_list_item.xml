@@ -1,147 +1,176 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:stretchColumns="1">
+    xmlns:tools="http://schemas.android.com/tools">
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/table_goal"
+        android:stretchColumns="1">
 
-    <TableRow>
-
-        <TextView
-            android:id="@+id/text_set_goal_title"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="Set Goal: " />
-    </TableRow>
-
-    <TableRow>
-
-        <TextView
-            android:gravity="center"
-            android:text="Sets:" />
-
-
-        <TextView
-            android:id="@+id/text_sets"
-            android:gravity="center" />
-    </TableRow>
-
-    <TableRow>
-
-        <TextView
-            android:gravity="center"
-            android:text="Reps:" />
-
-
-        <TextView
-            android:id="@+id/text_reps"
-            android:gravity="center" />
-
-    </TableRow>
-
-    <TableRow>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <androidx.appcompat.widget.AppCompatRadioButton
-                android:id="@+id/radio_btn_goal_option_automatic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        <TableRow>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Based on your details:" />
-        </LinearLayout>
+                android:id="@+id/text_set_goal_title"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Set Goal: " />
+        </TableRow>
 
-    </TableRow>
-
-    <TableRow>
-
-        <TextView
-            android:gravity="center"
-            android:text="Level" />
-
-
-        <Spinner
-            android:id="@+id/spinner_level"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </TableRow>
-
-    <TableRow>
-
-        <TextView
-            android:gravity="center"
-            android:text="Suggested Weight:" />
-
-
-        <TextView
-            android:id="@+id/text_suggested_goal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10" />
-
-        <TextView
-            android:gravity="center"
-            android:text="kg" />
-
-    </TableRow>
-
-    <TableRow>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <androidx.appcompat.widget.AppCompatRadioButton
-                android:id="@+id/radio_btn_goal_option_manual"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        <TableRow>
 
             <TextView
+                android:gravity="center"
+                android:text="Sets:" />
+
+
+            <TextView
+                android:id="@+id/text_sets"
+                android:gravity="center" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:gravity="center"
+                android:text="Reps:" />
+
+
+            <TextView
+                android:id="@+id/text_reps"
+                android:gravity="center" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/radio_btn_goal_option_automatic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Based on your details:" />
+            </LinearLayout>
+
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:gravity="center"
+                android:text="Level" />
+
+
+            <Spinner
+                android:id="@+id/spinner_level"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:gravity="center"
+                android:text="Suggested Weight:" />
+
+
+            <TextView
+                android:id="@+id/text_suggested_goal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Custom:" />
-        </LinearLayout>
+                android:ems="10" />
+
+            <TextView
+                android:gravity="center"
+                android:text="kg" />
+
+        </TableRow>
+
+        <TableRow>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/radio_btn_goal_option_manual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Custom:" />
+            </LinearLayout>
 
 
-    </TableRow>
+        </TableRow>
 
 
-    <TableRow>
+        <TableRow>
 
-        <TextView
-            android:gravity="center"
-            android:text="Weight:" />
-
-
-        <EditText
-            android:id="@+id/et_exercise_weight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number" />
-
-        <TextView
-            android:gravity="center"
-            android:text="kg" />
-
-    </TableRow>
+            <TextView
+                android:gravity="center"
+                android:text="Weight:" />
 
 
-    <TableRow>
+            <EditText
+                android:id="@+id/et_exercise_weight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number" />
 
-        <Button
-            android:id="@+id/btn_set_goal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Set Goal" />
-    </TableRow>
+            <TextView
+                android:gravity="center"
+                android:text="kg" />
 
-</TableLayout>
+        </TableRow>
+
+
+        <TableRow>
+
+            <Button
+                android:id="@+id/btn_set_goal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Set Goal" />
+        </TableRow>
+
+
+    </TableLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/table_goal"
+        android:id="@+id/text_group_goal_title"
+        android:gravity="center"
+        android:text="Set Group Goal:" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text_group_goal_title"
+        android:id="@+id/text_loading_group_list"
+        android:gravity="center"
+        android:text="Loading..." />
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/goal_groups_list"
+        android:visibility="gone"
+        tools:context="com.nova.groupxercise.HomeScreenActivity"
+        android:layout_below="@+id/text_loading_group_list"
+        ></ListView>
+</RelativeLayout>

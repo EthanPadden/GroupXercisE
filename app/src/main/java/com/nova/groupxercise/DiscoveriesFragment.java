@@ -65,7 +65,7 @@ public class DiscoveriesFragment extends Fragment {
 
                 // Set the fragment to be displayed in the frame view
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace( R.id.frame_set_goal_fragment_placeholder, exerciseListItemFragment );
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, exerciseListItemFragment );
                 ft.commit();
             }
         } );

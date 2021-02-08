@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,6 +24,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 
 /**
@@ -53,6 +56,10 @@ public class ExerciseListItemFragment extends Fragment {
     private RadioButton mGoalOptionsAutomaticRatioBtn;
     private RadioButton mGoalOptionsManualRatioBtn;
     private EditText mManualGoalET;
+    private ArrayAdapter mItemsAdapter;
+    private ArrayList mAdminGroups;
+    private ListView mListView;
+    private TextView mLoadingText;
 
     // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
@@ -109,6 +116,9 @@ public class ExerciseListItemFragment extends Fragment {
         mGoalOptionsAutomaticRatioBtn = view.findViewById( R.id.radio_btn_goal_option_automatic );
         mGoalOptionsManualRatioBtn = view.findViewById( R.id.radio_btn_goal_option_manual );
         mManualGoalET = view.findViewById( R.id.et_exercise_weight );
+        mListView = view.findViewById( R.id.goal_groups_list );
+        mLoadingText = view.findViewById( R.id.text_loading_group_list );
+
 
         // Set spinner adapter
         mLevelSpinner.setAdapter( mLevelSpinnerAdapter );
@@ -137,9 +147,14 @@ public class ExerciseListItemFragment extends Fragment {
         mSetGoalBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
-                    // Automatic goal calculation option: use suggested goal
-                    float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
-                    saveGoal( new Goal( mExerciseName, 0, target ) );
+                    User currentUser = User.getInstance();
+                    if(currentUser.isUserDetailsAreSet()) {
+                        // Automatic goal calculation option: use suggested goal
+                        float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
+                        saveGoal( new Goal( mExerciseName, 0, target ) );
+                    } else {
+                        Toast.makeText( getActivity(), "Invalid details", Toast.LENGTH_SHORT ).show();
+                    }
                 } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
                     // Manual goal calculation option: use user-set goal
                     String targetStr = ( mManualGoalET.getText().toString() );
@@ -185,6 +200,157 @@ public class ExerciseListItemFragment extends Fragment {
 
         // Get the strength standards from the DB based on the user details
         retrieveStrengthStandards( mExerciseName );
+        retrieveGroupIds();
+    }
+
+    /**
+     * Retrieves the group IDs that the user is an admin of from the DB
+     */
+    private void retrieveGroupIds() {
+        // Create empty list for the group IDs that the user is an admin of
+        final ArrayList< String > groupIds = new ArrayList<>();
+
+        // Get the current user ID
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Path to the reference
+        final String usersGroupPath = "user_groups/" + currentUserId;
+        DatabaseReference childRef = mRootRef.child( usersGroupPath );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
+                    Boolean isAdmin = ( Boolean ) usersGroupsDataSnapshot.getValue();
+                    if ( isAdmin.booleanValue() == true ) {
+                        // If the current user is an admin of the group
+                        groupIds.add( usersGroupsDataSnapshot.getKey() );
+                    }
+                }
+
+                retrieveGroupNames( groupIds );
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    /**
+     * Given a list of group IDs, retrieves the group names from the DB
+     * @param groupIds list of group IDs
+     */
+    private void retrieveGroupNames( ArrayList< String > groupIds ) {
+        // Create an empty list for the group names
+        mAdminGroups = new ArrayList<>();
+
+        // Set the list as the list for the items adapter
+        mItemsAdapter = new GroupItemsAdapter( getActivity(), mAdminGroups );
+
+        // The UI is updated when all of the group names have been added
+        // Necessary because of the async call within the for loop
+        final int expectedSize = groupIds.size();
+
+        for ( final String groupId : groupIds ) {
+            String groupPath = "groups/" + groupId;
+            DatabaseReference groupRef = mRootRef.child( groupPath );
+
+            groupRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange( DataSnapshot dataSnapshot ) {
+                    String groupName = dataSnapshot.child( "name" ).getValue().toString();
+                    mAdminGroups.add( new Group( groupName, groupId ) );
+                    if ( mAdminGroups.size() == expectedSize ) {
+                        // When we have all the group names retrieved
+                        setupGroupsList();
+                    }
+                }
+
+                @Override
+                public void onCancelled( DatabaseError databaseError ) {
+                }
+            } );
+        }
+        if ( mAdminGroups.size() == 0 ) {
+            mLoadingText.setText( "You are the admin of no groups" );
+        }
+    }
+
+    /**
+     * Builds the listview to display group names
+     */
+    private void setupGroupsList() {
+        mLoadingText.setVisibility( View.GONE );
+        mListView.setAdapter( mItemsAdapter );
+
+        // Set event listeners
+        mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
+                Group selectedGroup = ( Group ) mListView.getItemAtPosition( i );
+                String groupId = selectedGroup.getmGroupId();
+
+                if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
+                    User currentUser = User.getInstance();
+                    if(currentUser.isUserDetailsAreSet()) {
+                        // Automatic goal calculation option: use suggested goal
+                        float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
+                        saveGroupGoal( groupId, new Goal( mExerciseName, 0, target ) );
+                    } else {
+                        Toast.makeText( getActivity(), "Invalid details", Toast.LENGTH_SHORT ).show();
+                    }
+                } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
+                    // Manual goal calculation option: use user-set goal
+                    String targetStr = ( mManualGoalET.getText().toString() );
+
+                    if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
+                        float target = Float.parseFloat( targetStr );
+                        saveGroupGoal(groupId, new Goal( mExerciseName, 0, target ) );
+                    } else {
+                        Toast.makeText( getActivity(), R.string.error_no_target_entered, Toast.LENGTH_SHORT ).show();
+                    }
+                } else {
+                    Toast.makeText( getActivity(), R.string.error_generic, Toast.LENGTH_SHORT ).show();
+                }
+            }
+        } );
+
+        mListView.setVisibility( View.VISIBLE );
+    }
+
+    /**
+     * Saves the argument goal as a goal for the group with the argument group ID
+     * This updates the group goal if the group already has a goal for the exercise
+     * @param groupId the group ID of the group to set the goal
+     * @param goal the goal object
+     */
+    private void saveGroupGoal( String groupId, final Goal goal ) {
+        // Path to the group goal
+        String path = "groups/" + groupId + "/goals/" + goal.getmExerciseName();
+
+        // Get the DB reference
+        final DatabaseReference childRef = mRootRef.child( path );
+
+        // Check if we have a set of goals for that particular user
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
+
+                } else {
+                    Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
+
+                }
+                childRef.setValue( goal.getmTarget() );
+
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
     }
 
     /**
