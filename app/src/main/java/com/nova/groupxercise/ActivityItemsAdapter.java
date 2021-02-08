@@ -12,8 +12,8 @@ import java.util.ArrayList;
 public class ActivityItemsAdapter extends ArrayAdapter {
     private static final String LOG_TAG = GroupItemsAdapter.class.getSimpleName();
 
-    public ActivityItemsAdapter( Activity context, ArrayList< Group > groups ) {
-        super( context, 0, groups );
+    public ActivityItemsAdapter( Activity context, ArrayList< ExerciseActivity > activities ) {
+        super( context, 0, activities );
     }
 
     @Override
