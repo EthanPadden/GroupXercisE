@@ -2,10 +2,12 @@ package com.nova.groupxercise;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,6 +17,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 
@@ -45,12 +49,44 @@ public class LogActivityActivity extends AppCompatActivity {
         mLogActivityBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
-                //validateEnteredActivity();
+                validateEnteredActivity();
             }
         } );
 
+
         retrieveGoals();
         retrieveGroupIds();
+    }
+
+    private void validateEnteredActivity() {
+        String levelStr = mLevelEt.getText().toString();
+        if(levelStr != null && levelStr.compareTo( "" ) != 0) {
+            float level = Float.parseFloat( levelStr );
+            if(mSelectedGoal != null) {
+                Activity activity = new Activity(mSelectedGoal.getmExerciseName(), DateTime.now(), level );
+                logActivity( activity );
+            } else {
+                Toast.makeText( LogActivityActivity.this, "Choose a goal", Toast.LENGTH_SHORT ).show();
+            }
+        } else {
+            Toast.makeText( LogActivityActivity.this, "Enter level", Toast.LENGTH_SHORT ).show();
+        }
+    }
+    private void logActivity(Activity activity) {
+        Toast.makeText( LogActivityActivity.this, activity.toString(), Toast.LENGTH_SHORT ).show();
+    }
+    private void setupGoalsList() {
+        mLoadingText.setVisibility( View.GONE );
+        mListView.setAdapter( mItemsAdapter );
+
+        // Set event listeners
+        mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
+                Goal selectedGoal = (Goal ) mListView.getItemAtPosition( i );
+                mSelectedGoal = selectedGoal;
+            }
+        } );
     }
 
     /**
@@ -156,9 +192,7 @@ public class LogActivityActivity extends AppCompatActivity {
             }
         }
 
-        // Update UI
-        mLoadingText.setVisibility( View.GONE );
-        mListView.setAdapter( mItemsAdapter );
+       setupGoalsList();
     }
 
     /**
