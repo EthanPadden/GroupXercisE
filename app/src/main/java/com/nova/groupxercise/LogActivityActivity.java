@@ -1,5 +1,6 @@
 package com.nova.groupxercise;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -19,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.joda.time.DateTime;
+import org.joda.time.Instant;
 
 import java.util.ArrayList;
 
@@ -27,11 +30,11 @@ public class LogActivityActivity extends AppCompatActivity {
     private Button mLogActivityBtn;
     private Goal mSelectedGoal;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-    private ArrayList<Goal> mGoalsList;
+    private ArrayList< Goal > mGoalsList;
     private GoalItemsAdapter mItemsAdapter;
     private TextView mLoadingText;
     private ListView mListView;
-    private ArrayList<Group> mGroups;
+    private ArrayList< Group > mGroups;
 
 
     @Override
@@ -60,10 +63,10 @@ public class LogActivityActivity extends AppCompatActivity {
 
     private void validateEnteredActivity() {
         String levelStr = mLevelEt.getText().toString();
-        if(levelStr != null && levelStr.compareTo( "" ) != 0) {
+        if ( levelStr != null && levelStr.compareTo( "" ) != 0 ) {
             float level = Float.parseFloat( levelStr );
-            if(mSelectedGoal != null) {
-                Activity activity = new Activity(mSelectedGoal.getmExerciseName(), DateTime.now(), level );
+            if ( mSelectedGoal != null ) {
+                Activity activity = new Activity( mSelectedGoal.getmExerciseName(), DateTime.now(), level );
                 logActivity( activity );
             } else {
                 Toast.makeText( LogActivityActivity.this, "Choose a goal", Toast.LENGTH_SHORT ).show();
@@ -72,9 +75,26 @@ public class LogActivityActivity extends AppCompatActivity {
             Toast.makeText( LogActivityActivity.this, "Enter level", Toast.LENGTH_SHORT ).show();
         }
     }
-    private void logActivity(Activity activity) {
+
+    private void logActivity( Activity activity ) {
         Toast.makeText( LogActivityActivity.this, activity.toString(), Toast.LENGTH_SHORT ).show();
+
+        // Path to the subtree
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String currentUserId = currentUser.getUid();
+        String userActivitiesPath = "activities/" + currentUserId + "/" + activity.getmExerciseName();
+        final DatabaseReference childRef = mRootRef.child( userActivitiesPath );
+
+        Instant activityInstant = activity.getmTime().toInstant();
+        long activityTimeStamp = activityInstant.getMillis();
+
+        childRef.child( "time" ).setValue( activityTimeStamp );
+        childRef.child( "level" ).setValue( activity.getmLevel() );
+
+        Intent intent = new Intent( LogActivityActivity.this, HomeScreenActivity.class );
+        startActivity( intent );
     }
+
     private void setupGoalsList() {
         mLoadingText.setVisibility( View.GONE );
         mListView.setAdapter( mItemsAdapter );
@@ -83,7 +103,7 @@ public class LogActivityActivity extends AppCompatActivity {
         mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
-                Goal selectedGoal = (Goal ) mListView.getItemAtPosition( i );
+                Goal selectedGoal = ( Goal ) mListView.getItemAtPosition( i );
                 mSelectedGoal = selectedGoal;
             }
         } );
@@ -94,7 +114,7 @@ public class LogActivityActivity extends AppCompatActivity {
      */
     private void retrieveGroupIds() {
         // Create empty list for the group IDs
-        final ArrayList<String> groupIds = new ArrayList<>(  );
+        final ArrayList< String > groupIds = new ArrayList<>();
 
         // Get the current user ID
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -108,10 +128,10 @@ public class LogActivityActivity extends AppCompatActivity {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
-                    groupIds.add(  usersGroupsDataSnapshot.getKey());
+                    groupIds.add( usersGroupsDataSnapshot.getKey() );
                 }
 
-                retrieveGroupGoals(groupIds);
+                retrieveGroupGoals( groupIds );
             }
 
             @Override
@@ -122,9 +142,10 @@ public class LogActivityActivity extends AppCompatActivity {
 
     /**
      * Given a list of group IDs, retrieve the group goals from the DB
+     *
      * @param groupIds the list of group IDs
      */
-    private void retrieveGroupGoals( ArrayList<String> groupIds) {
+    private void retrieveGroupGoals( ArrayList< String > groupIds ) {
         // Create an empty list for the groups
         mGroups = new ArrayList<>();
 
@@ -132,7 +153,7 @@ public class LogActivityActivity extends AppCompatActivity {
         // Necessary because of the async call within the for loop
         final int expectedSize = groupIds.size();
 
-        for( final String groupId : groupIds) {
+        for ( final String groupId : groupIds ) {
             String groupPath = "groups/" + groupId;
             // Get the DBr reference
             DatabaseReference groupRef = mRootRef.child( groupPath );
@@ -146,14 +167,14 @@ public class LogActivityActivity extends AppCompatActivity {
                     DataSnapshot groupGoalsDataSnapshot = dataSnapshot.child( "goals" );
 
                     // If the group has goals
-                    if(groupGoalsDataSnapshot.exists()) {
-                        ArrayList<Goal> groupGoals = new ArrayList<>(  );
+                    if ( groupGoalsDataSnapshot.exists() ) {
+                        ArrayList< Goal > groupGoals = new ArrayList<>();
 
-                        for(DataSnapshot groupGoalDataSnapshot : groupGoalsDataSnapshot.getChildren()){
+                        for ( DataSnapshot groupGoalDataSnapshot : groupGoalsDataSnapshot.getChildren() ) {
                             String exerciseName = groupGoalDataSnapshot.getKey();
                             String targetStr = groupGoalDataSnapshot.getValue().toString();
                             float target = Float.parseFloat( targetStr );
-                            Goal goal = new Goal( exerciseName , 0, target );
+                            Goal goal = new Goal( exerciseName, 0, target );
                             groupGoals.add( goal );
                         }
 
@@ -163,7 +184,7 @@ public class LogActivityActivity extends AppCompatActivity {
                     mGroups.add( group );
 
 
-                    if(mGroups.size() == expectedSize) {
+                    if ( mGroups.size() == expectedSize ) {
                         displayGroupGoals();
                     }
                 }
@@ -173,7 +194,7 @@ public class LogActivityActivity extends AppCompatActivity {
                 }
             } );
         }
-        if(mGroups.size() == 0) {
+        if ( mGroups.size() == 0 ) {
             mLoadingText.setText( "You have no groups" );
         }
 
@@ -183,16 +204,16 @@ public class LogActivityActivity extends AppCompatActivity {
      * Builds a list for every group to display the group goals
      */
     private void displayGroupGoals() {
-        for(Group group : mGroups) {
+        for ( Group group : mGroups ) {
 
-            if(group.getGoals() != null) {
-                for(Goal goal: group.getGoals()) {
+            if ( group.getGoals() != null ) {
+                for ( Goal goal : group.getGoals() ) {
                     mGoalsList.add( goal );
                 }
             }
         }
 
-       setupGoalsList();
+        setupGoalsList();
     }
 
     /**
