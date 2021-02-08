@@ -68,6 +68,7 @@ public class LogActivityActivity extends AppCompatActivity {
             if ( mSelectedGoal != null ) {
                 ExerciseActivity exerciseActivity = new ExerciseActivity( mSelectedGoal.getmExerciseName(), DateTime.now(), level );
                 logActivity( exerciseActivity );
+                updatePersonalGoal( exerciseActivity );
             } else {
                 Toast.makeText( LogActivityActivity.this, "Choose a goal", Toast.LENGTH_SHORT ).show();
             }
@@ -132,6 +133,41 @@ public class LogActivityActivity extends AppCompatActivity {
                 }
 
                 retrieveGroupGoals( groupIds );
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    private void updatePersonalGoal( final ExerciseActivity activity ) {
+        // Get the current user ID
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Path to the current status of this goal
+        String goalPath = "user_goals/" + currentUserId + "/" + activity.getmExerciseName() + "/current_status";
+
+        final DatabaseReference goalRef = mRootRef.child( goalPath );
+
+        goalRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    // We have a goal for this exercise
+                    Object currentStatusObj = dataSnapshot.getValue();
+                    float currentStatus;
+                    if ( currentStatusObj instanceof Long ) {
+                        currentStatus = ( ( Long ) currentStatusObj ).floatValue();
+                    } else {
+                        currentStatus = ( ( Float ) currentStatusObj ).floatValue();
+                    }
+                    if(activity.getmLevel() > currentStatus) {
+                        goalRef.setValue( activity.getmLevel() );
+                    }
+                } else {
+                    Toast.makeText( LogActivityActivity.this, "There is no goal for this exercise", Toast.LENGTH_SHORT ).show();
+                }
             }
 
             @Override
