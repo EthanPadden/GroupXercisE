@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,6 +18,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
 

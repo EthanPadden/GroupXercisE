@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Activities;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -30,6 +30,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.nova.groupxercise.R;
+import com.nova.groupxercise.Objects.User;
+import com.nova.groupxercise.DBObjects.UserDetailsDBObject;
 
 import org.joda.time.DateTime;
 import org.joda.time.Instant;

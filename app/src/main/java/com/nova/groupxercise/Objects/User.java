@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Objects;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

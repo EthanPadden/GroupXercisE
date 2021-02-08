@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +19,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.nova.groupxercise.Adapters.GoalItemsAdapter;
+import com.nova.groupxercise.Objects.Goal;
+import com.nova.groupxercise.Objects.Group;
+import com.nova.groupxercise.R;
 
 import org.joda.time.DateTime;
 import org.joda.time.Instant;

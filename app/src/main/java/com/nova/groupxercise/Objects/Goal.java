@@ -1,6 +1,6 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Objects;
 
-import com.google.firebase.database.IgnoreExtraProperties;
+import com.nova.groupxercise.DBObjects.GoalDBObject;
 
 public class Goal {
     private String mExerciseName;

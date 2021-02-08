@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Activities;
 
 import org.joda.time.DateTime;
 

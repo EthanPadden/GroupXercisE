@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GoalsFragment">
+    tools:context=".Fragments.GoalsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
         android:paddingTop="10dp"
         android:paddingRight="10dp"
         android:paddingBottom="10dp"
-        tools:context="com.nova.groupxercise.HomeScreenActivity" />
+        tools:context="com.nova.groupxercise.Activities.HomeScreenActivity" />
 
     <LinearLayout
         android:layout_width="match_parent"

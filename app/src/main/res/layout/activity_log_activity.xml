@@ -32,7 +32,7 @@
         android:paddingTop="10dp"
         android:paddingRight="10dp"
         android:paddingBottom="10dp"
-        tools:context="com.nova.groupxercise.LogActivityActivity" />
+        tools:context="com.nova.groupxercise.Activities.LogActivityActivity" />
 
     <EditText
         android:id="@+id/et_level"

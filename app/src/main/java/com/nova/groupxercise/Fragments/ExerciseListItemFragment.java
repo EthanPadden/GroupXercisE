@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -24,6 +24,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.nova.groupxercise.Objects.Goal;
+import com.nova.groupxercise.DBObjects.GoalDBObject;
+import com.nova.groupxercise.Objects.Group;
+import com.nova.groupxercise.Adapters.GroupItemsAdapter;
+import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.nova.groupxercise.R;
+import com.nova.groupxercise.Objects.User;
 
 import java.util.ArrayList;
 
