@@ -53,6 +53,12 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
                     ft.replace( R.id.frame_home_screen_fragment_placeholder, groupsFragment );
                     ft.commit();
                     return true;
+                case R.id.navigation_activities:
+                    getSupportActionBar().setTitle( "Activities" );
+                    ActivitiesFragment activitiesFragment = new ActivitiesFragment();
+                    ft.replace( R.id.frame_home_screen_fragment_placeholder, activitiesFragment );
+                    ft.commit();
+                    return true;
             }
             return false;
         }
