@@ -70,7 +70,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         mUpdateBtn = findViewById( R.id.btn_update );
         Toolbar toolbar = findViewById( R.id.toolbar );
 
-        // Sets the Toolbar to act as the ActionBar for this Activity window.
+        // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
         // Make sure the toolbar exists in the activity and is not null
         setSupportActionBar( toolbar );
 
