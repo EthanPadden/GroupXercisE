@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ActivitiesFragment extends Fragment {
     private ArrayList< ExerciseActivity > mActivitesList;
@@ -105,6 +106,8 @@ public class ActivitiesFragment extends Fragment {
                 if ( mActivitesList.isEmpty() ) {
                     mLoadingText.setText( "No activities" );
                 } else {
+                    // Sort activites by time
+                    Collections.sort( mActivitesList );
                     // Update UI
                     mLoadingText.setVisibility( View.GONE );
                     mListView.setAdapter( mItemsAdapter );

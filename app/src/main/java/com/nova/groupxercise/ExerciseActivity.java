@@ -2,7 +2,7 @@ package com.nova.groupxercise;
 
 import org.joda.time.DateTime;
 
-public class ExerciseActivity {
+public class ExerciseActivity implements Comparable<ExerciseActivity>{
     private String mExerciseName;
     private DateTime mTime;
     private float mLevel;
@@ -16,6 +16,11 @@ public class ExerciseActivity {
     @Override
     public String toString() {
         return String.format( "%s\n%s\n%f", mExerciseName, mTime, mLevel );
+    }
+
+    @Override
+    public int compareTo( ExerciseActivity activity ) {
+        return activity.getmTime().compareTo( this.mTime );
     }
 
     public String getmExerciseName() {
