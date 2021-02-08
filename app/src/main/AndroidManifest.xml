@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/noAnimTheme">
+        <activity android:name=".LogActivityActivity"></activity>
         <activity android:name=".CreateGroupActivity" />
         <activity android:name=".SetUsernameActivity" />
         <activity android:name=".ProfileActivity" />

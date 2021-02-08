@@ -1,5 +1,6 @@
 package com.nova.groupxercise;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,5 +39,15 @@ public class ActivitiesFragment extends Fragment {
         mListView = view.findViewById( R.id.activities_list );
         mLoadingText = view.findViewById( R.id.text_loading_activities );
         mAddActivityBtn = view.findViewById( R.id.btn_add_activity );
+
+        // Set event listeners
+        mAddActivityBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View view ) {
+                // Go to log activity screen
+                Intent intent = new Intent( getActivity(), LogActivityActivity.class );
+                startActivity( intent );
+            }
+        } );
     }
 }
