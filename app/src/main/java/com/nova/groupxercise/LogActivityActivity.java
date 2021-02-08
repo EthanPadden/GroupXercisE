@@ -87,9 +87,9 @@ public class LogActivityActivity extends AppCompatActivity {
 
         Instant activityInstant = activity.getmTime().toInstant();
         long activityTimeStamp = activityInstant.getMillis();
+        String activityTimeStampStr = Long.toString( activityTimeStamp );
 
-        childRef.child( "time" ).setValue( activityTimeStamp );
-        childRef.child( "level" ).setValue( activity.getmLevel() );
+        childRef.child( activityTimeStampStr ).setValue( activity.getmLevel() );
 
         Intent intent = new Intent( LogActivityActivity.this, HomeScreenActivity.class );
         startActivity( intent );
