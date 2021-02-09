@@ -20,10 +20,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
-import com.nova.groupxercise.R;
+import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Objects.User;
+import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
 
@@ -41,7 +41,7 @@ public class GroupFragment extends Fragment {
     private EditText mMemberNameEt;
     private ListView mGroupGoalsList;
     private TextView mGroupGoalsLoadingText;
-    private ArrayList mGroupGoals;
+    private ArrayList mGroupGoalNames;
 
 
     public GroupFragment( String mGroupId ) {
@@ -124,13 +124,13 @@ public class GroupFragment extends Fragment {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                if(dataSnapshot.exists()) {
-                   mGroupGoals = new ArrayList(  );
+                   mGroupGoalNames = new ArrayList(  );
                     for(DataSnapshot goalDataSnapshot : dataSnapshot.getChildren()) {
                         String exerciseName = goalDataSnapshot.getKey();
                         String target = goalDataSnapshot.getValue().toString();
-                        mGroupGoals.add( exerciseName + ": " + target );
+                        mGroupGoalNames.add( exerciseName );
                         mGroupGoalsLoadingText.setVisibility( View.GONE );
-                        mGoalsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mGroupGoals );
+                        mGoalsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mGroupGoalNames );
                         mGroupGoalsList.setAdapter( mGoalsAdapter );
                         mGroupGoalsList.setVisibility( View.VISIBLE );
 
@@ -236,6 +236,20 @@ public class GroupFragment extends Fragment {
 
         /** Updating group in memory and UI */
         mGroup.getMembers().add( username );
+
+        /** Create subtree for the progress of that user towards the goals */
+        createProgressSubtree(username);
+    }
+
+    private void createProgressSubtree(String username) {
+        String progressPath = "groups/" + mGroupId + "/members/" + username + "/progress";
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( progressPath );
+
+        for( Object goalObj : mGroupGoalNames ) {
+            String goalName = (String) goalObj;
+            childRef.child( goalName ).setValue( 0 );
+        }
     }
 
     /**
