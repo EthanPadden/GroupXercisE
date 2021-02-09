@@ -332,7 +332,7 @@ public class ExerciseListItemFragment extends Fragment {
      * @param groupId the group ID of the group to set the goal
      * @param goal the goal object
      */
-    private void saveGroupGoal( String groupId, final Goal goal ) {
+    private void saveGroupGoal( final String groupId, final Goal goal ) {
         // Path to the group goal
         String path = "groups/" + groupId + "/goals/" + goal.getmExerciseName();
 
@@ -348,10 +348,34 @@ public class ExerciseListItemFragment extends Fragment {
 
                 } else {
                     Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
-
+                    addGoalProgressToMembers( groupId, goal );
                 }
                 childRef.setValue( goal.getmTarget() );
 
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    private void addGoalProgressToMembers( String groupId, final Goal goal) {
+        // Path to the group goal
+        String path = "groups/" + groupId + "/members";
+
+        // Get the DB reference
+        final DatabaseReference childRef = mRootRef.child( path );
+
+        // Check if we have a set of goals for that particular user
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                for(DataSnapshot memberDataSnapshot : dataSnapshot.getChildren()) {
+                    String username = memberDataSnapshot.getKey();
+                    DatabaseReference progressRef = childRef.child( username ).child( "progress" ).child( goal.getmExerciseName() );
+                    progressRef.setValue( 0 );
+                }
             }
 
             @Override
