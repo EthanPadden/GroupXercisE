@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +33,6 @@ public class GroupFragment extends Fragment {
     private String mGroupId;
     private TextView mGroupNameText;
     private TextView mGroupCreatorText;
-    private ListView mGroupMembersList;
     private ArrayAdapter< String > mItemsAdapter;
     private ArrayAdapter< String > mGoalsAdapter;
     private Button mAddMemberBtn;
@@ -42,6 +42,7 @@ public class GroupFragment extends Fragment {
     private ListView mGroupGoalsList;
     private TextView mGroupGoalsLoadingText;
     private ArrayList mGroupGoalNames;
+    private LinearLayout mGroupMembersLayout;
 
 
     public GroupFragment( String mGroupId ) {
@@ -62,13 +63,13 @@ public class GroupFragment extends Fragment {
         // Initialise components
         mGroupNameText = view.findViewById( R.id.text_group_name );
         mGroupCreatorText = view.findViewById( R.id.text_creator );
-        mGroupMembersList = view.findViewById( R.id.list_members );
         mAddMemberBtn = view.findViewById( R.id.btn_add_member );
         mMemberNameEt = view.findViewById( R.id.et_member_name );
         mDeleteGroupBtn = view.findViewById( R.id.btn_delete_group );
         mRemoveMemberBtn = view.findViewById( R.id.btn_remove_member );
         mGroupGoalsList = view.findViewById( R.id.list_group_goals );
         mGroupGoalsLoadingText = view.findViewById( R.id.text_group_goals_loading );
+        mGroupMembersLayout = view.findViewById( R.id.layout_members );
 
         // Set event listeners
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
@@ -325,8 +326,11 @@ public class GroupFragment extends Fragment {
                 // Update UI
                 mGroupNameText.setText( mGroup.getmGroupName() );
                 mGroupCreatorText.setText( mGroup.getmGroupCreator() );
-                mItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mGroup.getMembers() );
-                mGroupMembersList.setAdapter( mItemsAdapter );
+                for(String username : mGroup.getMembers()) {
+                    TextView textView = new TextView( getActivity() );
+                    textView.setText( username );
+                    mGroupMembersLayout.addView( textView );
+                }
 
                 // If the user is the creator, show the components that allows the user admin controls
                 User currentUser = User.getInstance();
