@@ -94,35 +94,30 @@
             android:text="Remove Member"
             android:visibility="gone"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="Goals:"
-            android:id="@+id/text_group_goals_title"
-            android:layout_below="@+id/btn_remove_member"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="Loading..."
-            android:id="@+id/text_group_goals_loading"
-            android:layout_below="@+id/text_group_goals_title"/>
 
-        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/list_group_goals"
+
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="10dp"
-            android:paddingTop="10dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="10dp"
-            android:visibility="gone"
-            android:layout_below="@id/text_group_goals_loading"
-            tools:context="com.nova.groupxercise.Activities.HomeScreenActivity" />
+            android:layout_below="@+id/btn_remove_member"
+            android:id="@+id/layout_group_goals">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="Goals:"
+                android:id="@+id/text_group_goals_title"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="Loading..."
+                android:id="@+id/text_group_goals_loading"/>
+
+        </LinearLayout>
 
     </RelativeLayout>
 

@@ -4,11 +4,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,16 +31,14 @@ public class GroupFragment extends Fragment {
     private String mGroupId;
     private TextView mGroupNameText;
     private TextView mGroupCreatorText;
-    private ArrayAdapter< String > mItemsAdapter;
-    private ArrayAdapter< String > mGoalsAdapter;
     private Button mAddMemberBtn;
     private Button mDeleteGroupBtn;
     private Button mRemoveMemberBtn;
     private EditText mMemberNameEt;
-    private ListView mGroupGoalsList;
     private TextView mGroupGoalsLoadingText;
     private ArrayList mGroupGoalNames;
     private LinearLayout mGroupMembersLayout;
+    private LinearLayout mGroupGoalsLayout;
 
 
     public GroupFragment( String mGroupId ) {
@@ -67,9 +63,9 @@ public class GroupFragment extends Fragment {
         mMemberNameEt = view.findViewById( R.id.et_member_name );
         mDeleteGroupBtn = view.findViewById( R.id.btn_delete_group );
         mRemoveMemberBtn = view.findViewById( R.id.btn_remove_member );
-        mGroupGoalsList = view.findViewById( R.id.list_group_goals );
         mGroupGoalsLoadingText = view.findViewById( R.id.text_group_goals_loading );
         mGroupMembersLayout = view.findViewById( R.id.layout_members );
+        mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
 
         // Set event listeners
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
@@ -131,9 +127,11 @@ public class GroupFragment extends Fragment {
                         String target = goalDataSnapshot.getValue().toString();
                         mGroupGoalNames.add( exerciseName );
                         mGroupGoalsLoadingText.setVisibility( View.GONE );
-                        mGoalsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mGroupGoalNames );
-                        mGroupGoalsList.setAdapter( mGoalsAdapter );
-                        mGroupGoalsList.setVisibility( View.VISIBLE );
+
+                        TextView textView = new TextView( getActivity() );
+                        textView.setText( exerciseName );
+
+                        mGroupGoalsLayout.addView( textView );
 
                     }
                } else {
