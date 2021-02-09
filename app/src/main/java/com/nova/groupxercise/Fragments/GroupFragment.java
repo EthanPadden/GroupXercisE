@@ -129,7 +129,7 @@ public class GroupFragment extends Fragment {
                         mGroupGoalsLoadingText.setVisibility( View.GONE );
 
                         TextView textView = new TextView( getActivity() );
-                        textView.setText( exerciseName );
+                        textView.setText( exerciseName + ": " + target );
 
                         mGroupGoalsLayout.addView( textView );
 
@@ -313,7 +313,26 @@ public class GroupFragment extends Fragment {
                 DataSnapshot membersDataSnapshot = dataSnapshot.child( "members" );
                 ArrayList< String > dbMembers = new ArrayList<>();
                 for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
-                    dbMembers.add( memberDataSnapshot.getKey() );
+                    String username = memberDataSnapshot.getKey();
+                    dbMembers.add( username );
+                    TextView usernameTextView = new TextView( getActivity() );
+                    usernameTextView.setText( username.toUpperCase() );
+                    mGroupMembersLayout.addView( usernameTextView );
+                    for( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren()) {
+                        String exerciseName = progressDataSnapshot.getKey();
+                        Object currentStatusObj = progressDataSnapshot.getValue();
+                        float currentStatus;
+                        if ( currentStatusObj instanceof Long ) {
+                            currentStatus = ( ( Long ) currentStatusObj ).floatValue();
+                        } else {
+                            currentStatus = ( ( Float ) currentStatusObj ).floatValue();
+                        }
+                        String progress = exerciseName + ": " + currentStatus;
+                        TextView progressTextView = new TextView( getActivity() );
+                        progressTextView.setText( progress );
+                        mGroupMembersLayout.addView( progressTextView );
+
+                    }
                 }
 
                 // Create group object
@@ -324,11 +343,14 @@ public class GroupFragment extends Fragment {
                 // Update UI
                 mGroupNameText.setText( mGroup.getmGroupName() );
                 mGroupCreatorText.setText( mGroup.getmGroupCreator() );
+
+                /**
                 for(String username : mGroup.getMembers()) {
                     TextView textView = new TextView( getActivity() );
                     textView.setText( username );
                     mGroupMembersLayout.addView( textView );
                 }
+                 */
 
                 // If the user is the creator, show the components that allows the user admin controls
                 User currentUser = User.getInstance();
