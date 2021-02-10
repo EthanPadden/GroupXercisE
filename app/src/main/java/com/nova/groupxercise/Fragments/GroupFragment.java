@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,7 +38,7 @@ public class GroupFragment extends Fragment {
     private Button mRemoveMemberBtn;
     private EditText mMemberNameEt;
     private TextView mGroupGoalsLoadingText;
-    private ArrayList mGroupGoals;
+    private ArrayList< Goal > mGroupGoals;
     private LinearLayout mGroupMembersLayout;
     private LinearLayout mGroupGoalsLayout;
     private Button mUpdateStatusBtn;
@@ -107,7 +108,7 @@ public class GroupFragment extends Fragment {
         mUpdateStatusBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
-                updateMyStatus();
+                updateMyStatuses();
             }
         } );
 
@@ -115,13 +116,48 @@ public class GroupFragment extends Fragment {
         retrieveGroupGoals();
     }
 
-    private void updateMyStatus() {
-
+    private void updateMyStatuses() {
         /** For every goal in the group, get my current status */
+        for ( Goal goal : mGroupGoals ) {
+            updateMyStatus(goal);
+        }
 
         /** Update the progress in the group goal progress */
 
         /** Update in memory and UI */
+    }
+
+    private void updateMyStatus( final Goal goal ) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String path = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    Object currentStatusObj = dataSnapshot.getValue();
+                    float currentStatus;
+                    if ( currentStatusObj instanceof Long ) {
+                        currentStatus = ( ( Long ) currentStatusObj ).floatValue();
+                    } else {
+                        currentStatus = ( ( Float ) currentStatusObj ).floatValue();
+                    }
+                    goal.setmCurrentStatus( currentStatus );
+                    updateStatusUI( goal );
+                }
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    private void updateStatusUI(Goal goal) {
+        Toast.makeText( getActivity(), goal.toString(), Toast.LENGTH_SHORT ).show();
+
     }
 
 
@@ -139,9 +175,9 @@ public class GroupFragment extends Fragment {
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
-               if(dataSnapshot.exists()) {
-                   mGroupGoals = new ArrayList(  );
-                    for(DataSnapshot goalDataSnapshot : dataSnapshot.getChildren()) {
+                if ( dataSnapshot.exists() ) {
+                    mGroupGoals = new ArrayList();
+                    for ( DataSnapshot goalDataSnapshot : dataSnapshot.getChildren() ) {
                         String exerciseName = goalDataSnapshot.getKey();
                         // We have a goal for this exercise
                         Object targetObj = goalDataSnapshot.getValue();
@@ -151,7 +187,7 @@ public class GroupFragment extends Fragment {
                         } else {
                             target = ( ( Float ) targetObj ).floatValue();
                         }
-                        mGroupGoals.add( new Goal(exerciseName, 0, target ) );
+                        mGroupGoals.add( new Goal( exerciseName, 0, target ) );
                         mGroupGoalsLoadingText.setVisibility( View.GONE );
 
                         TextView textView = new TextView( getActivity() );
@@ -160,9 +196,9 @@ public class GroupFragment extends Fragment {
                         mGroupGoalsLayout.addView( textView );
 
                     }
-               } else {
-                   mGroupGoalsLoadingText.setText( "No goals" );
-               }
+                } else {
+                    mGroupGoalsLoadingText.setText( "No goals" );
+                }
             }
 
             @Override
@@ -197,6 +233,7 @@ public class GroupFragment extends Fragment {
 
     /**
      * Checks the argument string is a valid username
+     *
      * @param username the username to check
      * @return true if the username is valid
      */
@@ -208,6 +245,7 @@ public class GroupFragment extends Fragment {
      * Checks if there is a user with the argument username
      * If not, show error message
      * If so, find the user ID and call addUserToGroup
+     *
      * @param username
      */
     private void checkIfUserExists( final String username ) {
@@ -239,8 +277,9 @@ public class GroupFragment extends Fragment {
 
     /**
      * Adds a user to the group, updating both the groups and user_groups subtrees
+     *
      * @param username the username of the user to add
-     * @param userId the ID of the user to add
+     * @param userId   the ID of the user to add
      */
     private void addUserToGroup( String username, String userId ) {
         /** Updating groups subtree */
@@ -263,22 +302,23 @@ public class GroupFragment extends Fragment {
         mGroup.getMembers().add( username );
 
         /** Create subtree for the progress of that user towards the goals */
-        createProgressSubtree(username);
+        createProgressSubtree( username );
     }
 
-    private void createProgressSubtree(String username) {
+    private void createProgressSubtree( String username ) {
         String progressPath = "groups/" + mGroupId + "/members/" + username + "/progress";
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
         DatabaseReference childRef = homeScreenActivity.getmRootRef().child( progressPath );
 
-        for( Object goalObj : mGroupGoals ) {
-            Goal goal = (Goal ) goalObj;
+        for ( Object goalObj : mGroupGoals ) {
+            Goal goal = ( Goal ) goalObj;
             childRef.child( goal.getmExerciseName() ).setValue( 0 );
         }
     }
 
     /**
      * Removes a user from the group, updating both the groups and user_groups subtrees
+     *
      * @param username the username of the user to remove
      */
     private void removeMember( final String username ) {
@@ -324,7 +364,7 @@ public class GroupFragment extends Fragment {
      */
     private void retrieveGroupInfo() {
         // Path to the group
-        String path = "groups/" + mGroupId;
+        final String path = "groups/" + mGroupId;
 
         // Get the DB reference
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
@@ -344,7 +384,7 @@ public class GroupFragment extends Fragment {
                     TextView usernameTextView = new TextView( getActivity() );
                     usernameTextView.setText( username.toUpperCase() );
                     mGroupMembersLayout.addView( usernameTextView );
-                    for( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren()) {
+                    for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
                         String exerciseName = progressDataSnapshot.getKey();
                         Object currentStatusObj = progressDataSnapshot.getValue();
                         float currentStatus;
@@ -369,14 +409,6 @@ public class GroupFragment extends Fragment {
                 // Update UI
                 mGroupNameText.setText( mGroup.getmGroupName() );
                 mGroupCreatorText.setText( mGroup.getmGroupCreator() );
-
-                /**
-                for(String username : mGroup.getMembers()) {
-                    TextView textView = new TextView( getActivity() );
-                    textView.setText( username );
-                    mGroupMembersLayout.addView( textView );
-                }
-                 */
 
                 // If the user is the creator, show the components that allows the user admin controls
                 User currentUser = User.getInstance();
