@@ -300,6 +300,8 @@ public class GroupFragment extends Fragment {
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
         DatabaseReference groupsChildRef = homeScreenActivity.getmRootRef().child( thisGroupMembersPath );
 
+        groupsChildRef.child( username ).setValue( false );
+
         // TODO: check if the user is already a member - error?
 
         /** Updating user_groups subtree */
