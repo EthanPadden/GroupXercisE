@@ -182,12 +182,12 @@ public class GroupFragment extends Fragment {
         // Get the DB reference
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
         DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+        mGroupGoals = new ArrayList();
 
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 if ( dataSnapshot.exists() ) {
-                    mGroupGoals = new ArrayList();
                     for ( DataSnapshot goalDataSnapshot : dataSnapshot.getChildren() ) {
                         String exerciseName = goalDataSnapshot.getKey();
                         // We have a goal for this exercise
