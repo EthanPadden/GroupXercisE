@@ -381,9 +381,14 @@ public class GroupFragment extends Fragment {
                 for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
                     String username = memberDataSnapshot.getKey();
                     dbMembers.add( username );
+
+                    LinearLayout linearLayout = new LinearLayout( getActivity() );
+                    linearLayout.setOrientation( LinearLayout.VERTICAL );
+
                     TextView usernameTextView = new TextView( getActivity() );
                     usernameTextView.setText( username.toUpperCase() );
-                    mGroupMembersLayout.addView( usernameTextView );
+                    linearLayout.addView( usernameTextView );
+
                     for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
                         String exerciseName = progressDataSnapshot.getKey();
                         Object currentStatusObj = progressDataSnapshot.getValue();
@@ -396,9 +401,11 @@ public class GroupFragment extends Fragment {
                         String progress = exerciseName + ": " + currentStatus;
                         TextView progressTextView = new TextView( getActivity() );
                         progressTextView.setText( progress );
-                        mGroupMembersLayout.addView( progressTextView );
+                        linearLayout.addView( progressTextView );
 
                     }
+
+                    mGroupMembersLayout.addView( linearLayout );
                 }
 
                 // Create group object
