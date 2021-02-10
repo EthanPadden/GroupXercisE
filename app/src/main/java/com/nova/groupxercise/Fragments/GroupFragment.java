@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Objects.User;
 import com.nova.groupxercise.R;
@@ -36,9 +37,10 @@ public class GroupFragment extends Fragment {
     private Button mRemoveMemberBtn;
     private EditText mMemberNameEt;
     private TextView mGroupGoalsLoadingText;
-    private ArrayList mGroupGoalNames;
+    private ArrayList mGroupGoals;
     private LinearLayout mGroupMembersLayout;
     private LinearLayout mGroupGoalsLayout;
+    private Button mUpdateStatusBtn;
 
 
     public GroupFragment( String mGroupId ) {
@@ -66,6 +68,7 @@ public class GroupFragment extends Fragment {
         mGroupGoalsLoadingText = view.findViewById( R.id.text_group_goals_loading );
         mGroupMembersLayout = view.findViewById( R.id.layout_members );
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
+        mUpdateStatusBtn = view.findViewById( R.id.btn_update_status );
 
         // Set event listeners
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
@@ -101,10 +104,26 @@ public class GroupFragment extends Fragment {
                 deleteGroup();
             }
         } );
+        mUpdateStatusBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View view ) {
+                updateMyStatus();
+            }
+        } );
 
         retrieveGroupInfo();
         retrieveGroupGoals();
     }
+
+    private void updateMyStatus() {
+
+        /** For every goal in the group, get my current status */
+
+        /** Update the progress in the group goal progress */
+
+        /** Update in memory and UI */
+    }
+
 
     /**
      * Retrieves the group goals from the DB
@@ -121,11 +140,18 @@ public class GroupFragment extends Fragment {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                if(dataSnapshot.exists()) {
-                   mGroupGoalNames = new ArrayList(  );
+                   mGroupGoals = new ArrayList(  );
                     for(DataSnapshot goalDataSnapshot : dataSnapshot.getChildren()) {
                         String exerciseName = goalDataSnapshot.getKey();
-                        String target = goalDataSnapshot.getValue().toString();
-                        mGroupGoalNames.add( exerciseName );
+                        // We have a goal for this exercise
+                        Object targetObj = goalDataSnapshot.getValue();
+                        float target;
+                        if ( targetObj instanceof Long ) {
+                            target = ( ( Long ) targetObj ).floatValue();
+                        } else {
+                            target = ( ( Float ) targetObj ).floatValue();
+                        }
+                        mGroupGoals.add( new Goal(exerciseName, 0, target ) );
                         mGroupGoalsLoadingText.setVisibility( View.GONE );
 
                         TextView textView = new TextView( getActivity() );
@@ -245,9 +271,9 @@ public class GroupFragment extends Fragment {
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
         DatabaseReference childRef = homeScreenActivity.getmRootRef().child( progressPath );
 
-        for( Object goalObj : mGroupGoalNames ) {
-            String goalName = (String) goalObj;
-            childRef.child( goalName ).setValue( 0 );
+        for( Object goalObj : mGroupGoals ) {
+            Goal goal = (Goal ) goalObj;
+            childRef.child( goal.getmExerciseName() ).setValue( 0 );
         }
     }
 
