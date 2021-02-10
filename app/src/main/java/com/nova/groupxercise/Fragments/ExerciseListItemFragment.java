@@ -378,6 +378,8 @@ public class ExerciseListItemFragment extends Fragment {
                 for ( DataSnapshot memberDataSnapshot : dataSnapshot.getChildren() ) {
                     String username = memberDataSnapshot.getKey();
                     DatabaseReference progressRef = childRef.child( username ).child( "progress" ).child( goal.getmExerciseName() );
+
+                    // TODO: HERE - GET CURRENT STATUS OF GOAL
                     progressRef.setValue( 0 );
                 }
             }

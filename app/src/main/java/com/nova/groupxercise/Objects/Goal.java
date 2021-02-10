@@ -1,5 +1,12 @@
 package com.nova.groupxercise.Objects;
 
+import androidx.annotation.NonNull;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.DBObjects.GoalDBObject;
 
 public class Goal {
@@ -19,6 +26,119 @@ public class Goal {
         setmGoalDBObject( new GoalDBObject( mCurrentStatus, mTarget ) );
     }
 
+    public void matchUserProgressToGroup( String userId, User user, final Group group) {
+        String personalGoalProgressPath = "user_goals/" + userId + "/" + mExerciseName + "current_status";
+        final String groupGoalProgressPath = "groups/" + group.getmGroupId() + "/members/" + user.getUsername() + "/progress/" + mExerciseName;
+
+        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        final DatabaseReference personalGoalProgressRef = rootRef.child( personalGoalProgressPath );
+        final DatabaseReference groupGoalProgressRef = rootRef.child( groupGoalProgressPath );
+
+        personalGoalProgressRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( @NonNull final DataSnapshot personalGoalDataSnapshot ) {
+                groupGoalProgressRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                    @Override
+                    public void onDataChange( @NonNull DataSnapshot groupGoalProgressDataSnapshot ) {
+                        if(personalGoalDataSnapshot.exists() && groupGoalProgressDataSnapshot.exists()) {
+                            Object personalProgressObj = personalGoalDataSnapshot.getValue();
+                            Object groupGoalProgressObj = groupGoalProgressDataSnapshot.getValue();
+                            float personalProgress;
+                            float groupGoalProgress;
+
+                            if ( personalProgressObj instanceof Long ) {
+                                personalProgress = ( ( Long ) personalProgressObj ).floatValue();
+                            } else {
+                                personalProgress = ( ( Float ) personalProgressObj ).floatValue();
+                            }
+
+                            if ( groupGoalProgressObj instanceof Long ) {
+                                groupGoalProgress = ( ( Long ) groupGoalProgressObj ).floatValue();
+                            } else {
+                                groupGoalProgress = ( ( Float ) groupGoalProgressObj ).floatValue();
+                            }
+
+                            // Compare values
+                            if(personalProgress > groupGoalProgress) {
+                                groupGoalProgressRef.setValue( personalProgress );
+                            }
+
+                        } else {
+                            groupGoalProgressRef.setValue( 0.0f );
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled( @NonNull DatabaseError databaseError ) {
+
+                    }
+                } );
+
+            }
+
+            @Override
+            public void onCancelled( @NonNull DatabaseError databaseError ) {
+
+            }
+        } );
+    }
+
+    public void matchGroupProgressToUser( String userId, User user, final Group group) {
+        String personalGoalProgressPath = "user_goals/" + userId + "/" + mExerciseName + "current_status";
+        final String groupGoalProgressPath = "groups/" + group.getmGroupId() + "/members/" + user.getUsername() + "/progress/" + mExerciseName;
+
+        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        final DatabaseReference personalGoalProgressRef = rootRef.child( personalGoalProgressPath );
+        final DatabaseReference groupGoalProgressRef = rootRef.child( groupGoalProgressPath );
+
+        personalGoalProgressRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( @NonNull final DataSnapshot personalGoalDataSnapshot ) {
+                groupGoalProgressRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                    @Override
+                    public void onDataChange( @NonNull DataSnapshot groupGoalProgressDataSnapshot ) {
+                        if(personalGoalDataSnapshot.exists() && groupGoalProgressDataSnapshot.exists()) {
+                            Object personalProgressObj = personalGoalDataSnapshot.getValue();
+                            Object groupGoalProgressObj = groupGoalProgressDataSnapshot.getValue();
+                            float personalProgress;
+                            float groupGoalProgress;
+
+                            if ( personalProgressObj instanceof Long ) {
+                                personalProgress = ( ( Long ) personalProgressObj ).floatValue();
+                            } else {
+                                personalProgress = ( ( Float ) personalProgressObj ).floatValue();
+                            }
+
+                            if ( groupGoalProgressObj instanceof Long ) {
+                                groupGoalProgress = ( ( Long ) groupGoalProgressObj ).floatValue();
+                            } else {
+                                groupGoalProgress = ( ( Float ) groupGoalProgressObj ).floatValue();
+                            }
+
+                            // Compare values
+                            if(groupGoalProgress > personalProgress) {
+                                personalGoalProgressRef.setValue( groupGoalProgress );
+                            }
+
+                        } else  {
+                            personalGoalProgressRef.setValue( 0.0f );
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled( @NonNull DatabaseError databaseError ) {
+
+                    }
+                } );
+
+            }
+
+            @Override
+            public void onCancelled( @NonNull DatabaseError databaseError ) {
+
+            }
+        } );
+    }
     @Override
     public String toString() {
         return String.format( "%s\nCurrent: %s\nTarget: %s", mExerciseName, mCurrentStatus, mTarget );
