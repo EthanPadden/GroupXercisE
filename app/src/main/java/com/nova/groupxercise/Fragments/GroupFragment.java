@@ -302,8 +302,6 @@ public class GroupFragment extends Fragment {
 
         // TODO: check if the user is already a member - error?
 
-        groupsChildRef.child( username ).setValue( false );
-
         /** Updating user_groups subtree */
         String userGroupsPath = "user_groups/" + userId;
         DatabaseReference userGroupsChildRef = homeScreenActivity.getmRootRef().child( userGroupsPath );
@@ -313,18 +311,41 @@ public class GroupFragment extends Fragment {
         mGroup.getMembers().add( username );
 
         /** Create subtree for the progress of that user towards the goals */
-        createProgressSubtree( username );
-    }
-
-    private void createProgressSubtree( String username ) {
-        String progressPath = "groups/" + mGroupId + "/members/" + username + "/progress";
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( progressPath );
-
-        for ( Object goalObj : mGroupGoals ) {
-            Goal goal = ( Goal ) goalObj;
-            childRef.child( goal.getmExerciseName() ).setValue( 0 );
+        for(Goal goal : mGroupGoals) {
+            createProgressSubtree(username, userId, goal);
         }
+
+    }
+    private void createProgressSubtree( String username, String userId, Goal goal ) {
+        String currentStatusPath = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
+        String progressPath = "groups/" + mGroupId + "/members/" + username + "/progress/" + goal.getmExerciseName();
+
+        // Get the DB reference
+        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        final DatabaseReference currentStatusRef = homeScreenActivity.getmRootRef().child( currentStatusPath );
+        final DatabaseReference progressRef = homeScreenActivity.getmRootRef().child( progressPath );
+
+        currentStatusRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                float currentStatus = 0.0f; // Default value
+                if(dataSnapshot.exists()) {
+                    Object currentStatusObj = dataSnapshot.getValue();
+                    // The user has a personal goal for this exercise
+                    if ( currentStatusObj instanceof Long ) {
+                        currentStatus = ( ( Long ) currentStatusObj ).floatValue();
+                    } else {
+                        currentStatus = ( ( Float ) currentStatusObj ).floatValue();
+                    }
+                }
+
+                progressRef.setValue( currentStatus );
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
     }
 
     /**
