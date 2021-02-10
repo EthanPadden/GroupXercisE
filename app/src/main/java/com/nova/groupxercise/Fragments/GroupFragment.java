@@ -1,6 +1,7 @@
 package com.nova.groupxercise.Fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -117,21 +118,23 @@ public class GroupFragment extends Fragment {
     }
 
     private void updateMyStatuses() {
-        /** For every goal in the group, get my current status */
+        /** For every goal in the group, get my current status in memory and UI */
         for ( Goal goal : mGroupGoals ) {
-            updateMyStatus(goal);
+            updateMyStatusFromPersonalGoals( goal );
         }
 
         /** Update the progress in the group goal progress */
-
-        /** Update in memory and UI */
     }
 
-    private void updateMyStatus( final Goal goal ) {
+    private void updateMyStatusFromPersonalGoals( final Goal goal ) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        Log.d( "jar", userId);
+
         String path = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
+        Log.d( "jar", path);
+
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+        final DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
 
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
@@ -145,6 +148,8 @@ public class GroupFragment extends Fragment {
                         currentStatus = ( ( Float ) currentStatusObj ).floatValue();
                     }
                     goal.setmCurrentStatus( currentStatus );
+                    Log.d( "jar", ""+currentStatus);
+
                     updateStatusUI( goal );
                 }
             }
@@ -155,9 +160,15 @@ public class GroupFragment extends Fragment {
         } );
     }
 
-    private void updateStatusUI(Goal goal) {
-        Toast.makeText( getActivity(), goal.toString(), Toast.LENGTH_SHORT ).show();
+    private void updateStatusUI( Goal goal ) {
+        String currentUsername = User.getInstance().getUsername();
+        String progressId = currentUsername + goal.getmExerciseName();
+        int hashedProgressId = progressId.hashCode();
+        Log.d("Update",progressId);
 
+        TextView textView = getView().findViewById( hashedProgressId );
+        if ( textView != null )
+            textView.setText( goal.getmExerciseName() + ": " + goal.getmCurrentStatus() );
     }
 
 
@@ -389,6 +400,10 @@ public class GroupFragment extends Fragment {
                     usernameTextView.setText( username.toUpperCase() );
                     linearLayout.addView( usernameTextView );
 
+                    String currentUsername = User.getInstance().getUsername();
+                    int hashedUsername = currentUsername.hashCode();
+                    linearLayout.setId( hashedUsername );
+
                     for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
                         String exerciseName = progressDataSnapshot.getKey();
                         Object currentStatusObj = progressDataSnapshot.getValue();
@@ -401,6 +416,12 @@ public class GroupFragment extends Fragment {
                         String progress = exerciseName + ": " + currentStatus;
                         TextView progressTextView = new TextView( getActivity() );
                         progressTextView.setText( progress );
+
+                        String progressId = username + exerciseName;
+                        Log.d("Build",progressId);
+
+                        int hashedProgressId = progressId.hashCode();
+                        progressTextView.setId( hashedProgressId );
                         linearLayout.addView( progressTextView );
 
                     }
