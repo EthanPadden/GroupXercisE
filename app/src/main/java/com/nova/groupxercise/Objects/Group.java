@@ -14,6 +14,10 @@ public class Group {
         this.mGroupId = mGroupId;
     }
 
+    public Group( String mGroupId ) {
+        this.mGroupId = mGroupId;
+    }
+
     public String getmGroupName() {
         return mGroupName;
     }

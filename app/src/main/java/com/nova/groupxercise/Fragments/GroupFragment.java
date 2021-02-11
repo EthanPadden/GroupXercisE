@@ -128,10 +128,10 @@ public class GroupFragment extends Fragment {
 
     private void updateMyStatusFromPersonalGoals( final Goal goal ) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        Log.d( "jar", userId);
+        Log.d( "jar", userId );
 
         String path = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
-        Log.d( "jar", path);
+        Log.d( "jar", path );
 
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
         final DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
@@ -148,7 +148,7 @@ public class GroupFragment extends Fragment {
                         currentStatus = ( ( Float ) currentStatusObj ).floatValue();
                     }
                     goal.setmCurrentStatus( currentStatus );
-                    Log.d( "jar", ""+currentStatus);
+                    Log.d( "jar", "" + currentStatus );
 
                     updateStatusUI( goal );
                 }
@@ -164,7 +164,7 @@ public class GroupFragment extends Fragment {
         String currentUsername = User.getInstance().getUsername();
         String progressId = currentUsername + goal.getmExerciseName();
         int hashedProgressId = progressId.hashCode();
-        Log.d("Update",progressId);
+        Log.d( "Update", progressId );
 
         TextView textView = getView().findViewById( hashedProgressId );
         if ( textView != null )
@@ -313,41 +313,12 @@ public class GroupFragment extends Fragment {
         mGroup.getMembers().add( username );
 
         /** Create subtree for the progress of that user towards the goals */
-        for(Goal goal : mGroupGoals) {
-            createProgressSubtree(username, userId, goal);
+        for ( Goal goal : mGroupGoals ) {
+            User user = new User();
+            user.setUsername( username );
+            goal.matchUserProgressToGroup( userId, user, mGroup );
         }
 
-    }
-    private void createProgressSubtree( String username, String userId, Goal goal ) {
-        String currentStatusPath = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
-        String progressPath = "groups/" + mGroupId + "/members/" + username + "/progress/" + goal.getmExerciseName();
-
-        // Get the DB reference
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        final DatabaseReference currentStatusRef = homeScreenActivity.getmRootRef().child( currentStatusPath );
-        final DatabaseReference progressRef = homeScreenActivity.getmRootRef().child( progressPath );
-
-        currentStatusRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                float currentStatus = 0.0f; // Default value
-                if(dataSnapshot.exists()) {
-                    Object currentStatusObj = dataSnapshot.getValue();
-                    // The user has a personal goal for this exercise
-                    if ( currentStatusObj instanceof Long ) {
-                        currentStatus = ( ( Long ) currentStatusObj ).floatValue();
-                    } else {
-                        currentStatus = ( ( Float ) currentStatusObj ).floatValue();
-                    }
-                }
-
-                progressRef.setValue( currentStatus );
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
     }
 
     /**
@@ -441,7 +412,7 @@ public class GroupFragment extends Fragment {
                         progressTextView.setText( progress );
 
                         String progressId = username + exerciseName;
-                        Log.d("Build",progressId);
+                        Log.d( "Build", progressId );
 
                         int hashedProgressId = progressId.hashCode();
                         progressTextView.setId( hashedProgressId );

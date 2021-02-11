@@ -25,13 +25,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.Objects.Goal;
-import com.nova.groupxercise.DBObjects.GoalDBObject;
-import com.nova.groupxercise.Objects.Group;
-import com.nova.groupxercise.Adapters.GroupItemsAdapter;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
-import com.nova.groupxercise.R;
+import com.nova.groupxercise.Adapters.GroupItemsAdapter;
+import com.nova.groupxercise.DBObjects.GoalDBObject;
+import com.nova.groupxercise.Objects.Goal;
+import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Objects.User;
+import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
 
@@ -355,7 +355,6 @@ public class ExerciseListItemFragment extends Fragment {
                     addGoalProgressToMembers( groupId, goal );
                 }
                 childRef.setValue( goal.getmTarget() );
-
             }
 
             @Override
@@ -364,7 +363,7 @@ public class ExerciseListItemFragment extends Fragment {
         } );
     }
 
-    private void addGoalProgressToMembers( String groupId, final Goal goal ) {
+    private void addGoalProgressToMembers( final String groupId, final Goal goal ) {
         // Path to the group goal
         String path = "groups/" + groupId + "/members";
 
@@ -376,11 +375,26 @@ public class ExerciseListItemFragment extends Fragment {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 for ( DataSnapshot memberDataSnapshot : dataSnapshot.getChildren() ) {
-                    String username = memberDataSnapshot.getKey();
-                    DatabaseReference progressRef = childRef.child( username ).child( "progress" ).child( goal.getmExerciseName() );
+                    final String username = memberDataSnapshot.getKey();
 
-                    // TODO: HERE - GET CURRENT STATUS OF GOAL
-                    progressRef.setValue( 0 );
+                    String usernamePath = "usernames/" + username;
+                    final DatabaseReference usernameRef = mRootRef.child( usernamePath );
+
+                    usernameRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                        @Override
+                        public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
+                            String userId = dataSnapshot.getValue().toString();
+                            User user = new User();
+                            user.setUsername( username );
+                            goal.matchUserProgressToGroup( userId, user, new Group( groupId ) );
+                        }
+
+                        @Override
+                        public void onCancelled( @NonNull DatabaseError databaseError ) {
+
+                        }
+                    } );
+
                 }
             }
 
@@ -403,7 +417,7 @@ public class ExerciseListItemFragment extends Fragment {
             Toast.makeText( getActivity(), R.string.error_goal_setting, Toast.LENGTH_SHORT ).show();
         } else {
             // Path to the users goals
-            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             String path = "user_goals/" + userId + "/" + goal.getmExerciseName();
 
             // Get the DB reference
@@ -431,7 +445,7 @@ public class ExerciseListItemFragment extends Fragment {
 
                     // Check does the user have progress towards this exercise in a group
                     for(String groupId : mGroupIds) {
-                        checkForGroupGoalProgress(groupId, goal);
+                        goal.matchGroupProgressToUser( userId, User.getInstance(), new Group( groupId ) );
                     }
                 }
 
@@ -440,44 +454,6 @@ public class ExerciseListItemFragment extends Fragment {
                 }
             } );
         }
-    }
-
-    private void checkForGroupGoalProgress(String groupId, Goal goal) {
-        String username = User.getInstance().getUsername();
-        String path = "groups/" + groupId + "/members/" + username + "/progress/" + goal.getmExerciseName();
-        // Path to the users goals
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String userGoalsPath = "user_goals/" + userId + "/" + goal.getmExerciseName();
-
-        // Get the DB reference
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        final DatabaseReference userGoalsRef = homeScreenActivity.getmRootRef().child( userGoalsPath );
-        // Get the DB reference
-        final DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
-                if(dataSnapshot.exists()) {
-                    // Update the personal goal with the progress from the group
-                    Object progressObj = dataSnapshot.getValue();
-                    float progress;
-                    if ( progressObj instanceof Long ) {
-                        progress = ( ( Long ) progressObj ).floatValue();
-                    } else {
-                        progress = ( ( Float ) progressObj ).floatValue();
-                    }
-
-                    // Progress towards an exercise should be the same across groups
-                    userGoalsRef.child( "current_status" ).setValue( progress );
-                }
-            }
-
-            @Override
-            public void onCancelled( @NonNull DatabaseError databaseError ) {
-
-            }
-        } );
     }
 
     /**

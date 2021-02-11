@@ -27,7 +27,7 @@ public class Goal {
     }
 
     public void matchUserProgressToGroup( String userId, User user, final Group group) {
-        String personalGoalProgressPath = "user_goals/" + userId + "/" + mExerciseName + "current_status";
+        String personalGoalProgressPath = "user_goals/" + userId + "/" + mExerciseName + "/current_status";
         final String groupGoalProgressPath = "groups/" + group.getmGroupId() + "/members/" + user.getUsername() + "/progress/" + mExerciseName;
 
         final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
@@ -63,7 +63,19 @@ public class Goal {
                                 groupGoalProgressRef.setValue( personalProgress );
                             }
 
-                        } else {
+                        } else if(personalGoalDataSnapshot.exists()) {
+                            Object personalProgressObj = personalGoalDataSnapshot.getValue();
+
+                            float personalProgress;
+                            if ( personalProgressObj instanceof Long ) {
+                                personalProgress = ( ( Long ) personalProgressObj ).floatValue();
+                            } else {
+                                personalProgress = ( ( Float ) personalProgressObj ).floatValue();
+                            }
+                            groupGoalProgressRef.setValue( personalProgress );
+
+
+                        }else {
                             groupGoalProgressRef.setValue( 0.0f );
                         }
                     }
@@ -84,7 +96,7 @@ public class Goal {
     }
 
     public void matchGroupProgressToUser( String userId, User user, final Group group) {
-        String personalGoalProgressPath = "user_goals/" + userId + "/" + mExerciseName + "current_status";
+        String personalGoalProgressPath = "user_goals/" + userId + "/" + mExerciseName + "/current_status";
         final String groupGoalProgressPath = "groups/" + group.getmGroupId() + "/members/" + user.getUsername() + "/progress/" + mExerciseName;
 
         final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();

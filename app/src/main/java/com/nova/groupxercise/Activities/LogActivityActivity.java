@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -73,16 +74,55 @@ public class LogActivityActivity extends AppCompatActivity {
             if ( mSelectedGoal != null ) {
                 ExerciseActivity exerciseActivity = new ExerciseActivity( mSelectedGoal.getmExerciseName(), DateTime.now(), level );
                 logActivity( exerciseActivity );
+                // Update both seperately (should be the same at this point)
                 updatePersonalGoal( exerciseActivity );
-                for(Group group : mGroups) {
-                    updateGroupGoal(group, exerciseActivity);
-
-                }
+                updateGroupGoals( exerciseActivity );
             } else {
                 Toast.makeText( LogActivityActivity.this, "Choose a goal", Toast.LENGTH_SHORT ).show();
             }
         } else {
             Toast.makeText( LogActivityActivity.this, "Enter level", Toast.LENGTH_SHORT ).show();
+        }
+    }
+
+    public void updateGroupGoals( final ExerciseActivity exerciseActivity){
+        for(Group group : mGroups) {
+            // Update the progress only if there is a goal for that group:
+            // Check is there a goal for the exercise in the group (using the progress)
+            // If so, update the progress with the value
+            String progressPath = "groups/"
+                    + group.getmGroupId()
+                    + "/members/"
+                    + User.getInstance().getUsername()
+                    + "/progress/"
+                    + exerciseActivity.getmExerciseName();
+            
+            final DatabaseReference progressRef = mRootRef.child( progressPath );
+            progressRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
+                    if(dataSnapshot.exists()) {
+                        // This means there is a goal for this exercise
+                        // Update the value here
+                        Object progressObj = dataSnapshot.getValue();
+                        float progress;
+                        if ( progressObj instanceof Long ) {
+                            progress = ( ( Long ) progressObj ).floatValue();
+                        } else {
+                            progress = ( ( Float ) progressObj ).floatValue();
+                        }
+
+                        if(exerciseActivity.getmLevel() > progress) {
+                            progressRef.setValue( exerciseActivity.getmLevel() );
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled( @NonNull DatabaseError databaseError ) {
+
+                }
+            } );
         }
     }
 
@@ -152,7 +192,7 @@ public class LogActivityActivity extends AppCompatActivity {
 
     private void updatePersonalGoal( final ExerciseActivity activity ) {
         // Get the current user ID
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         // Path to the current status of this goal
         String goalPath = "user_goals/" + currentUserId + "/" + activity.getmExerciseName() + "/current_status";
@@ -174,6 +214,7 @@ public class LogActivityActivity extends AppCompatActivity {
                     if(activity.getmLevel() > currentStatus) {
                         goalRef.setValue( activity.getmLevel() );
                     }
+
                 } else {
                     Toast.makeText( LogActivityActivity.this, "There is no personal goal for this exercise", Toast.LENGTH_SHORT ).show();
                 }
@@ -186,38 +227,6 @@ public class LogActivityActivity extends AppCompatActivity {
     }
 
 
-    private void updateGroupGoal( Group group, final ExerciseActivity activity ) {
-        // Path to the current status of this goal
-        String currentUsername = User.getInstance().getUsername();
-        String goalPath = "groups/" + group.getmGroupId() + "/members/" + currentUsername + "/progress/" + activity.getmExerciseName();
-
-        final DatabaseReference goalRef = mRootRef.child( goalPath );
-
-        goalRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    // The group has a goal for this exercise
-                    Object progressObj = dataSnapshot.getValue();
-                    float progress;
-                    if ( progressObj instanceof Long ) {
-                        progress = ( ( Long ) progressObj ).floatValue();
-                    } else {
-                        progress = ( ( Float ) progressObj ).floatValue();
-                    }
-                    if(activity.getmLevel() > progress) {
-                        goalRef.setValue( activity.getmLevel() );
-                    }
-                } else {
-                    Toast.makeText( LogActivityActivity.this, "There is no group goal for this exercise", Toast.LENGTH_SHORT ).show();
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
 
     /**
      * Given a list of group IDs, retrieve the group goals from the DB
