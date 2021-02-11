@@ -64,7 +64,19 @@ public class LogActivityActivity extends AppCompatActivity {
         } );
 
 
-        retrieveGoals();
+//        retrieveGoals();
+        mGoalsList = new ArrayList<>(  );
+
+        // Set the list as the list for the items adapter
+        mItemsAdapter = new GoalItemsAdapter( this, mGoalsList );
+        Goal.retrievePersonalGoals( mGoalsList, new DBListener() {
+            @Override
+            public void onRetrievalFinished() {
+                if(mGoalsList.size() > 0){
+                    setupGoalsList();
+                }
+            }
+        } );
 //        retrieveGroupIds();
         final ArrayList<String> groupIds = new ArrayList<>(  );
         Group.retrieveGroupIds( groupIds, new DBListener() {
@@ -228,76 +240,5 @@ public class LogActivityActivity extends AppCompatActivity {
         } );
     }
 
-
-
-
-    /**
-     * Builds a list for every group to display the group goals
-     */
-    private void displayGroupGoals() {
-        for ( Group group : mGroups ) {
-
-            if ( group.getGoals() != null ) {
-                for ( Goal goal : group.getGoals() ) {
-                    mGoalsList.add( goal );
-                }
-            }
-        }
-
-        setupGoalsList();
-    }
-
-    /**
-     * Gets the list of goals from the DB and makes the UI list visible when retrieved
-     */
-    public void retrieveGoals() {
-        // Path to the users goals
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String path = "user_goals/" + userId;
-
-        // Get the DB reference
-        DatabaseReference childRef = mRootRef.child( path );
-
-        // Create an empty list for the goals
-        mGoalsList = new ArrayList<>();
-
-        // Set the list as the list for the items adapter
-        mItemsAdapter = new GoalItemsAdapter( this, mGoalsList );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot exerciseDataSnapshot : dataSnapshot.getChildren() ) {
-                    // Get the exercise name
-                    String exerciseName = exerciseDataSnapshot.getKey();
-
-                    // Get the current status as a float value
-                    DataSnapshot currentStatusDataSnapshot = exerciseDataSnapshot.child( "current_status" );
-                    float currentStatus = 0.0f;
-                    if ( currentStatusDataSnapshot.exists() ) {
-                        Long currentStatusLong = ( Long ) currentStatusDataSnapshot.getValue();
-                        currentStatus = currentStatusLong.floatValue();
-                    }
-
-                    // Get the target as a float value
-                    DataSnapshot targetStatusDataSnapshot = exerciseDataSnapshot.child( "target" );
-                    float target = 0.0f;
-                    if ( targetStatusDataSnapshot.exists() ) {
-                        Long targetLong = ( Long ) targetStatusDataSnapshot.getValue();
-                        target = targetLong.floatValue();
-                    }
-
-                    // Add the goal to the list
-                    mGoalsList.add( new Goal( exerciseName, currentStatus, target ) );
-
-                    setupGoalsList();
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
 
 }

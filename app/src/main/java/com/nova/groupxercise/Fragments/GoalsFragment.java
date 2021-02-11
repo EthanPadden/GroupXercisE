@@ -12,12 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.Activities.HomeScreenActivity;
 import com.nova.groupxercise.Adapters.GoalItemsAdapter;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
@@ -56,7 +50,27 @@ public class GoalsFragment extends Fragment {
 
         mGroups = new ArrayList<>(  );
         mLoadingText.setVisibility( View.INVISIBLE );
-        retrieveGoals();
+//        retrieveGoals();
+
+
+
+
+        mGoalsList = new ArrayList<>(  );
+
+        // Set the list as the list for the items adapter
+        mItemsAdapter = new GoalItemsAdapter( getActivity(), mGoalsList );
+        Goal.retrievePersonalGoals( mGoalsList, new DBListener() {
+            @Override
+            public void onRetrievalFinished() {
+                if(mGoalsList.size() > 0){
+                    mLoadingText.setVisibility( View.GONE );
+                    mListView.setAdapter( mItemsAdapter );
+                }
+            }
+        } );
+
+
+
         final ArrayList<String> groupIds = new ArrayList<>(  );
         Group.retrieveGroupIds( groupIds, new DBListener() {
             @Override
@@ -81,6 +95,7 @@ public class GoalsFragment extends Fragment {
             }
         } );
     }
+
 
 
     /**
@@ -113,61 +128,7 @@ public class GoalsFragment extends Fragment {
         return listView;
     }
 
-    /**
-     * Gets the list of goals from the DB and makes the UI list visible when retrieved
-     */
-    public void retrieveGoals() {
-        // Path to the users goals
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String path = "user_goals/" + userId;
 
-        // Get the DBr reference
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-
-        // Create an empty list for the goals
-        mGoalsList = new ArrayList<>();
-
-        // Set the list as the list for the items adapter
-        mItemsAdapter = new GoalItemsAdapter( getActivity(), mGoalsList );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot exerciseDataSnapshot : dataSnapshot.getChildren() ) {
-                    // Get the exercise name
-                    String exerciseName = exerciseDataSnapshot.getKey();
-
-                    // Get the current status as a float value
-                    DataSnapshot currentStatusDataSnapshot = exerciseDataSnapshot.child( "current_status" );
-                    float currentStatus = 0.0f;
-                    if ( currentStatusDataSnapshot.exists() ) {
-                        Long currentStatusLong = ( Long ) currentStatusDataSnapshot.getValue();
-                        currentStatus = currentStatusLong.floatValue();
-                    }
-
-                    // Get the target as a float value
-                    DataSnapshot targetStatusDataSnapshot = exerciseDataSnapshot.child( "target" );
-                    float target = 0.0f;
-                    if ( targetStatusDataSnapshot.exists() ) {
-                        Long targetLong = ( Long ) targetStatusDataSnapshot.getValue();
-                        target = targetLong.floatValue();
-                    }
-
-                    // Add the goal to the list
-                    mGoalsList.add( new Goal( exerciseName, currentStatus, target ) );
-                }
-
-                // Update UI
-                mLoadingText.setVisibility( View.GONE );
-                mListView.setAdapter( mItemsAdapter );
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
 
     private void retreiveGroupGoals() {
 

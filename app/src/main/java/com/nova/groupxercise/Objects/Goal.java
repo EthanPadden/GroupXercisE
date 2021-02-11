@@ -2,12 +2,16 @@ package com.nova.groupxercise.Objects;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.annotations.NotNull;
 import com.nova.groupxercise.DBObjects.GoalDBObject;
+
+import java.util.ArrayList;
 
 public class Goal {
     private String mExerciseName;
@@ -148,6 +152,49 @@ public class Goal {
             @Override
             public void onCancelled( @NonNull DatabaseError databaseError ) {
 
+            }
+        } );
+    }
+
+    public static void retrievePersonalGoals( @NotNull final ArrayList<Goal> goals, final DBListener listener ){
+        // Path to the users goals
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String path = "user_goals/" + userId;
+
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                for ( DataSnapshot exerciseDataSnapshot : dataSnapshot.getChildren() ) {
+                    // Get the exercise name
+                    String exerciseName = exerciseDataSnapshot.getKey();
+
+                    // Get the current status as a float value
+                    DataSnapshot currentStatusDataSnapshot = exerciseDataSnapshot.child( "current_status" );
+                    float currentStatus = 0.0f;
+                    if ( currentStatusDataSnapshot.exists() ) {
+                        Long currentStatusLong = ( Long ) currentStatusDataSnapshot.getValue();
+                        currentStatus = currentStatusLong.floatValue();
+                    }
+
+                    // Get the target as a float value
+                    DataSnapshot targetStatusDataSnapshot = exerciseDataSnapshot.child( "target" );
+                    float target = 0.0f;
+                    if ( targetStatusDataSnapshot.exists() ) {
+                        Long targetLong = ( Long ) targetStatusDataSnapshot.getValue();
+                        target = targetLong.floatValue();
+                    }
+
+                    // Add the goal to the list
+                    goals.add( new Goal( exerciseName, currentStatus, target ) );
+                }
+
+                listener.onRetrievalFinished();
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
             }
         } );
     }
