@@ -76,7 +76,22 @@ public class LogActivityActivity extends AppCompatActivity {
                 Group.retrieveGroupNames( groupIds, mGroups, new DBListener() {
                     @Override
                     public void onRetrievalFinished() {
-                        retrieveGroupGoals( groupIds );
+                        if(mGroups.size() == 0) {
+                            mLoadingText.setText( "You have no groups" );
+                        } else {
+                            for( final Group group: mGroups) {
+                                group.retrieveGroupGoals( new DBListener() {
+                                    @Override
+                                    public void onRetrievalFinished() {
+                                        for ( Goal goal : group.getGoals() ) {
+                                            mGoalsList.add( goal );
+                                            setupGoalsList();
+
+                                        }
+                                    }
+                                } );
+                            }
+                        }
                     }
                 } );
 
@@ -215,65 +230,6 @@ public class LogActivityActivity extends AppCompatActivity {
 
 
 
-    /**
-     * Given a list of group IDs, retrieve the group goals from the DB
-     *
-     * @param groupIds the list of group IDs
-     */
-    private void retrieveGroupGoals( ArrayList< String > groupIds ) {
-        // Create an empty list for the groups
-        mGroups = new ArrayList<>();
-
-        // The UI is updated when all of the group names have been added
-        // Necessary because of the async call within the for loop
-        final int expectedSize = groupIds.size();
-
-        for ( final String groupId : groupIds ) {
-            String groupPath = "groups/" + groupId;
-            // Get the DBr reference
-            DatabaseReference groupRef = mRootRef.child( groupPath );
-
-            groupRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                @Override
-                public void onDataChange( DataSnapshot dataSnapshot ) {
-                    String groupName = dataSnapshot.child( "name" ).getValue().toString();
-
-                    Group group = new Group( groupName, groupId );
-                    DataSnapshot groupGoalsDataSnapshot = dataSnapshot.child( "goals" );
-
-                    // If the group has goals
-                    if ( groupGoalsDataSnapshot.exists() ) {
-                        ArrayList< Goal > groupGoals = new ArrayList<>();
-
-                        for ( DataSnapshot groupGoalDataSnapshot : groupGoalsDataSnapshot.getChildren() ) {
-                            String exerciseName = groupGoalDataSnapshot.getKey();
-                            String targetStr = groupGoalDataSnapshot.getValue().toString();
-                            float target = Float.parseFloat( targetStr );
-                            Goal goal = new Goal( exerciseName, 0, target );
-                            groupGoals.add( goal );
-                        }
-
-                        group.setGoals( groupGoals );
-                    }
-
-                    mGroups.add( group );
-
-
-                    if ( mGroups.size() == expectedSize ) {
-                        displayGroupGoals();
-                    }
-                }
-
-                @Override
-                public void onCancelled( DatabaseError databaseError ) {
-                }
-            } );
-        }
-        if ( mGroups.size() == 0 ) {
-            mLoadingText.setText( "You have no groups" );
-        }
-
-    }
 
     /**
      * Builds a list for every group to display the group goals

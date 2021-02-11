@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Objects.User;
@@ -39,7 +40,6 @@ public class GroupFragment extends Fragment {
     private Button mRemoveMemberBtn;
     private EditText mMemberNameEt;
     private TextView mGroupGoalsLoadingText;
-    private ArrayList< Goal > mGroupGoals;
     private LinearLayout mGroupMembersLayout;
     private LinearLayout mGroupGoalsLayout;
     private Button mUpdateStatusBtn;
@@ -113,13 +113,31 @@ public class GroupFragment extends Fragment {
             }
         } );
 
+        mGroup = new Group( mGroupId );
         retrieveGroupInfo();
-        retrieveGroupGoals();
+        mGroup.retrieveGroupGoals(  new DBListener() {
+            @Override
+            public void onRetrievalFinished() {
+                if(mGroup.getGoals().size() == 0) {
+                    mGroupGoalsLoadingText.setText( "No goals" );
+                } else {
+                    mGroupGoalsLoadingText.setVisibility( View.GONE );
+
+                    for(Goal goal : mGroup.getGoals()) {
+                        TextView textView = new TextView( getActivity() );
+                        textView.setText( goal.getmExerciseName() + ": " + goal.getmTarget());
+
+                        mGroupGoalsLayout.addView( textView );
+                    }
+                }
+
+            }
+        } );
     }
 
     private void updateMyStatuses() {
         /** For every goal in the group, get my current status in memory and UI */
-        for ( Goal goal : mGroupGoals ) {
+        for ( Goal goal : mGroup.getGoals() ) {
             updateMyStatusFromPersonalGoals( goal );
         }
 
@@ -172,51 +190,6 @@ public class GroupFragment extends Fragment {
     }
 
 
-    /**
-     * Retrieves the group goals from the DB
-     */
-    private void retrieveGroupGoals() {
-        // Path to group goals
-        String path = "groups/" + mGroupId + "/goals";
-
-        // Get the DB reference
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-        mGroupGoals = new ArrayList();
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    for ( DataSnapshot goalDataSnapshot : dataSnapshot.getChildren() ) {
-                        String exerciseName = goalDataSnapshot.getKey();
-                        // We have a goal for this exercise
-                        Object targetObj = goalDataSnapshot.getValue();
-                        float target;
-                        if ( targetObj instanceof Long ) {
-                            target = ( ( Long ) targetObj ).floatValue();
-                        } else {
-                            target = ( ( Float ) targetObj ).floatValue();
-                        }
-                        mGroupGoals.add( new Goal( exerciseName, 0, target ) );
-                        mGroupGoalsLoadingText.setVisibility( View.GONE );
-
-                        TextView textView = new TextView( getActivity() );
-                        textView.setText( exerciseName + ": " + target );
-
-                        mGroupGoalsLayout.addView( textView );
-
-                    }
-                } else {
-                    mGroupGoalsLoadingText.setText( "No goals" );
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
 
     /**
      * Removes all members from the group (including the creator)
@@ -313,7 +286,7 @@ public class GroupFragment extends Fragment {
         mGroup.getMembers().add( username );
 
         /** Create subtree for the progress of that user towards the goals */
-        for ( Goal goal : mGroupGoals ) {
+        for ( Goal goal : mGroup.getGoals() ) {
             User user = new User();
             user.setUsername( username );
             goal.matchUserProgressToGroup( userId, user, mGroup );

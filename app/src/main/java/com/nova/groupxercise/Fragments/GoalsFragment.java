@@ -54,104 +54,56 @@ public class GoalsFragment extends Fragment {
         // Set the list as the list for the items adapter
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mGoalsList );
 
+        mGroups = new ArrayList<>(  );
         mLoadingText.setVisibility( View.INVISIBLE );
         retrieveGoals();
         final ArrayList<String> groupIds = new ArrayList<>(  );
         Group.retrieveGroupIds( groupIds, new DBListener() {
             @Override
             public void onRetrievalFinished() {
-                retrieveGroupGoals(groupIds);
+                Group.retrieveGroupNames( groupIds, mGroups, new DBListener() {
+                    @Override
+                    public void onRetrievalFinished() {
+                        if(mGroups.size() == 0) {
+                            mLoadingText.setText( "You have no groups" );
+                        } else {
+                            for( final Group group: mGroups) {
+                                group.retrieveGroupGoals( new DBListener() {
+                                    @Override
+                                    public void onRetrievalFinished() {
+                                        addGroupGoalsToUI(group);
+                                    }
+                                } );
+                            }
+                        }
+                    }
+                } );
             }
         } );
-
     }
 
-    /**
-     * Given a list of group IDs, retrieve the group goals from the DB
-     * @param groupIds the list of group IDs
-     */
-    private void retrieveGroupGoals( ArrayList<String> groupIds) {
-        // Create an empty list for the groups
-        mGroups = new ArrayList<>();
-
-        // The UI is updated when all of the group names have been added
-        // Necessary because of the async call within the for loop
-        final int expectedSize = groupIds.size();
-
-        for( final String groupId : groupIds) {
-            String groupPath = "groups/" + groupId;
-            // Get the DBr reference
-            HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-            DatabaseReference groupRef = homeScreenActivity.getmRootRef().child( groupPath );
-
-            groupRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                @Override
-                public void onDataChange( DataSnapshot dataSnapshot ) {
-                    String groupName = dataSnapshot.child( "name" ).getValue().toString();
-
-                    Group group = new Group( groupName, groupId );
-                    DataSnapshot groupGoalsDataSnapshot = dataSnapshot.child( "goals" );
-
-                    // If the group has goals
-                    if(groupGoalsDataSnapshot.exists()) {
-                        ArrayList<Goal> groupGoals = new ArrayList<>(  );
-
-                        for(DataSnapshot groupGoalDataSnapshot : groupGoalsDataSnapshot.getChildren()){
-                            String exerciseName = groupGoalDataSnapshot.getKey();
-                            String targetStr = groupGoalDataSnapshot.getValue().toString();
-                            float target = Float.parseFloat( targetStr );
-                            Goal goal = new Goal( exerciseName , 0, target );
-                            groupGoals.add( goal );
-                        }
-
-                        group.setGoals( groupGoals );
-                    }
-
-                    mGroups.add( group );
-
-
-                    if(mGroups.size() == expectedSize) {
-                        displayGroupGoals();
-                    }
-                }
-
-                @Override
-                public void onCancelled( DatabaseError databaseError ) {
-                }
-            } );
-        }
-        if(mGroups.size() == 0) {
-            mLoadingText.setText( "You have no groups" );
-        }
-
-    }
 
     /**
      * Builds a list for every group to display the group goals
      */
-    private void displayGroupGoals() {
-        for(Group group : mGroups) {
-            // Group title
-            TextView groupTitleText = new TextView( getActivity() );
-            groupTitleText.setText( group.getmGroupName().toUpperCase() );
-            mGroupGoalsLayout.addView( groupTitleText );
+    private void addGroupGoalsToUI(Group group) {
+        // Group title
+        TextView groupTitleText = new TextView( getActivity() );
+        groupTitleText.setText( group.getmGroupName().toUpperCase() );
+        mGroupGoalsLayout.addView( groupTitleText );
 
-            if(group.getGoals() != null) {
-                ListView groupListView = createGroupGoalsListView( group );
+        if(group.getGoals() != null) {
+            ListView groupListView = createGroupGoalsListView( group );
 
-                // Append to layout
-                mGroupGoalsLayout.addView( groupListView );
+            // Append to layout
+            mGroupGoalsLayout.addView( groupListView );
 
-            } else {
-                // Display that the group has no goals
-                TextView noGoalsText = new TextView( getActivity() );
-                noGoalsText.setText( "No goals" );
-                mGroupGoalsLayout.addView( noGoalsText );
-            }
+        } else {
+            // Display that the group has no goals
+            TextView noGoalsText = new TextView( getActivity() );
+            noGoalsText.setText( "No goals" );
+            mGroupGoalsLayout.addView( noGoalsText );
         }
-
-        // Redraw
-        mGroupGoalsLayout.invalidate();
     }
 
     private ListView createGroupGoalsListView(Group group) {

@@ -24,6 +24,8 @@ public class Group {
 
     public Group( String mGroupId ) {
         this.mGroupId = mGroupId;
+        members = new ArrayList<>(  );
+        goals = new ArrayList<>(  );
     }
 
     public static void retrieveGroupIds( @NotNull final ArrayList<String> groupIds, final DBListener listener) {
@@ -52,7 +54,6 @@ public class Group {
             }
         } );
     }
-
 
     public static void retrieveGroupIds( @NotNull final ArrayList<String> adminGroupIds, @NotNull final ArrayList<String> groupIds, final DBListener listener) {
 
@@ -86,7 +87,38 @@ public class Group {
         } );
     }
 
+    public void retrieveGroupGoals(final DBListener listener) {
+        // Path to group goals
+        String path = "groups/" + mGroupId + "/goals";
 
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    for ( DataSnapshot goalDataSnapshot : dataSnapshot.getChildren() ) {
+                        String exerciseName = goalDataSnapshot.getKey();
+                        // We have a goal for this exercise
+                        Object targetObj = goalDataSnapshot.getValue();
+                        float target;
+                        if ( targetObj instanceof Long ) {
+                            target = ( ( Long ) targetObj ).floatValue();
+                        } else {
+                            target = ( ( Float ) targetObj ).floatValue();
+                        }
+                        goals.add( new Goal( exerciseName, 0, target ) );
+                    }
+                }
+
+                listener.onRetrievalFinished();
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
     public static void retrieveGroupNames( @NotNull final ArrayList<String> groupIds,
                                            @NotNull final ArrayList<Group> groups,
                                            final DBListener listener) {
@@ -117,7 +149,6 @@ public class Group {
             } );
         }
     }
-
 
 
 
