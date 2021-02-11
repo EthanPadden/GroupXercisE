@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +25,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.nova.groupxercise.Adapters.GroupItemsAdapter;
+import com.nova.groupxercise.DBObjects.GoalDBObject;
+import com.nova.groupxercise.Objects.Goal;
+import com.nova.groupxercise.Objects.Group;
+import com.nova.groupxercise.Objects.User;
+import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
 
@@ -60,6 +68,7 @@ public class ExerciseListItemFragment extends Fragment {
     private ArrayList mAdminGroups;
     private ListView mListView;
     private TextView mLoadingText;
+    private ArrayList<String> mGroupIds;
 
     // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
@@ -148,10 +157,10 @@ public class ExerciseListItemFragment extends Fragment {
             public void onClick( View v ) {
                 if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
                     User currentUser = User.getInstance();
-                    if(currentUser.isUserDetailsAreSet()) {
+                    if ( currentUser.isUserDetailsAreSet() ) {
                         // Automatic goal calculation option: use suggested goal
                         float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
-                        saveGoal( new Goal( mExerciseName, 0, target ) );
+                        savePersonalGoal( new Goal( mExerciseName, 0, target ) );
                     } else {
                         Toast.makeText( getActivity(), "Invalid details", Toast.LENGTH_SHORT ).show();
                     }
@@ -161,7 +170,7 @@ public class ExerciseListItemFragment extends Fragment {
 
                     if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
                         float target = Float.parseFloat( targetStr );
-                        saveGoal( new Goal( mExerciseName, 0, target ) );
+                        savePersonalGoal( new Goal( mExerciseName, 0, target ) );
                     } else {
                         Toast.makeText( getActivity(), R.string.error_no_target_entered, Toast.LENGTH_SHORT ).show();
                     }
@@ -209,6 +218,7 @@ public class ExerciseListItemFragment extends Fragment {
     private void retrieveGroupIds() {
         // Create empty list for the group IDs that the user is an admin of
         final ArrayList< String > groupIds = new ArrayList<>();
+        mGroupIds = new ArrayList(  );
 
         // Get the current user ID
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -226,6 +236,7 @@ public class ExerciseListItemFragment extends Fragment {
                         // If the current user is an admin of the group
                         groupIds.add( usersGroupsDataSnapshot.getKey() );
                     }
+                    mGroupIds.add( usersGroupsDataSnapshot.getKey() );
                 }
 
                 retrieveGroupNames( groupIds );
@@ -293,7 +304,7 @@ public class ExerciseListItemFragment extends Fragment {
 
                 if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
                     User currentUser = User.getInstance();
-                    if(currentUser.isUserDetailsAreSet()) {
+                    if ( currentUser.isUserDetailsAreSet() ) {
                         // Automatic goal calculation option: use suggested goal
                         float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
                         saveGroupGoal( groupId, new Goal( mExerciseName, 0, target ) );
@@ -306,7 +317,7 @@ public class ExerciseListItemFragment extends Fragment {
 
                     if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
                         float target = Float.parseFloat( targetStr );
-                        saveGroupGoal(groupId, new Goal( mExerciseName, 0, target ) );
+                        saveGroupGoal( groupId, new Goal( mExerciseName, 0, target ) );
                     } else {
                         Toast.makeText( getActivity(), R.string.error_no_target_entered, Toast.LENGTH_SHORT ).show();
                     }
@@ -323,9 +334,9 @@ public class ExerciseListItemFragment extends Fragment {
      * Saves the argument goal as a goal for the group with the argument group ID
      * This updates the group goal if the group already has a goal for the exercise
      * @param groupId the group ID of the group to set the goal
-     * @param goal the goal object
+     * @param goal  the goal object
      */
-    private void saveGroupGoal( String groupId, final Goal goal ) {
+    private void saveGroupGoal( final String groupId, final Goal goal ) {
         // Path to the group goal
         String path = "groups/" + groupId + "/goals/" + goal.getmExerciseName();
 
@@ -341,10 +352,50 @@ public class ExerciseListItemFragment extends Fragment {
 
                 } else {
                     Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
-
+                    addGoalProgressToMembers( groupId, goal );
                 }
                 childRef.setValue( goal.getmTarget() );
+            }
 
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    private void addGoalProgressToMembers( final String groupId, final Goal goal ) {
+        // Path to the group goal
+        String path = "groups/" + groupId + "/members";
+
+        // Get the DB reference
+        final DatabaseReference childRef = mRootRef.child( path );
+
+        // Check if we have a set of goals for that particular user
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                for ( DataSnapshot memberDataSnapshot : dataSnapshot.getChildren() ) {
+                    final String username = memberDataSnapshot.getKey();
+
+                    String usernamePath = "usernames/" + username;
+                    final DatabaseReference usernameRef = mRootRef.child( usernamePath );
+
+                    usernameRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                        @Override
+                        public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
+                            String userId = dataSnapshot.getValue().toString();
+                            User user = new User();
+                            user.setUsername( username );
+                            goal.matchUserProgressToGroup( userId, user, new Group( groupId ) );
+                        }
+
+                        @Override
+                        public void onCancelled( @NonNull DatabaseError databaseError ) {
+
+                        }
+                    } );
+
+                }
             }
 
             @Override
@@ -361,13 +412,13 @@ public class ExerciseListItemFragment extends Fragment {
      *
      * @param goal the goal object to save to the DB
      */
-    private void saveGoal( final Goal goal ) {
+    private void savePersonalGoal( final Goal goal ) {
         if ( goal == null ) {
             Toast.makeText( getActivity(), R.string.error_goal_setting, Toast.LENGTH_SHORT ).show();
         } else {
             // Path to the users goals
-            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            String path = "user_goals/" + userId;
+            final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            String path = "user_goals/" + userId + "/" + goal.getmExerciseName();
 
             // Get the DB reference
             HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
@@ -377,29 +428,24 @@ public class ExerciseListItemFragment extends Fragment {
             childRef.addListenerForSingleValueEvent( new ValueEventListener() {
                 @Override
                 public void onDataChange( DataSnapshot dataSnapshot ) {
+                    // Get the DB object for the goal
+                    GoalDBObject goalDBObject = goal.getmGoalDBObject();
+
                     if ( dataSnapshot.exists() ) {
-                        // This means there is a set of goals associated with the user
-                        // (this could be an empty list)
-
-                        // Get the DB object for the goal
-                        GoalDBObject goalDBObject = goal.getmGoalDBObject();
-
-                        // Check if a goal already exists for the exercise
-                        DataSnapshot exerciseDataSnapshot = dataSnapshot.child( goal.getmExerciseName() );
-                        if ( exerciseDataSnapshot.exists() ) {
-                            // If so, the operation is an update
-                            Toast.makeText( getActivity(), R.string.info_updating_goal, Toast.LENGTH_SHORT ).show();
-                        } else {
-                            // If not, the operation is a create
-                            Toast.makeText( getActivity(), R.string.info_creating_goal, Toast.LENGTH_SHORT ).show();
-                        }
-
-                        // If no child exists, this will create a new one
-                        // If one does, this will update it
-                        childRef.child( goal.getmExerciseName() ).setValue( goalDBObject );
+                        // If so, the operation is an update
+                        Toast.makeText( getActivity(), R.string.info_updating_goal, Toast.LENGTH_SHORT ).show();
                     } else {
-                        // This is an error
-                        Toast.makeText( getActivity(), R.string.error_no_goalset_found, Toast.LENGTH_SHORT ).show();
+                        // If not, the operation is a create
+                        Toast.makeText( getActivity(), R.string.info_creating_goal, Toast.LENGTH_SHORT ).show();
+                    }
+
+                    // If no child exists, this will create a new one
+                    // If one does, this will update it
+                    childRef.setValue( goalDBObject );
+
+                    // Check does the user have progress towards this exercise in a group
+                    for(String groupId : mGroupIds) {
+                        goal.matchGroupProgressToUser( userId, User.getInstance(), new Group( groupId ) );
                     }
                 }
 

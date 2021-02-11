@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.DBObjects;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 

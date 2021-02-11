@@ -9,23 +9,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/noAnimTheme">
-        <activity android:name=".LogActivityActivity"></activity>
-        <activity android:name=".CreateGroupActivity" />
-        <activity android:name=".SetUsernameActivity" />
-        <activity android:name=".ProfileActivity" />
+        <activity android:name=".Activities.LogActivityActivity"></activity>
+        <activity android:name=".Activities.CreateGroupActivity" />
+        <activity android:name=".Activities.SetUsernameActivity" />
+        <activity android:name=".Activities.ProfileActivity" />
         <activity
-            android:name=".HomeScreenActivity"
+            android:name=".Activities.HomeScreenActivity"
             android:label="@string/title_activity_home_screen" />
-        <activity android:name=".EditUserDetailsActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activities.EditUserDetailsActivity" />
+        <activity android:name=".Activities.LoginActivity" />
+        <activity android:name=".Activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegistrationActivity" />
+        <activity android:name=".Activities.RegistrationActivity" />
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Activities;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -19,6 +19,13 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.nova.groupxercise.Fragments.ActivitiesFragment;
+import com.nova.groupxercise.Fragments.DiscoveriesFragment;
+import com.nova.groupxercise.Fragments.ExerciseListItemFragment;
+import com.nova.groupxercise.Fragments.GoalsFragment;
+import com.nova.groupxercise.Fragments.MyGroupsFragment;
+import com.nova.groupxercise.R;
+import com.nova.groupxercise.Objects.User;
 
 public class HomeScreenActivity extends AppCompatActivity implements ExerciseListItemFragment.OnFragmentInteractionListener {
     private FirebaseAuth mAuth;

@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Adapters;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -7,15 +7,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.nova.groupxercise.Objects.MemberProgress;
+import com.nova.groupxercise.R;
+
 import java.util.ArrayList;
 
-public class GoalItemsAdapter extends ArrayAdapter {
-    private static final String LOG_TAG = GoalItemsAdapter.class.getSimpleName();
+public class MemberProgressItemsAdapter extends ArrayAdapter {
+    private static final String LOG_TAG = GroupItemsAdapter.class.getSimpleName();
 
-    public GoalItemsAdapter( Activity context, ArrayList< Goal > goals ) {
-        super( context, 0, goals );
+    public MemberProgressItemsAdapter( Activity context, ArrayList< MemberProgress > memberProgresses ) {
+        super( context, 0, memberProgresses );
     }
-
 
     @Override
     public View getView( int position, View convertView, ViewGroup parent ) {
@@ -26,14 +28,12 @@ public class GoalItemsAdapter extends ArrayAdapter {
                     R.layout.layout_goal_list_item, parent, false );
         }
 
-        Goal currentGoal = ( Goal ) getItem( position );
+        MemberProgress currentMemberProgress = ( MemberProgress ) getItem( position );
 
-        TextView exerciseNameText = listItemView.findViewById( R.id.goal_exercise_name );
-        exerciseNameText.setText( currentGoal.getmExerciseName() );
+        TextView goalNameText = listItemView.findViewById( R.id.goal_exercise_name );
+        goalNameText.setText( currentMemberProgress.getUsername() );
         TextView currentStatusText = listItemView.findViewById( R.id.goal_current_status );
-        currentStatusText.setText( Float.toString( currentGoal.getmCurrentStatus() ) );
-        TextView targetText = listItemView.findViewById( R.id.goal_target );
-        targetText.setText( Float.toString( currentGoal.getmTarget() ) );
+        currentStatusText.setText( Float.toString( currentMemberProgress.getCurrentStatus() ) );
 
         return listItemView;
     }

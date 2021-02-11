@@ -170,7 +170,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/goal_groups_list"
         android:visibility="gone"
-        tools:context="com.nova.groupxercise.HomeScreenActivity"
+        tools:context="com.nova.groupxercise.Activities.HomeScreenActivity"
         android:layout_below="@+id/text_loading_group_list"
         ></ListView>
 </RelativeLayout>

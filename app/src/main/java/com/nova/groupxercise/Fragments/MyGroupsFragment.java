@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,13 +22,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.nova.groupxercise.Activities.CreateGroupActivity;
+import com.nova.groupxercise.Objects.Group;
+import com.nova.groupxercise.Adapters.GroupItemsAdapter;
+import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
 
 
 public class MyGroupsFragment extends Fragment {
     private Button mCreateGroupBtn;
-    private ArrayList<Group> mGroups;
+    private ArrayList< Group > mGroups;
     private ArrayAdapter< String > mItemsAdapter;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     private TextView mLoadingText;

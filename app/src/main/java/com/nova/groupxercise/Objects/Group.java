@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Objects;
 
 import java.util.ArrayList;
 
@@ -11,6 +11,10 @@ public class Group {
 
     public Group( String mGroupName, String mGroupId ) {
         this.mGroupName = mGroupName;
+        this.mGroupId = mGroupId;
+    }
+
+    public Group( String mGroupId ) {
         this.mGroupId = mGroupId;
     }
 

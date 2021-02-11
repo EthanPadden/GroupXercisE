@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +18,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.nova.groupxercise.R;
+import com.nova.groupxercise.Objects.User;
 
 public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;

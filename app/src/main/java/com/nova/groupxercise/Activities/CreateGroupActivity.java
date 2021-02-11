@@ -1,4 +1,4 @@
-package com.nova.groupxercise;
+package com.nova.groupxercise.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.nova.groupxercise.DBObjects.GroupDBObject;
+import com.nova.groupxercise.R;
+import com.nova.groupxercise.Objects.User;
 
 public class CreateGroupActivity extends AppCompatActivity {
     private Button mCreateGroupBtn;
