@@ -16,16 +16,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Activities.CreateGroupActivity;
-import com.nova.groupxercise.Objects.Group;
-import com.nova.groupxercise.Adapters.GroupItemsAdapter;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.nova.groupxercise.Adapters.GroupItemsAdapter;
+import com.nova.groupxercise.Objects.DBListener;
+import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
@@ -71,81 +68,27 @@ public class MyGroupsFragment extends Fragment {
             }
         } );
 
-        retrieveGroupIds();
-    }
-
-    /**
-     * Gets the IDs of the groups that the current user is a part of
-     * Calls retrieveGroupNames
-     */
-    private void retrieveGroupIds() {
-        // Create empty list for the group IDs
         final ArrayList<String> groupIds = new ArrayList<>(  );
-
-        // Get the current user ID
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Path to the reference
-        String usersGroupPath = "user_groups/" + currentUserId;
-        DatabaseReference childRef = mRootRef.child( usersGroupPath );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+        Group.retrieveGroupIds( groupIds, new DBListener() {
             @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
-                    groupIds.add(  usersGroupsDataSnapshot.getKey());
-                }
+            public void onRetrievalFinished() {
+                // Create an empty list for the group names
+                mGroups = new ArrayList<>();
 
-                retrieveGroupNames( groupIds );
-            }
+                // Set the list as the list for the items adapter
+                mItemsAdapter = new GroupItemsAdapter( getActivity(),  mGroups );
 
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
+                Group.retrieveGroupNames( groupIds, mGroups, new DBListener() {
+                    @Override
+                    public void onRetrievalFinished() {
+                        setupGroupsList();
+                    }
+                } );
+
             }
         } );
     }
 
-    /**
-     * Sets the list of group names using the list of group IDs
-     * Calls setupGroupsList
-     * @param groupIds the list of group IDs
-     */
-    private void retrieveGroupNames(ArrayList<String> groupIds) {
-        // Create an empty list for the group names
-        mGroups = new ArrayList<>();
-
-        // Set the list as the list for the items adapter
-        mItemsAdapter = new GroupItemsAdapter( getActivity(),  mGroups );
-
-        // The UI is updated when all of the group names have been added
-        // Necessary because of the async call within the for loop
-        final int expectedSize = groupIds.size();
-
-        for( final String groupId : groupIds) {
-            String groupPath = "groups/" + groupId;
-            DatabaseReference groupRef = mRootRef.child( groupPath );
-
-            groupRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                @Override
-                public void onDataChange( DataSnapshot dataSnapshot ) {
-                    String groupName = dataSnapshot.child( "name" ).getValue().toString();
-                    mGroups.add( new Group( groupName, groupId ) );
-                    if(mGroups.size() == expectedSize) {
-                        // When we have all the group names retrieved
-                        setupGroupsList();
-                    }
-                }
-
-                @Override
-                public void onCancelled( DatabaseError databaseError ) {
-                }
-            } );
-        }
-        if(mGroups.size() == 0) {
-            mLoadingText.setText( "You have no groups" );
-        }
-
-    }
 
     /**
      * Updates the UI with the group names and sets event listeners for the list items

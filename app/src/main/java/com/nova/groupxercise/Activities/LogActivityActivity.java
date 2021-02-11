@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Adapters.GoalItemsAdapter;
+import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Objects.User;
@@ -64,7 +65,23 @@ public class LogActivityActivity extends AppCompatActivity {
 
 
         retrieveGoals();
-        retrieveGroupIds();
+//        retrieveGroupIds();
+        final ArrayList<String> groupIds = new ArrayList<>(  );
+        Group.retrieveGroupIds( groupIds, new DBListener() {
+            @Override
+            public void onRetrievalFinished() {
+                // Create an empty list for the group names
+                mGroups = new ArrayList<>();
+
+                Group.retrieveGroupNames( groupIds, mGroups, new DBListener() {
+                    @Override
+                    public void onRetrievalFinished() {
+                        retrieveGroupGoals( groupIds );
+                    }
+                } );
+
+            }
+        } );
     }
 
     private void validateEnteredActivity() {
@@ -159,36 +176,6 @@ public class LogActivityActivity extends AppCompatActivity {
         } );
     }
 
-    /**
-     * Retrieves the group IDs of the groups that the user is a member of from the DB
-     */
-    private void retrieveGroupIds() {
-        // Create empty list for the group IDs
-        final ArrayList< String > groupIds = new ArrayList<>();
-
-        // Get the current user ID
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Path to the reference
-        String usersGroupPath = "user_groups/" + currentUserId;
-        // Get the DBr reference
-        DatabaseReference childRef = mRootRef.child( usersGroupPath );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
-                    groupIds.add( usersGroupsDataSnapshot.getKey() );
-                }
-
-                retrieveGroupGoals( groupIds );
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
 
     private void updatePersonalGoal( final ExerciseActivity activity ) {
         // Get the current user ID

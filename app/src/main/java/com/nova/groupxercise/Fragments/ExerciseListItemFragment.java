@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
 import com.nova.groupxercise.Adapters.GroupItemsAdapter;
 import com.nova.groupxercise.DBObjects.GoalDBObject;
+import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Objects.User;
@@ -69,7 +70,7 @@ public class ExerciseListItemFragment extends Fragment {
     private ListView mListView;
     private TextView mLoadingText;
     private ArrayList<String> mGroupIds;
-
+    private ArrayList<String> mAdminGroupIds;
     // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
 
@@ -209,84 +210,29 @@ public class ExerciseListItemFragment extends Fragment {
 
         // Get the strength standards from the DB based on the user details
         retrieveStrengthStandards( mExerciseName );
-        retrieveGroupIds();
-    }
-
-    /**
-     * Retrieves the group IDs that the user is an admin of from the DB
-     */
-    private void retrieveGroupIds() {
-        // Create empty list for the group IDs that the user is an admin of
-        final ArrayList< String > groupIds = new ArrayList<>();
-        mGroupIds = new ArrayList(  );
-
-        // Get the current user ID
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Path to the reference
-        final String usersGroupPath = "user_groups/" + currentUserId;
-        DatabaseReference childRef = mRootRef.child( usersGroupPath );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+//        retrieveGroupIds();
+        mGroupIds = new ArrayList<>(  );
+        mAdminGroupIds = new ArrayList<>(  );
+        Group.retrieveGroupIds( mAdminGroupIds, mGroupIds, new DBListener() {
             @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
-                    Boolean isAdmin = ( Boolean ) usersGroupsDataSnapshot.getValue();
-                    if ( isAdmin.booleanValue() == true ) {
-                        // If the current user is an admin of the group
-                        groupIds.add( usersGroupsDataSnapshot.getKey() );
+            public void onRetrievalFinished() {
+
+                mAdminGroups = new ArrayList<>();
+                // Set the list as the list for the items adapter
+                mItemsAdapter = new GroupItemsAdapter( getActivity(), mAdminGroups );
+
+                Group.retrieveGroupNames( mAdminGroupIds, mAdminGroups, new DBListener() {
+                    @Override
+                    public void onRetrievalFinished() {
+                        setupGroupsList();
+
                     }
-                    mGroupIds.add( usersGroupsDataSnapshot.getKey() );
-                }
+                } );
 
-                retrieveGroupNames( groupIds );
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
             }
         } );
     }
 
-    /**
-     * Given a list of group IDs, retrieves the group names from the DB
-     * @param groupIds list of group IDs
-     */
-    private void retrieveGroupNames( ArrayList< String > groupIds ) {
-        // Create an empty list for the group names
-        mAdminGroups = new ArrayList<>();
-
-        // Set the list as the list for the items adapter
-        mItemsAdapter = new GroupItemsAdapter( getActivity(), mAdminGroups );
-
-        // The UI is updated when all of the group names have been added
-        // Necessary because of the async call within the for loop
-        final int expectedSize = groupIds.size();
-
-        for ( final String groupId : groupIds ) {
-            String groupPath = "groups/" + groupId;
-            DatabaseReference groupRef = mRootRef.child( groupPath );
-
-            groupRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                @Override
-                public void onDataChange( DataSnapshot dataSnapshot ) {
-                    String groupName = dataSnapshot.child( "name" ).getValue().toString();
-                    mAdminGroups.add( new Group( groupName, groupId ) );
-                    if ( mAdminGroups.size() == expectedSize ) {
-                        // When we have all the group names retrieved
-                        setupGroupsList();
-                    }
-                }
-
-                @Override
-                public void onCancelled( DatabaseError databaseError ) {
-                }
-            } );
-        }
-        if ( mAdminGroups.size() == 0 ) {
-            mLoadingText.setText( "You are the admin of no groups" );
-        }
-    }
 
     /**
      * Builds the listview to display group names

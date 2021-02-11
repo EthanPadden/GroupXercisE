@@ -17,10 +17,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.Objects.Goal;
-import com.nova.groupxercise.Adapters.GoalItemsAdapter;
-import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.nova.groupxercise.Adapters.GoalItemsAdapter;
+import com.nova.groupxercise.Objects.DBListener;
+import com.nova.groupxercise.Objects.Goal;
+import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
@@ -55,39 +56,14 @@ public class GoalsFragment extends Fragment {
 
         mLoadingText.setVisibility( View.INVISIBLE );
         retrieveGoals();
-        retrieveGroupIds();
-    }
-
-    /**
-     * Retrieves the group IDs of the groups that the user is a member of from the DB
-     */
-    private void retrieveGroupIds() {
-        // Create empty list for the group IDs
         final ArrayList<String> groupIds = new ArrayList<>(  );
-
-        // Get the current user ID
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Path to the reference
-        String usersGroupPath = "user_groups/" + currentUserId;
-        // Get the DBr reference
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( usersGroupPath );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+        Group.retrieveGroupIds( groupIds, new DBListener() {
             @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
-                    groupIds.add(  usersGroupsDataSnapshot.getKey());
-                }
-
+            public void onRetrievalFinished() {
                 retrieveGroupGoals(groupIds);
             }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
         } );
+
     }
 
     /**
