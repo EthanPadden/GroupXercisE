@@ -28,9 +28,11 @@ public class User {
     // Singleton class
     private static final User user = new User();
 
+    private FirebaseAuth mAuth;
+
     // Constructors
     public User() {
-
+        mAuth = FirebaseAuth.getInstance();
     }
 
     public static User getInstance() {
@@ -105,6 +107,19 @@ public class User {
             }
         } );
 
+    }
+
+    /**
+     * Sign out the user that is currently logged in using Firebase method
+     */
+    public void signOutUser() {
+        // Check if there is a user currently logged in
+        if ( mAuth.getCurrentUser() != null ) {
+            // Reset the local user instance
+            setUserDetailsAreSet( false );
+            setUsername( null );
+            mAuth.signOut();
+        }
     }
 
     /**

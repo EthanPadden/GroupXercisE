@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,8 +17,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.nova.groupxercise.R;
 import com.nova.groupxercise.Objects.User;
+import com.nova.groupxercise.R;
 
 public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -125,7 +124,9 @@ public class ProfileActivity extends AppCompatActivity {
                     Intent intent = new Intent( ProfileActivity.this, HomeScreenActivity.class );
                     startActivity( intent );
                 } else if ( item.getItemId() == R.id.drawer_logout ) {
-                    signOutUser();
+                    User.getInstance().signOutUser();
+                    Intent intent = new Intent( ProfileActivity.this, LoginActivity.class );
+                    startActivity( intent );
                 }
                 mDrawerContainer.closeDrawers();
                 return true;
@@ -150,26 +151,5 @@ public class ProfileActivity extends AppCompatActivity {
             mDrawerContainer.openDrawer( GravityCompat.START );
         }
         return super.onOptionsItemSelected( item );
-    }
-
-    /**
-     * Sign out the user that is currently logged in using Firebase method
-     * Toast with error message if no user is currently logged in
-     */
-    protected void signOutUser() {
-        // Check if there is a user currently logged in
-        if ( mAuth.getCurrentUser() != null ) {
-            // Reset the local user instance
-            User.getInstance().setUserDetailsAreSet( false );
-            User.getInstance().setUsername( null );
-            mAuth.signOut();
-        } else {
-            Toast.makeText( ProfileActivity.this, R.string.error_user_not_logged_in,
-                    Toast.LENGTH_SHORT ).show();
-        }
-
-        // Regardless, go to login screen
-        Intent intent = new Intent( ProfileActivity.this, LoginActivity.class );
-        startActivity( intent );
     }
 }
