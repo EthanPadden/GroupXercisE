@@ -120,6 +120,31 @@ public class Group {
             }
         } );
     }
+
+    public void retrieveGroupMembers(final  DBListener listener) {
+        String path = "groups/" + mGroupId + "/members";
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    for ( DataSnapshot memberDataSnapshot : dataSnapshot.getChildren() ) {
+                        String memberName = memberDataSnapshot.getKey();
+
+                        members.add( memberName );
+                    }
+                }
+
+                if(listener != null && listener.isActive()) listener.onRetrievalFinished();
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+
+    }
+
     public static void retrieveGroupNames( @NotNull final ArrayList<String> groupIds,
                                            @NotNull final ArrayList<Group> groups,
                                            final DBListener listener) {

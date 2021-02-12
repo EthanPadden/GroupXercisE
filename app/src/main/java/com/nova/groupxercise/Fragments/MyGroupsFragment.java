@@ -36,12 +36,12 @@ public class MyGroupsFragment extends Fragment {
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     private TextView mLoadingText;
     private ListView mListView;
-    private  ArrayList<DBListener> mDBListeners;
+    private ArrayList< DBListener > mDBListeners;
 
     @Override
     public void onAttach( @NonNull Context context ) {
         super.onAttach( context );
-        mDBListeners = new ArrayList<>(  );
+        mDBListeners = new ArrayList<>();
     }
 
     @Override
@@ -75,38 +75,52 @@ public class MyGroupsFragment extends Fragment {
             }
         } );
 
-        final ArrayList<String> groupIds = new ArrayList<>(  );
+        final ArrayList< String > groupIds = new ArrayList<>();
         DBListener groupIdListener = new DBListener() {
             public void onRetrievalFinished() {
                 // Create an empty list for the group names
                 mGroups = new ArrayList<>();
 
                 // Set the list as the list for the items adapter
-                mItemsAdapter = new GroupItemsAdapter( getActivity(),  mGroups );
+                mItemsAdapter = new GroupItemsAdapter( getActivity(), mGroups );
 
                 DBListener groupNameListener = new DBListener() {
                     public void onRetrievalFinished() {
                         setupGroupsList();
+                        for ( Group group : mGroups ) {
+                            DBListener groupMembersListener = new DBListener() {
+                                public void onRetrievalFinished() {
+                                    setupGroupsList();
+                                    mDBListeners.remove( this );
+                                }
+                            };
+                            mDBListeners.add( groupMembersListener );
+                            group.retrieveGroupMembers( groupMembersListener );
+                        }
                         mDBListeners.remove( this );
                     }
                 };
                 mDBListeners.add( groupNameListener );
-                Group.retrieveGroupNames( groupIds, mGroups,groupNameListener  );
+                Group.retrieveGroupNames( groupIds, mGroups, groupNameListener );
+
+
+
                 mDBListeners.remove( this );
             }
         };
         mDBListeners.add( groupIdListener );
-        Group.retrieveGroupIds( groupIds,groupIdListener  );
+        Group.retrieveGroupIds( groupIds, groupIdListener );
     }
 
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        for(DBListener dbListener : mDBListeners) {
+        for ( DBListener dbListener : mDBListeners ) {
             dbListener.setActive( false );
         }
     }
+
     /**
      * Updates the UI with the group names and sets event listeners for the list items
      */
@@ -118,13 +132,13 @@ public class MyGroupsFragment extends Fragment {
         mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
-                Group selectedGroup = (Group) mListView.getItemAtPosition( i );
+                Group selectedGroup = ( Group ) mListView.getItemAtPosition( i );
 
                 HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
                 homeScreenActivity.getSupportActionBar().setTitle( selectedGroup.getmGroupName() );
 
                 FragmentTransaction ft = homeScreenActivity.getSupportFragmentManager().beginTransaction();
-                GroupFragment groupFragment = new GroupFragment(selectedGroup.getmGroupId());
+                GroupFragment groupFragment = new GroupFragment( selectedGroup.getmGroupId() );
                 ft.replace( R.id.frame_home_screen_fragment_placeholder, groupFragment );
                 ft.commit();
             }
