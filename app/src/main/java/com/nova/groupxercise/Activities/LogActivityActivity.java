@@ -78,6 +78,8 @@ public class LogActivityActivity extends AppCompatActivity {
                 if ( mGoalsList.size() > 0 ) {
                     setupGoalsList();
                 }
+                mDBListeners.remove( this );
+
             }
         };
         mDBListeners.add( personalGoalsListener );
@@ -90,7 +92,8 @@ public class LogActivityActivity extends AppCompatActivity {
                 mGroups = new ArrayList<>();
 
                 DBListener groupNamesListener = new DBListener() {
-                    public void onRetrievalFinished() {
+                    public void onRetrievalFinished() {                mDBListeners.remove( this );
+
                         if ( mGroups.size() == 0 ) {
                             mLoadingText.setText( "You have no groups" );
                         } else {
@@ -101,16 +104,21 @@ public class LogActivityActivity extends AppCompatActivity {
                                             mGoalsList.add( goal );
                                             setupGoalsList();
                                         }
+                                        mDBListeners.remove( this );
+
                                     }
                                 };
                                 mDBListeners.add( groupGoalsListener );
                                 group.retrieveGroupGoals( groupGoalsListener );
                             }
                         }
+                        mDBListeners.remove( this );
+
                     }
                 };
                 mDBListeners.add( groupNamesListener );
                 Group.retrieveGroupNames( groupIds, mGroups, groupNamesListener );
+                mDBListeners.remove( this );
 
             }
         };

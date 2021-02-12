@@ -73,6 +73,7 @@ public class GoalsFragment extends Fragment {
                     mLoadingText.setVisibility( View.GONE );
                     mListView.setAdapter( mItemsAdapter );
                 }
+                mDBListeners.remove( this );
             }
         };
         mDBListeners.add( pesonalGoalsListener );
@@ -92,16 +93,24 @@ public class GoalsFragment extends Fragment {
                                 DBListener groupGoalsListener = new DBListener() {
                                     public void onRetrievalFinished() {
                                         addGroupGoalsToUI(group);
+                                        mDBListeners.remove( this );
+
                                     }
                                 };
                                 mDBListeners.add( groupGoalsListener );
                                 group.retrieveGroupGoals( groupGoalsListener );
                             }
                         }
+                        mDBListeners.remove( this );
+
                     }
+
                 };
                 mDBListeners.add( groupNamesListener );
+                mDBListeners.remove( this );
                 Group.retrieveGroupNames( groupIds, mGroups, groupNamesListener );
+                mDBListeners.remove( this );
+
             }
         };
         mDBListeners.add( groupIdsListener );

@@ -87,11 +87,12 @@ public class MyGroupsFragment extends Fragment {
                 DBListener groupNameListener = new DBListener() {
                     public void onRetrievalFinished() {
                         setupGroupsList();
+                        mDBListeners.remove( this );
                     }
                 };
                 mDBListeners.add( groupNameListener );
                 Group.retrieveGroupNames( groupIds, mGroups,groupNameListener  );
-
+                mDBListeners.remove( this );
             }
         };
         mDBListeners.add( groupIdListener );

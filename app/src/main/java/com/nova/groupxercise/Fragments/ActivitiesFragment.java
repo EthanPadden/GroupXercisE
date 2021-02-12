@@ -87,6 +87,8 @@ public class ActivitiesFragment extends Fragment {
                     mLoadingText.setVisibility( View.GONE );
                     mListView.setAdapter( mItemsAdapter );
                 }
+                mDBListeners.remove( this );
+
             }
 
 

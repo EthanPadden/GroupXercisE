@@ -131,6 +131,7 @@ public class GroupFragment extends Fragment {
                         mGroupGoalsLayout.addView( textView );
                     }
                 }
+                mDBListeners.remove( this );
 
             }
         };
@@ -161,6 +162,7 @@ public class GroupFragment extends Fragment {
                     Goal retrievedGoal = (Goal) retrievedData;
                     goal.setmCurrentStatus( retrievedGoal.getmCurrentStatus() );
                     updateStatusUI( goal );
+                    mDBListeners.remove( this );
                 }
             };
             mDBListeners.add( statusUpdateListener );

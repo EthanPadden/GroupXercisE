@@ -73,6 +73,8 @@ public class DiscoveriesFragment extends Fragment {
             public void onRetrievalFinished() {
                 mLoadingText.setVisibility( View.INVISIBLE );
                 mListView.setAdapter( mItemsAdapter );
+                mDBListeners.remove( this );
+
             }
 
 

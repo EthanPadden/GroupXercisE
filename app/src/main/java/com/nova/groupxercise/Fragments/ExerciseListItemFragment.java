@@ -217,6 +217,8 @@ public class ExerciseListItemFragment extends Fragment {
             public void onRetrievalFinished( Object retrievedData ) {
                 mStrengthStandards = (DataSnapshot) retrievedData;
                 calculateSuggestedWeight();
+                mDBListeners.remove( this );
+
             }
         };
         mDBListeners.add( strengthStandardsListener );
@@ -237,11 +239,14 @@ public class ExerciseListItemFragment extends Fragment {
 
                     public void onRetrievalFinished() {
                         setupGroupsList();
+                        mDBListeners.remove( this );
+
                     }
 
                 };
                 mDBListeners.add( groupNamesListener );
                 Group.retrieveGroupNames( mAdminGroupIds, mAdminGroups,  groupNamesListener);
+                mDBListeners.remove( this );
 
             }
 
