@@ -1,6 +1,7 @@
 package com.nova.groupxercise.Fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,8 +35,6 @@ import java.util.ArrayList;
 public class GroupFragment extends Fragment {
     private Group mGroup;
     private String mGroupId;
-    private TextView mGroupNameText;
-    private TextView mGroupCreatorText;
     private Button mAddMemberBtn;
     private Button mDeleteGroupBtn;
     private Button mRemoveMemberBtn;
@@ -63,8 +62,6 @@ public class GroupFragment extends Fragment {
         super.onViewCreated( view, savedInstanceState );
 
         // Initialise components
-        mGroupNameText = view.findViewById( R.id.text_group_name );
-        mGroupCreatorText = view.findViewById( R.id.text_creator );
         mAddMemberBtn = view.findViewById( R.id.btn_add_member );
         mMemberNameEt = view.findViewById( R.id.et_member_name );
         mDeleteGroupBtn = view.findViewById( R.id.btn_delete_group );
@@ -391,6 +388,7 @@ public class GroupFragment extends Fragment {
 
                     TextView usernameTextView = new TextView( getActivity() );
                     usernameTextView.setText( username.toUpperCase() );
+                    if(username.compareTo( dbGroupCreator ) == 0) usernameTextView.setTextColor( Color.BLUE );
                     linearLayout.addView( usernameTextView );
 
                     String currentUsername = User.getInstance().getUsername();
@@ -411,7 +409,6 @@ public class GroupFragment extends Fragment {
                         progressTextView.setText( progress );
 
                         String progressId = username + exerciseName;
-                        Log.d( "Build", progressId );
 
                         int hashedProgressId = progressId.hashCode();
                         progressTextView.setId( hashedProgressId );
@@ -427,9 +424,6 @@ public class GroupFragment extends Fragment {
                 mGroup.setmGroupCreator( dbGroupCreator );
                 mGroup.setMembers( dbMembers );
 
-                // Update UI
-                mGroupNameText.setText( mGroup.getmGroupName() );
-                mGroupCreatorText.setText( mGroup.getmGroupCreator() );
 
                 // If the user is the creator, show the components that allows the user admin controls
                 User currentUser = User.getInstance();
