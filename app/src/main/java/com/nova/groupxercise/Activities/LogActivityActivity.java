@@ -22,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Adapters.GoalItemsAdapter;
 import com.nova.groupxercise.Objects.DBListener;
+import com.nova.groupxercise.Objects.ExerciseActivity;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Objects.User;
@@ -42,6 +43,7 @@ public class LogActivityActivity extends AppCompatActivity {
     private TextView mLoadingText;
     private ListView mListView;
     private ArrayList< Group > mGroups;
+    private ArrayList< DBListener > mDBListeners;
 
 
     @Override
@@ -65,50 +67,64 @@ public class LogActivityActivity extends AppCompatActivity {
 
 
 //        retrieveGoals();
-        mGoalsList = new ArrayList<>(  );
+        mGoalsList = new ArrayList<>();
+
+        mDBListeners = new ArrayList<>(  ) ;
 
         // Set the list as the list for the items adapter
         mItemsAdapter = new GoalItemsAdapter( this, mGoalsList );
-        Goal.retrievePersonalGoals( mGoalsList, new DBListener() {
-            @Override
+        DBListener personalGoalsListener = new DBListener() {
             public void onRetrievalFinished() {
-                if(mGoalsList.size() > 0){
+                if ( mGoalsList.size() > 0 ) {
                     setupGoalsList();
                 }
             }
-        } );
+        };
+        mDBListeners.add( personalGoalsListener );
+        Goal.retrievePersonalGoals( mGoalsList, personalGoalsListener );
 //        retrieveGroupIds();
-        final ArrayList<String> groupIds = new ArrayList<>(  );
-        Group.retrieveGroupIds( groupIds, new DBListener() {
-            @Override
+        final ArrayList< String > groupIds = new ArrayList<>();
+        DBListener groupIdsListener = new DBListener() {
             public void onRetrievalFinished() {
                 // Create an empty list for the group names
                 mGroups = new ArrayList<>();
 
-                Group.retrieveGroupNames( groupIds, mGroups, new DBListener() {
-                    @Override
+                DBListener groupNamesListener = new DBListener() {
                     public void onRetrievalFinished() {
-                        if(mGroups.size() == 0) {
+                        if ( mGroups.size() == 0 ) {
                             mLoadingText.setText( "You have no groups" );
                         } else {
-                            for( final Group group: mGroups) {
-                                group.retrieveGroupGoals( new DBListener() {
-                                    @Override
+                            for ( final Group group : mGroups ) {
+                                DBListener groupGoalsListener = new DBListener() {
                                     public void onRetrievalFinished() {
                                         for ( Goal goal : group.getGoals() ) {
                                             mGoalsList.add( goal );
                                             setupGoalsList();
-
                                         }
                                     }
-                                } );
+                                };
+                                mDBListeners.add( groupGoalsListener );
+                                group.retrieveGroupGoals( groupGoalsListener );
                             }
                         }
                     }
-                } );
+                };
+                mDBListeners.add( groupNamesListener );
+                Group.retrieveGroupNames( groupIds, mGroups, groupNamesListener );
 
             }
-        } );
+        };
+        mDBListeners.add( groupIdsListener );
+        Group.retrieveGroupIds( groupIds, groupIdsListener );
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for ( DBListener dbListener : mDBListeners ) {
+            dbListener.setActive( false );
+        }
     }
 
     private void validateEnteredActivity() {
@@ -129,8 +145,8 @@ public class LogActivityActivity extends AppCompatActivity {
         }
     }
 
-    public void updateGroupGoals( final ExerciseActivity exerciseActivity){
-        for(Group group : mGroups) {
+    public void updateGroupGoals( final ExerciseActivity exerciseActivity ) {
+        for ( Group group : mGroups ) {
             // Update the progress only if there is a goal for that group:
             // Check is there a goal for the exercise in the group (using the progress)
             // If so, update the progress with the value
@@ -140,12 +156,12 @@ public class LogActivityActivity extends AppCompatActivity {
                     + User.getInstance().getUsername()
                     + "/progress/"
                     + exerciseActivity.getmExerciseName();
-            
+
             final DatabaseReference progressRef = mRootRef.child( progressPath );
             progressRef.addListenerForSingleValueEvent( new ValueEventListener() {
                 @Override
                 public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
-                    if(dataSnapshot.exists()) {
+                    if ( dataSnapshot.exists() ) {
                         // This means there is a goal for this exercise
                         // Update the value here
                         Object progressObj = dataSnapshot.getValue();
@@ -156,7 +172,7 @@ public class LogActivityActivity extends AppCompatActivity {
                             progress = ( ( Float ) progressObj ).floatValue();
                         }
 
-                        if(exerciseActivity.getmLevel() > progress) {
+                        if ( exerciseActivity.getmLevel() > progress ) {
                             progressRef.setValue( exerciseActivity.getmLevel() );
                         }
                     }
@@ -225,7 +241,7 @@ public class LogActivityActivity extends AppCompatActivity {
                     } else {
                         currentStatus = ( ( Float ) currentStatusObj ).floatValue();
                     }
-                    if(activity.getmLevel() > currentStatus) {
+                    if ( activity.getmLevel() > currentStatus ) {
                         goalRef.setValue( activity.getmLevel() );
                     }
 

@@ -1,5 +1,6 @@
 package com.nova.groupxercise.Fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -35,7 +36,13 @@ public class MyGroupsFragment extends Fragment {
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     private TextView mLoadingText;
     private ListView mListView;
+    private  ArrayList<DBListener> mDBListeners;
 
+    @Override
+    public void onAttach( @NonNull Context context ) {
+        super.onAttach( context );
+        mDBListeners = new ArrayList<>(  );
+    }
 
     @Override
     public void onCreate( Bundle savedInstanceState ) {
@@ -69,8 +76,7 @@ public class MyGroupsFragment extends Fragment {
         } );
 
         final ArrayList<String> groupIds = new ArrayList<>(  );
-        Group.retrieveGroupIds( groupIds, new DBListener() {
-            @Override
+        DBListener groupIdListener = new DBListener() {
             public void onRetrievalFinished() {
                 // Create an empty list for the group names
                 mGroups = new ArrayList<>();
@@ -78,18 +84,28 @@ public class MyGroupsFragment extends Fragment {
                 // Set the list as the list for the items adapter
                 mItemsAdapter = new GroupItemsAdapter( getActivity(),  mGroups );
 
-                Group.retrieveGroupNames( groupIds, mGroups, new DBListener() {
-                    @Override
+                DBListener groupNameListener = new DBListener() {
                     public void onRetrievalFinished() {
                         setupGroupsList();
                     }
-                } );
+                };
+                mDBListeners.add( groupNameListener );
+                Group.retrieveGroupNames( groupIds, mGroups,groupNameListener  );
 
             }
-        } );
+        };
+        mDBListeners.add( groupIdListener );
+        Group.retrieveGroupIds( groupIds,groupIdListener  );
     }
 
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for(DBListener dbListener : mDBListeners) {
+            dbListener.setActive( false );
+        }
+    }
     /**
      * Updates the UI with the group names and sets event listeners for the list items
      */

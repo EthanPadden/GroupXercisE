@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.nova.groupxercise.Activities.ExerciseActivity;
+import com.nova.groupxercise.Objects.ExerciseActivity;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;

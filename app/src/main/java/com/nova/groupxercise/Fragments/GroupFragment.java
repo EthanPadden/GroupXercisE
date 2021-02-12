@@ -1,5 +1,6 @@
 package com.nova.groupxercise.Fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,6 +44,7 @@ public class GroupFragment extends Fragment {
     private LinearLayout mGroupMembersLayout;
     private LinearLayout mGroupGoalsLayout;
     private Button mUpdateStatusBtn;
+    private ArrayList<DBListener> mDBListeners;
 
 
     public GroupFragment( String mGroupId ) {
@@ -115,8 +117,7 @@ public class GroupFragment extends Fragment {
 
         mGroup = new Group( mGroupId );
         retrieveGroupInfo();
-        mGroup.retrieveGroupGoals(  new DBListener() {
-            @Override
+        DBListener groupGoalListener = new DBListener() {
             public void onRetrievalFinished() {
                 if(mGroup.getGoals().size() == 0) {
                     mGroupGoalsLoadingText.setText( "No goals" );
@@ -132,13 +133,38 @@ public class GroupFragment extends Fragment {
                 }
 
             }
-        } );
+        };
+        mDBListeners.add( groupGoalListener );
+        mGroup.retrieveGroupGoals( groupGoalListener );
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for(DBListener dbListener : mDBListeners) {
+            // Deactivate any active listeners
+            dbListener.setActive( false );
+        }
+    }
+
+    @Override
+    public void onAttach( @NonNull Context context ) {
+        super.onAttach( context );
+        mDBListeners = new ArrayList<>(  );
     }
 
     private void updateMyStatuses() {
         /** For every goal in the group, get my current status in memory and UI */
-        for ( Goal goal : mGroup.getGoals() ) {
-            updateMyStatusFromPersonalGoals( goal );
+        for ( final Goal goal : mGroup.getGoals() ) {
+            DBListener statusUpdateListener = new DBListener() {
+                public void onRetrievalFinished( Object retrievedData ) {
+                    Goal retrievedGoal = (Goal) retrievedData;
+                    goal.setmCurrentStatus( retrievedGoal.getmCurrentStatus() );
+                    updateStatusUI( goal );
+                }
+            };
+            mDBListeners.add( statusUpdateListener );
+            mGroup.updateMyStatusFromPersonalGoals( goal, statusUpdateListener );
         }
 
         /** Update the progress in the group goal progress */
@@ -146,10 +172,8 @@ public class GroupFragment extends Fragment {
 
     private void updateMyStatusFromPersonalGoals( final Goal goal ) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        Log.d( "jar", userId );
 
         String path = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
-        Log.d( "jar", path );
 
         HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
         final DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );

@@ -46,7 +46,7 @@ public class Group {
                     groupIds.add(  usersGroupsDataSnapshot.getKey());
                 }
 
-                listener.onRetrievalFinished();
+                if(listener != null && listener.isActive()) listener.onRetrievalFinished();
             }
 
             @Override
@@ -78,7 +78,7 @@ public class Group {
                     groupIds.add(  usersGroupsDataSnapshot.getKey());
                 }
 
-                listener.onRetrievalFinished();
+                if(listener != null && listener.isActive()) listener.onRetrievalFinished();
             }
 
             @Override
@@ -88,6 +88,7 @@ public class Group {
     }
 
     public void retrieveGroupGoals(final DBListener listener) {
+
         // Path to group goals
         String path = "groups/" + mGroupId + "/goals";
 
@@ -111,7 +112,7 @@ public class Group {
                     }
                 }
 
-                listener.onRetrievalFinished();
+                if(listener != null && listener.isActive()) listener.onRetrievalFinished();
             }
 
             @Override
@@ -122,6 +123,7 @@ public class Group {
     public static void retrieveGroupNames( @NotNull final ArrayList<String> groupIds,
                                            @NotNull final ArrayList<Group> groups,
                                            final DBListener listener) {
+
 
 
 
@@ -139,7 +141,7 @@ public class Group {
                     String groupName = dataSnapshot.child( "name" ).getValue().toString();
                     groups.add( new Group( groupName, groupId ) );
                     if(groups.size() == expectedSize) {
-                       listener.onRetrievalFinished();
+                        if(listener != null && listener.isActive()) listener.onRetrievalFinished();
                     }
                 }
 
@@ -151,6 +153,35 @@ public class Group {
     }
 
 
+    public void updateMyStatusFromPersonalGoals( final Goal goal, final  DBListener listener ) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        String path = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
+
+        final DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    Object currentStatusObj = dataSnapshot.getValue();
+                    float currentStatus;
+                    if ( currentStatusObj instanceof Long ) {
+                        currentStatus = ( ( Long ) currentStatusObj ).floatValue();
+                    } else {
+                        currentStatus = ( ( Float ) currentStatusObj ).floatValue();
+                    }
+                    goal.setmCurrentStatus( currentStatus );
+
+                    if ( listener != null && listener.isActive() )  listener.onRetrievalFinished( goal );
+                }
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
 
     public String getmGroupName() {
         return mGroupName;

@@ -1,5 +1,6 @@
 package com.nova.groupxercise.Fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.nova.groupxercise.Objects.DBListener;
+import com.nova.groupxercise.Objects.ExerciseActivity;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
@@ -30,6 +33,12 @@ public class DiscoveriesFragment extends Fragment {
     private TextView mLoadingText;
     private ArrayAdapter< String > mItemsAdapter;
     private ArrayAdapter< CharSequence > mLevelSpinnerAdapter;
+    protected ArrayList< DBListener > mDBListeners;
+    @Override
+    public void onAttach( @NonNull Context context ) {
+        super.onAttach( context );
+        mDBListeners = new ArrayList<>(  );
+    }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
@@ -52,7 +61,24 @@ public class DiscoveriesFragment extends Fragment {
         mLevelSpinnerAdapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
 
         // Get the list of exercises from the database
-        retrieveExerciseList();
+//        retrieveExerciseList();
+        // Create an empty list for the exercise names
+        mExerciseNameList = new ArrayList<>();
+
+        // Set the list as the list for the items adapter
+        mItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mExerciseNameList );
+
+        DBListener exerciseListener = new DBListener() {
+
+            public void onRetrievalFinished() {
+                mLoadingText.setVisibility( View.INVISIBLE );
+                mListView.setAdapter( mItemsAdapter );
+            }
+
+
+        };
+        mDBListeners.add( exerciseListener );
+        ExerciseActivity.retrieveExerciseList( mExerciseNameList,  exerciseListener);
 
         // Set event listeners
         mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
@@ -71,6 +97,13 @@ public class DiscoveriesFragment extends Fragment {
                 ft.commit();
             }
         } );
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for(DBListener dbListener : mDBListeners) {
+            dbListener.setActive( false );
+        }
     }
 
     /**

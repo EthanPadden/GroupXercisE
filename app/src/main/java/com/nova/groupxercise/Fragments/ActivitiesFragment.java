@@ -1,5 +1,6 @@
 package com.nova.groupxercise.Fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,10 +21,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.Adapters.ActivityItemsAdapter;
-import com.nova.groupxercise.Activities.ExerciseActivity;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
 import com.nova.groupxercise.Activities.LogActivityActivity;
+import com.nova.groupxercise.Adapters.ActivityItemsAdapter;
+import com.nova.groupxercise.Objects.DBListener;
+import com.nova.groupxercise.Objects.ExerciseActivity;
 import com.nova.groupxercise.R;
 
 import org.joda.time.DateTime;
@@ -36,7 +39,12 @@ public class ActivitiesFragment extends Fragment {
     private TextView mLoadingText;
     private ArrayAdapter< String > mItemsAdapter;
     private Button mAddActivityBtn;
-
+    protected ArrayList< DBListener > mDBListeners;
+    @Override
+    public void onAttach( @NonNull Context context ) {
+        super.onAttach( context );
+        mDBListeners = new ArrayList<>(  );
+    }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
@@ -64,7 +72,61 @@ public class ActivitiesFragment extends Fragment {
             }
         } );
 
-        retrieveActivities();
+//        retrieveActivities();
+        mActivitesList = new ArrayList<>();
+        mItemsAdapter = new ActivityItemsAdapter( getActivity(), mActivitesList );
+        DBListener activitiesListener = new DBListener() {
+
+            public void onRetrievalFinished() {
+                if ( mActivitesList.isEmpty() ) {
+                    mLoadingText.setText( "No activities" );
+                } else {
+                    // Sort activites by time
+                    Collections.sort( mActivitesList );
+                    // Update UI
+                    mLoadingText.setVisibility( View.GONE );
+                    mListView.setAdapter( mItemsAdapter );
+                }
+            }
+
+
+        };
+        mDBListeners.add( activitiesListener );
+        ExerciseActivity.retrieveActivities( mActivitesList,  activitiesListener);
+
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        for(DBListener dbListener : mDBListeners) {
+            dbListener.setActive( false );
+        }
+
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Toast.makeText( getActivity(), "Pause", Toast.LENGTH_SHORT ).show();
+
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Toast.makeText( getActivity(), "Detached", Toast.LENGTH_SHORT ).show();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Toast.makeText( getActivity(), "Stopped", Toast.LENGTH_SHORT ).show();
+
     }
 
     private void retrieveActivities() {

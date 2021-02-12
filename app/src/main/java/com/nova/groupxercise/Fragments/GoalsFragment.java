@@ -1,5 +1,6 @@
 package com.nova.groupxercise.Fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,13 @@ public class GoalsFragment extends Fragment {
     private TextView mLoadingText;
     private ArrayList< Group > mGroups;
     private LinearLayout mGroupGoalsLayout;
+    protected ArrayList< DBListener > mDBListeners;
+
+    @Override
+    public void onAttach( @NonNull Context context ) {
+        super.onAttach( context );
+        mDBListeners = new ArrayList<>(  );
+    }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
@@ -59,55 +67,65 @@ public class GoalsFragment extends Fragment {
 
         // Set the list as the list for the items adapter
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mGoalsList );
-        Goal.retrievePersonalGoals( mGoalsList, new DBListener() {
-            @Override
+        DBListener pesonalGoalsListener =   new DBListener() {
             public void onRetrievalFinished() {
                 if(mGoalsList.size() > 0){
                     mLoadingText.setVisibility( View.GONE );
                     mListView.setAdapter( mItemsAdapter );
                 }
             }
-        } );
+        };
+        mDBListeners.add( pesonalGoalsListener );
+        Goal.retrievePersonalGoals( mGoalsList, pesonalGoalsListener);
 
 
 
         final ArrayList<String> groupIds = new ArrayList<>(  );
-        Group.retrieveGroupIds( groupIds, new DBListener() {
-            @Override
+        DBListener groupIdsListener = new DBListener() {
             public void onRetrievalFinished() {
-                Group.retrieveGroupNames( groupIds, mGroups, new DBListener() {
-                    @Override
+                DBListener groupNamesListener = new DBListener() {
                     public void onRetrievalFinished() {
                         if(mGroups.size() == 0) {
                             mLoadingText.setText( "You have no groups" );
                         } else {
                             for( final Group group: mGroups) {
-                                group.retrieveGroupGoals( new DBListener() {
-                                    @Override
+                                DBListener groupGoalsListener = new DBListener() {
                                     public void onRetrievalFinished() {
                                         addGroupGoalsToUI(group);
                                     }
-                                } );
+                                };
+                                mDBListeners.add( groupGoalsListener );
+                                group.retrieveGroupGoals( groupGoalsListener );
                             }
                         }
                     }
-                } );
+                };
+                mDBListeners.add( groupNamesListener );
+                Group.retrieveGroupNames( groupIds, mGroups, groupNamesListener );
             }
-        } );
+        };
+        mDBListeners.add( groupIdsListener );
+        Group.retrieveGroupIds( groupIds, groupIdsListener);
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for(DBListener dbListener : mDBListeners) {
+            dbListener.setActive( false );
+        }
+    }
 
     /**
      * Builds a list for every group to display the group goals
      */
-    private void addGroupGoalsToUI(Group group) {
+    private void addGroupGoalsToUI( Group group ) {
         // Group title
         TextView groupTitleText = new TextView( getActivity() );
         groupTitleText.setText( group.getmGroupName().toUpperCase() );
         mGroupGoalsLayout.addView( groupTitleText );
 
-        if(group.getGoals() != null) {
+        if ( group.getGoals() != null ) {
             ListView groupListView = createGroupGoalsListView( group );
 
             // Append to layout
