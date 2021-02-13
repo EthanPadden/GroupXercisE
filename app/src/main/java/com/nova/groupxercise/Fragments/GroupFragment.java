@@ -17,8 +17,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
-import com.nova.groupxercise.Activities.HomeScreenActivity;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
@@ -101,7 +99,12 @@ public class GroupFragment extends Fragment {
         mDeleteGroupBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
-                deleteGroup();
+                mGroup.deleteGroup();
+                // Set the fragment to be the my groups fragment
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
+                ft.commit();
             }
         } );
 
@@ -240,35 +243,6 @@ public class GroupFragment extends Fragment {
         mDBListeners = new ArrayList<>();
     }
 
-    /**
-     * Removes all members from the group (including the creator)
-     * Deletes the group
-     * Sets the fragment to be the my groups fragment
-     */
-    private void deleteGroup() {
-        // Remove all members
-        for ( String memberUsername : mGroup.getMembers() ) {
-            DBListener removalListener = new DBListener() {
-                public void onRetrievalFinished() {
-                    mDBListeners.remove( this );
-                }
-            };
-            mDBListeners.add( removalListener );
-            mGroup.removeMember( memberUsername, removalListener );
-        }
-
-        // Delete group subtree
-        String groupPath = "groups/" + mGroupId;
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference groupRef = homeScreenActivity.getmRootRef().child( groupPath );
-        groupRef.removeValue();
-
-        // Set the fragment to be the my groups fragment
-        FragmentTransaction ft = homeScreenActivity.getSupportFragmentManager().beginTransaction();
-        MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
-        ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
-        ft.commit();
-    }
 
 
 }

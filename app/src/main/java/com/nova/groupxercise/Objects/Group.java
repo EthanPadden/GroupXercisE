@@ -175,6 +175,17 @@ public class Group {
         if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
     }
 
+    public void deleteGroup() {
+        for( String member : members ){
+            removeMember( member, null );
+        }
+        // Delete group subtree
+        String groupPath = "groups/" + mGroupId;
+
+        DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child( groupPath );
+        groupRef.removeValue();
+    }
+
     public void removeMember( final String username, final DBListener listener ) {
         /** Updating groups subtree */
         // Path to this groups members child
