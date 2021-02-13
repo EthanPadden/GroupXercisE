@@ -289,14 +289,29 @@ public class ExerciseListItemFragment extends Fragment {
             @Override
             public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
                 Group selectedGroup = ( Group ) mListView.getItemAtPosition( i );
-                String groupId = selectedGroup.getmGroupId();
+                final String groupId = selectedGroup.getmGroupId();
 
                 if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
                     User currentUser = User.getInstance();
                     if ( currentUser.isUserDetailsAreSet() ) {
                         // Automatic goal calculation option: use suggested goal
                         float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
-                        saveGroupGoal( groupId, new Goal( mExerciseName, 0, target ) );
+                        final Goal goal =  new Goal( mExerciseName, 0, target  );
+                        DBListener goalSaveListener = new DBListener() {
+                            public void onRetrievalFinished(Object retrievedData) {
+                                boolean goalAlreadyExists = ((Boolean) retrievedData).booleanValue();
+                                if(goalAlreadyExists){
+                                    Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
+                                } else {
+                                    Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
+                                    addGoalProgressToMembers( groupId, goal );
+                                }
+                                mDBListeners.remove( this );
+                            }
+                        };
+                        mDBListeners.add( goalSaveListener );
+                        Group group = new Group( groupId );
+                        group.saveGoal( goal, goalSaveListener );
                     } else {
                         Toast.makeText( getActivity(), "Invalid details", Toast.LENGTH_SHORT ).show();
                     }
@@ -306,7 +321,22 @@ public class ExerciseListItemFragment extends Fragment {
 
                     if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
                         float target = Float.parseFloat( targetStr );
-                        saveGroupGoal( groupId, new Goal( mExerciseName, 0, target ) );
+                        final Goal goal = new Goal( mExerciseName, 0, target);
+                        DBListener goalSaveListener = new DBListener() {
+                            public void onRetrievalFinished(Object retrievedData) {
+                                boolean goalAlreadyExists = ((Boolean) retrievedData).booleanValue();
+                                if(goalAlreadyExists){
+                                    Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
+                                } else {
+                                    Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
+                                    addGoalProgressToMembers( groupId, goal );
+                                }
+                                mDBListeners.remove( this );
+                            }
+                        };
+                        mDBListeners.add( goalSaveListener );
+                        Group group = new Group( groupId );
+                        group.saveGoal( goal, goalSaveListener );
                     } else {
                         Toast.makeText( getActivity(), R.string.error_no_target_entered, Toast.LENGTH_SHORT ).show();
                     }
@@ -319,41 +349,6 @@ public class ExerciseListItemFragment extends Fragment {
         mListView.setVisibility( View.VISIBLE );
     }
 
-    /**
-     * Saves the argument goal as a goal for the group with the argument group ID
-     * This updates the group goal if the group already has a goal for the exercise
-     *
-     * @param groupId the group ID of the group to set the goal
-     * @param goal    the goal object
-     */
-    private void saveGroupGoal( final String groupId, final Goal goal ) {
-        // Path to the group goal
-        String path = "groups/" + groupId + "/goals/" + goal.getmExerciseName();
-
-        // Get the DB reference
-        final DatabaseReference childRef = mRootRef.child( path );
-
-        // Check if we have a set of goals for that particular user
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( getActivity() != null ) {
-                    if ( dataSnapshot.exists() ) {
-                        Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
-
-                    } else {
-                        Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
-                        addGoalProgressToMembers( groupId, goal );
-                    }
-                }
-                childRef.setValue( goal.getmTarget() );
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
 
     private void addGoalProgressToMembers( final String groupId, final Goal goal ) {
         // Path to the group goal

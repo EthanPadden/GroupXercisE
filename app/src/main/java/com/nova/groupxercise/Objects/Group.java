@@ -186,6 +186,33 @@ public class Group {
         groupRef.removeValue();
     }
 
+    public void saveGoal( final Goal goal, final DBListener listener ){
+        // Path to the group goal
+        String path = "groups/" + mGroupId + "/goals/" + goal.getmExerciseName();
+
+        // Get the DB reference
+        final DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+        // Check if we have a set of goals for that particular user
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( listener != null && listener.isActive() ) {
+                    if ( dataSnapshot.exists() ) {
+                        listener.onRetrievalFinished( true );
+                    } else {
+                        listener.onRetrievalFinished( false );
+                    }
+                }
+
+                childRef.setValue( goal.getmTarget() );
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
     public void removeMember( final String username, final DBListener listener ) {
         /** Updating groups subtree */
         // Path to this groups members child
