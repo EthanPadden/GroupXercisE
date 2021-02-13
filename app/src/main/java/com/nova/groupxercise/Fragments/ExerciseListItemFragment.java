@@ -26,7 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
-import com.nova.groupxercise.Adapters.GroupItemsAdapter;
+import com.nova.groupxercise.Adapters.SimpleGroupItemsAdapter;
 import com.nova.groupxercise.DBObjects.GoalDBObject;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
@@ -66,7 +66,7 @@ public class ExerciseListItemFragment extends Fragment {
     private RadioButton mGoalOptionsManualRatioBtn;
     private EditText mManualGoalET;
     private ArrayAdapter mItemsAdapter;
-    private ArrayList mAdminGroups;
+    private ArrayList <Group>mAdminGroups;
     private ListView mListView;
     private TextView mLoadingText;
     private ArrayList< String > mGroupIds;
@@ -74,7 +74,6 @@ public class ExerciseListItemFragment extends Fragment {
     // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
     private ArrayList< DBListener > mDBListeners;
-
     // DB root reference
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -204,12 +203,9 @@ public class ExerciseListItemFragment extends Fragment {
         } );
 
         // Set the fragment title
-        mSetGoalTitleText.setText( R.string.set_goal_title + mExerciseName );
+        mSetGoalTitleText.setText( getResources().getString( R.string.set_goal_title ) + " " + mExerciseName );
         mDBListeners = new ArrayList<>();
 
-        // Set defauls sets and reps
-        mSetsText.setText( "3" );
-        mRepsText.setText( "10" );
 
         // Get the strength standards from the DB based on the user details
 //        retrieveStrengthStandards( mExerciseName );
@@ -245,14 +241,13 @@ public class ExerciseListItemFragment extends Fragment {
 
                 mAdminGroups = new ArrayList<>();
                 // Set the list as the list for the items adapter
-                mItemsAdapter = new GroupItemsAdapter( getActivity(), mAdminGroups );
+                mItemsAdapter = new SimpleGroupItemsAdapter( getActivity(), mAdminGroups );
 
                 DBListener groupNamesListener = new DBListener() {
 
                     public void onRetrievalFinished() {
                         setupGroupsList();
                         mDBListeners.remove( this );
-
                     }
 
                 };
@@ -296,11 +291,11 @@ public class ExerciseListItemFragment extends Fragment {
                     if ( currentUser.isUserDetailsAreSet() ) {
                         // Automatic goal calculation option: use suggested goal
                         float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
-                        final Goal goal =  new Goal( mExerciseName, 0, target  );
+                        final Goal goal = new Goal( mExerciseName, 0, target );
                         DBListener goalSaveListener = new DBListener() {
-                            public void onRetrievalFinished(Object retrievedData) {
-                                boolean goalAlreadyExists = ((Boolean) retrievedData).booleanValue();
-                                if(goalAlreadyExists){
+                            public void onRetrievalFinished( Object retrievedData ) {
+                                boolean goalAlreadyExists = ( ( Boolean ) retrievedData ).booleanValue();
+                                if ( goalAlreadyExists ) {
                                     Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
                                 } else {
                                     Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
@@ -321,11 +316,11 @@ public class ExerciseListItemFragment extends Fragment {
 
                     if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
                         float target = Float.parseFloat( targetStr );
-                        final Goal goal = new Goal( mExerciseName, 0, target);
+                        final Goal goal = new Goal( mExerciseName, 0, target );
                         DBListener goalSaveListener = new DBListener() {
-                            public void onRetrievalFinished(Object retrievedData) {
-                                boolean goalAlreadyExists = ((Boolean) retrievedData).booleanValue();
-                                if(goalAlreadyExists){
+                            public void onRetrievalFinished( Object retrievedData ) {
+                                boolean goalAlreadyExists = ( ( Boolean ) retrievedData ).booleanValue();
+                                if ( goalAlreadyExists ) {
                                     Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
                                 } else {
                                     Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
