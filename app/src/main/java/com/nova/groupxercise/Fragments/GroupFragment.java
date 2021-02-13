@@ -71,7 +71,7 @@ public class GroupFragment extends Fragment {
             @Override
             public void onClick( View view ) {
                 final String username = mMemberNameEt.getText().toString();
-                if ( checkIfUsernameIsValid( username ) ) {
+                if ( User.checkIfUsernameIsValid( username ) ) {
                     DBListener userCheckListener = new DBListener() {
                         public void onRetrievalFinished(Object retrievedData) {
                             if(retrievedData == null) {
@@ -268,16 +268,6 @@ public class GroupFragment extends Fragment {
         MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
         ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
         ft.commit();
-    }
-
-    /**
-     * Checks the argument string is a valid username
-     *
-     * @param username the username to check
-     * @return true if the username is valid
-     */
-    private boolean checkIfUsernameIsValid( String username ) {
-        return username != null && username.compareTo( "" ) != 0;
     }
 
 

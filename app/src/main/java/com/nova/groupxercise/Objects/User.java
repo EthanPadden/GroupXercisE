@@ -144,6 +144,10 @@ public class User {
         } );
     }
 
+    public static boolean checkIfUsernameIsValid( String username ) {
+        return username != null && username.compareTo( "" ) != 0;
+    }
+
     /**
      * Retrieves the user details from the DB
      * If there are no details saved in the DB, it does nothing

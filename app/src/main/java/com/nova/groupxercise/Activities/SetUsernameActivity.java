@@ -41,23 +41,15 @@ public class SetUsernameActivity extends AppCompatActivity {
         mSetUsernameBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 String username = mUsernameEt.getText().toString();
-                checkIfUsernameIsValid( username );
+                if(User.checkIfUsernameIsValid( username )){
+                    checkIfUsernameIsAvailable( username );
+                } else {
+                    Toast.makeText( SetUsernameActivity.this, "Invalid username", Toast.LENGTH_SHORT ).show();
+                }
             }
         } );
     }
 
-    /**
-     * Checks that the argument username is a valid username
-     * If so, calls checkIfUsernameIsAvailable
-     * @param username the username to check
-     */
-    private void checkIfUsernameIsValid( String username ) {
-        if ( username == null || username.compareTo( "" ) == 0 ) {
-            Toast.makeText( SetUsernameActivity.this, "Invalid username", Toast.LENGTH_SHORT ).show();
-        } else {
-            checkIfUsernameIsAvailable( username );
-        }
-    }
 
     /**
      * Checks if another user already has the argument username
