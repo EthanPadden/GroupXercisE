@@ -71,12 +71,6 @@
             android:layout_below="@id/btn_delete_group"
             android:text="Remove Member"
             android:visibility="gone"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:id="@+id/btn_update_status"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/btn_remove_member"
-            android:text="Update Status"/>
 
 
 
@@ -86,7 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_below="@+id/btn_update_status"
+            android:layout_below="@+id/btn_remove_member"
             android:id="@+id/layout_group_goals">
             <TextView
                 android:layout_width="match_parent"

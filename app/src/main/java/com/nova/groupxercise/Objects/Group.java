@@ -1,5 +1,7 @@
 package com.nova.groupxercise.Objects;
 
+import androidx.annotation.NonNull;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,21 +16,21 @@ public class Group {
     private String mGroupName;
     private String mGroupId;
     private String mGroupCreator;
-    private ArrayList<String> members;
-    private ArrayList<Goal> goals;
+    private ArrayList< String > members;
+    private ArrayList< Goal > goals;
 
     public Group( String mGroupName, String mGroupId ) {
-        this(mGroupId);
+        this( mGroupId );
         this.mGroupName = mGroupName;
     }
 
     public Group( String mGroupId ) {
         this.mGroupId = mGroupId;
-        members = new ArrayList<>(  );
-        goals = new ArrayList<>(  );
+        members = new ArrayList<>();
+        goals = new ArrayList<>();
     }
 
-    public static void retrieveGroupIds( @NotNull final ArrayList<String> groupIds, final DBListener listener) {
+    public static void retrieveGroupIds( @NotNull final ArrayList< String > groupIds, final DBListener listener ) {
 
         // Get the current user ID
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -43,10 +45,10 @@ public class Group {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
-                    groupIds.add(  usersGroupsDataSnapshot.getKey());
+                    groupIds.add( usersGroupsDataSnapshot.getKey() );
                 }
 
-                if(listener != null && listener.isActive()) listener.onRetrievalFinished();
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
             }
 
             @Override
@@ -55,7 +57,7 @@ public class Group {
         } );
     }
 
-    public static void retrieveGroupIds( @NotNull final ArrayList<String> adminGroupIds, @NotNull final ArrayList<String> groupIds, final DBListener listener) {
+    public static void retrieveGroupIds( @NotNull final ArrayList< String > adminGroupIds, @NotNull final ArrayList< String > groupIds, final DBListener listener ) {
 
         // Get the current user ID
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -75,10 +77,10 @@ public class Group {
                         // If the current user is an admin of the group
                         adminGroupIds.add( usersGroupsDataSnapshot.getKey() );
                     }
-                    groupIds.add(  usersGroupsDataSnapshot.getKey());
+                    groupIds.add( usersGroupsDataSnapshot.getKey() );
                 }
 
-                if(listener != null && listener.isActive()) listener.onRetrievalFinished();
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
             }
 
             @Override
@@ -87,7 +89,62 @@ public class Group {
         } );
     }
 
-    public void retrieveGroupGoals(final DBListener listener) {
+    public void retrieveGroupInfo( final DBListener listener ) {
+        // Path to the group
+        final String path = "groups/" + mGroupId;
+
+        // Get the DB reference
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
+                // Get group name
+                String dbGroupName = dataSnapshot.child( "name" ).getValue().toString();
+                setmGroupName( dbGroupName );
+
+                String dbGroupCreator = dataSnapshot.child( "creator" ).getValue().toString();
+                setmGroupCreator( dbGroupCreator );
+
+                DataSnapshot membersDataSnapshot = dataSnapshot.child( "members" );
+                for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
+                    String username = memberDataSnapshot.getKey();
+                    members.add( username );
+                }
+
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
+            }
+
+            @Override
+            public void onCancelled( @NonNull DatabaseError databaseError ) {
+
+            }
+        } );
+
+    }
+
+    public void retrieveGroupProgress(final DBListener listener  ){
+        // Path to the group
+        final String path = "groups/" + mGroupId + "/members";
+
+        // Get the DB reference
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled( @NonNull DatabaseError databaseError ) {
+
+            }
+        } );
+
+    }
+
+    public void retrieveGroupGoals( final DBListener listener ) {
 
         // Path to group goals
         String path = "groups/" + mGroupId + "/goals";
@@ -112,7 +169,7 @@ public class Group {
                     }
                 }
 
-                if(listener != null && listener.isActive()) listener.onRetrievalFinished();
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
             }
 
             @Override
@@ -121,7 +178,7 @@ public class Group {
         } );
     }
 
-    public void retrieveGroupMembers(final  DBListener listener) {
+    public void retrieveGroupMembers( final DBListener listener ) {
         String path = "groups/" + mGroupId + "/members";
         DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
@@ -135,7 +192,7 @@ public class Group {
                     }
                 }
 
-                if(listener != null && listener.isActive()) listener.onRetrievalFinished();
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
             }
 
             @Override
@@ -145,18 +202,16 @@ public class Group {
 
     }
 
-    public static void retrieveGroupNames( @NotNull final ArrayList<String> groupIds,
-                                           @NotNull final ArrayList<Group> groups,
-                                           final DBListener listener) {
-
-
+    public static void retrieveGroupNames( @NotNull final ArrayList< String > groupIds,
+                                           @NotNull final ArrayList< Group > groups,
+                                           final DBListener listener ) {
 
 
         // The UI is updated when all of the group names have been added
         // Necessary because of the async call within the for loop
         final int expectedSize = groupIds.size();
 
-        for( final String groupId : groupIds) {
+        for ( final String groupId : groupIds ) {
             String groupPath = "groups/" + groupId;
             DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child( groupPath );
 
@@ -165,8 +220,9 @@ public class Group {
                 public void onDataChange( DataSnapshot dataSnapshot ) {
                     String groupName = dataSnapshot.child( "name" ).getValue().toString();
                     groups.add( new Group( groupName, groupId ) );
-                    if(groups.size() == expectedSize) {
-                        if(listener != null && listener.isActive()) listener.onRetrievalFinished();
+                    if ( groups.size() == expectedSize ) {
+                        if ( listener != null && listener.isActive() )
+                            listener.onRetrievalFinished();
                     }
                 }
 
@@ -178,7 +234,7 @@ public class Group {
     }
 
 
-    public void updateMyStatusFromPersonalGoals( final Goal goal, final  DBListener listener ) {
+    public void updateMyStatusFromPersonalGoals( final Goal goal, final DBListener listener ) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         String path = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
@@ -198,7 +254,8 @@ public class Group {
                     }
                     goal.setmCurrentStatus( currentStatus );
 
-                    if ( listener != null && listener.isActive() )  listener.onRetrievalFinished( goal );
+                    if ( listener != null && listener.isActive() )
+                        listener.onRetrievalFinished( goal );
                 }
             }
 
