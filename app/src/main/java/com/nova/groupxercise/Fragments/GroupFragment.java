@@ -34,7 +34,6 @@ public class GroupFragment extends Fragment {
     private String mGroupId;
     private Button mAddMemberBtn;
     private Button mDeleteGroupBtn;
-    private Button mRemoveMemberBtn;
     private EditText mMemberNameEt;
     private TextView mGroupGoalsLoadingText;
     private LinearLayout mGroupMembersLayout;
@@ -63,7 +62,6 @@ public class GroupFragment extends Fragment {
         mAddMemberBtn = view.findViewById( R.id.btn_add_member );
         mMemberNameEt = view.findViewById( R.id.et_member_name );
         mDeleteGroupBtn = view.findViewById( R.id.btn_delete_group );
-        mRemoveMemberBtn = view.findViewById( R.id.btn_remove_member );
         mGroupGoalsLoadingText = view.findViewById( R.id.text_group_goals_loading );
         mGroupMembersLayout = view.findViewById( R.id.layout_members );
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
@@ -82,22 +80,7 @@ public class GroupFragment extends Fragment {
                 }
             }
         } );
-        mRemoveMemberBtn.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( View view ) {
-                String username = mMemberNameEt.getText().toString();
-                if ( checkIfUsernameIsValid( username ) ) {
-                    // You cannot remove the group creator
-                    if ( mGroup.getmGroupCreator().compareTo( username ) == 0 ) {
-                        Toast.makeText( getActivity(), "You cannot remove the creator", Toast.LENGTH_SHORT ).show();
-                    } else {
-                        removeMember( username );
-                    }
-                } else {
-                    Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
-                }
-            }
-        } );
+
         mDeleteGroupBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
@@ -116,7 +99,6 @@ public class GroupFragment extends Fragment {
                     mAddMemberBtn.setVisibility( View.VISIBLE );
                     mMemberNameEt.setVisibility( View.VISIBLE );
                     mDeleteGroupBtn.setVisibility( View.VISIBLE );
-                    mRemoveMemberBtn.setVisibility( View.VISIBLE );
                     adminGroup = true;
                 }
                 DBListener groupProgressListener = new DBListener() {
@@ -124,7 +106,7 @@ public class GroupFragment extends Fragment {
                         DataSnapshot membersDataSnapshot = ( DataSnapshot ) retrievedData;
                         ArrayList< String > dbMembers = new ArrayList<>();
                         for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
-                            String username = memberDataSnapshot.getKey();
+                            final String username = memberDataSnapshot.getKey();
                             dbMembers.add( username );
 
                             // For each member
@@ -142,8 +124,14 @@ public class GroupFragment extends Fragment {
                             }
 
                             else if(adminGroup) {
-                                Button removeMemberBtn =  memberCard.findViewById( R.id.btn_remove_member );
+                                final Button removeMemberBtn =  memberCard.findViewById( R.id.btn_remove_member );
                                 removeMemberBtn.setVisibility(View.VISIBLE );
+                                removeMemberBtn.setOnClickListener( new View.OnClickListener() {
+                                    @Override
+                                    public void onClick( View view ) {
+                                        removeMember( username );
+                                    }
+                                } );
                             }
 
 
