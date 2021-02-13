@@ -109,7 +109,6 @@ public class GroupFragment extends Fragment {
                             final String username = memberDataSnapshot.getKey();
                             dbMembers.add( username );
 
-                            // For each member
                             View memberCard = getLayoutInflater().inflate( R.layout.layout_group_member_card, null );
                             LinearLayout memberCardRootLayout = memberCard.findViewById( R.id.layout_card_root );
 
@@ -145,12 +144,12 @@ public class GroupFragment extends Fragment {
                                     progress = ( ( Float ) progressObj ).floatValue();
                                 }
 
-                                View progressView = getLayoutInflater().inflate( R.layout.layout_group_member_progress, memberCardRootLayout );
+                                View progressView = getLayoutInflater().inflate( R.layout.layout_group_member_progress, null );
                                 TextView exerciseNameText = progressView.findViewById( R.id.text_progress_exercise_name );
                                 TextView progressText = progressView.findViewById( R.id.text_progress );
                                 exerciseNameText.setText( exerciseName );
                                 progressText.setText( Float.toString( progress ) );
-
+                                memberCardRootLayout.addView( progressView );
                             }
 
                             mGroupMembersLayout.addView( memberCard );
