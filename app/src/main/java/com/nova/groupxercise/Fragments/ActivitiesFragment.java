@@ -7,28 +7,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nova.groupxercise.Activities.LogActivityActivity;
 import com.nova.groupxercise.Adapters.ActivityItemsAdapter;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.ExerciseActivity;
 import com.nova.groupxercise.R;
-
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +29,7 @@ public class ActivitiesFragment extends Fragment {
     private ListView mListView;
     private TextView mLoadingText;
     private ArrayAdapter< String > mItemsAdapter;
-    private Button mAddActivityBtn;
+    private FloatingActionButton mAddActivityBtn;
     protected ArrayList< DBListener > mDBListeners;
     @Override
     public void onAttach( @NonNull Context context ) {
@@ -88,7 +79,6 @@ public class ActivitiesFragment extends Fragment {
                     mListView.setAdapter( mItemsAdapter );
                 }
                 mDBListeners.remove( this );
-
             }
 
 
@@ -106,86 +96,5 @@ public class ActivitiesFragment extends Fragment {
         for(DBListener dbListener : mDBListeners) {
             dbListener.setActive( false );
         }
-
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Toast.makeText( getActivity(), "Pause", Toast.LENGTH_SHORT ).show();
-
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Toast.makeText( getActivity(), "Detached", Toast.LENGTH_SHORT ).show();
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Toast.makeText( getActivity(), "Stopped", Toast.LENGTH_SHORT ).show();
-
-    }
-
-    private void retrieveActivities() {
-        // Path to the users goals
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String path = "activities/" + userId;
-
-        // Get the DB reference
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-
-        // Create an empty list for the goals
-        mActivitesList = new ArrayList<>();
-
-        // Set the list as the list for the items adapter
-        mItemsAdapter = new ActivityItemsAdapter( getActivity(), mActivitesList );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot exerciseDataSnapshot : dataSnapshot.getChildren() ) {
-                    // Get the exercise name
-                    String exerciseName = exerciseDataSnapshot.getKey();
-
-                    for ( DataSnapshot activityDataSnapshot : exerciseDataSnapshot.getChildren() ) {
-                        String timestampStr = activityDataSnapshot.getKey();
-                        long timestamp = Long.parseLong( timestampStr );
-                        DateTime time = new DateTime( timestamp );
-
-                        Object levelObj = activityDataSnapshot.getValue();
-                        float level;
-                        if ( levelObj instanceof Long ) {
-                            level = ( ( Long ) levelObj ).floatValue();
-                        } else {
-                            level = ( ( Float ) levelObj ).floatValue();
-                        }
-
-
-                        ExerciseActivity activity = new ExerciseActivity( exerciseName, time, level );
-                        mActivitesList.add( activity );
-                    }
-                }
-
-                if ( mActivitesList.isEmpty() ) {
-                    mLoadingText.setText( "No activities" );
-                } else {
-                    // Sort activites by time
-                    Collections.sort( mActivitesList );
-                    // Update UI
-                    mLoadingText.setVisibility( View.GONE );
-                    mListView.setAdapter( mItemsAdapter );
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
     }
 }
