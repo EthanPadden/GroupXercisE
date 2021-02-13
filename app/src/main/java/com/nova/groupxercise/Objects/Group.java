@@ -144,6 +144,44 @@ public class Group {
 
     }
 
+    public void removeMember(final String username,final DBListener listener ){
+        /** Updating groups subtree */
+        // Path to this groups members child
+        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
+
+       final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference groupsChildRef = rootRef.child( thisGroupMembersPath );
+
+        // TODO: check if the user is already a member - error?
+        // TODO: what if that user is not a member? = error?
+        groupsChildRef.child( username ).removeValue();
+
+
+        /** Updating user_groups subtree */
+        String usernamePath = "usernames/" + username;
+        DatabaseReference usernameChildRef = rootRef.child( usernamePath );
+        usernameChildRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                String userId = dataSnapshot.getValue().toString();
+
+                String userGroupsPath = "user_groups/" + userId;
+                DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
+                userGroupsChildRef.child( mGroupId ).removeValue();
+
+                /** Updating group in memory and UI */
+                members.remove( username );
+
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
+            }
+
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
     public void retrieveGroupGoals( final DBListener listener ) {
 
         // Path to group goals

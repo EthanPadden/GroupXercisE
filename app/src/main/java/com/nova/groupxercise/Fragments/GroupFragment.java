@@ -128,7 +128,13 @@ public class GroupFragment extends Fragment {
                                 removeMemberBtn.setOnClickListener( new View.OnClickListener() {
                                     @Override
                                     public void onClick( View view ) {
-                                        removeMember( username );
+                                        DBListener removalListener = new DBListener() {
+                                            public void onRetrievalFinished() {
+                                                mDBListeners.remove( this );
+                                            }
+                                        };
+                                        mDBListeners.add( removalListener );
+                                        mGroup.removeMember( username, removalListener );
                                     }
                                 } );
                             }
@@ -225,7 +231,13 @@ public class GroupFragment extends Fragment {
     private void deleteGroup() {
         // Remove all members
         for ( String memberUsername : mGroup.getMembers() ) {
-            removeMember( memberUsername );
+            DBListener removalListener = new DBListener() {
+                public void onRetrievalFinished() {
+                    mDBListeners.remove( this );
+                }
+            };
+            mDBListeners.add( removalListener );
+            mGroup.removeMember( memberUsername, removalListener );
         }
 
         // Delete group subtree
@@ -320,47 +332,6 @@ public class GroupFragment extends Fragment {
 
     }
 
-    /**
-     * Removes a user from the group, updating both the groups and user_groups subtrees
-     *
-     * @param username the username of the user to remove
-     */
-    private void removeMember( final String username ) {
 
-        /** Updating groups subtree */
-        // Path to this groups members child
-        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
-
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference groupsChildRef = homeScreenActivity.getmRootRef().child( thisGroupMembersPath );
-
-        // TODO: check if the user is already a member - error?
-        // TODO: what if that user is not a member? = error?
-        groupsChildRef.child( username ).removeValue();
-
-
-        /** Updating user_groups subtree */
-        String usernamePath = "usernames/" + username;
-        final DatabaseReference rootRef = homeScreenActivity.getmRootRef();
-        DatabaseReference usernameChildRef = rootRef.child( usernamePath );
-        usernameChildRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                String userId = dataSnapshot.getValue().toString();
-
-                String userGroupsPath = "user_groups/" + userId;
-                DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
-                userGroupsChildRef.child( mGroupId ).removeValue();
-
-                /** Updating group in memory and UI */
-                mGroup.getMembers().remove( username );
-            }
-
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
 
 }
