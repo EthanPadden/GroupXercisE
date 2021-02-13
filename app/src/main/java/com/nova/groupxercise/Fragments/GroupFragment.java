@@ -40,6 +40,7 @@ public class GroupFragment extends Fragment {
     private LinearLayout mGroupMembersLayout;
     private LinearLayout mGroupGoalsLayout;
     private ArrayList< DBListener > mDBListeners;
+    private boolean adminGroup;
 
 
     public GroupFragment( String mGroupId ) {
@@ -57,6 +58,7 @@ public class GroupFragment extends Fragment {
     public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
         super.onViewCreated( view, savedInstanceState );
 
+        adminGroup = false;
         // Initialise components
         mAddMemberBtn = view.findViewById( R.id.btn_add_member );
         mMemberNameEt = view.findViewById( R.id.et_member_name );
@@ -115,6 +117,7 @@ public class GroupFragment extends Fragment {
                     mMemberNameEt.setVisibility( View.VISIBLE );
                     mDeleteGroupBtn.setVisibility( View.VISIBLE );
                     mRemoveMemberBtn.setVisibility( View.VISIBLE );
+                    adminGroup = true;
                 }
                 DBListener groupProgressListener = new DBListener() {
                     public void onRetrievalFinished( Object retrievedData ) {
@@ -136,6 +139,11 @@ public class GroupFragment extends Fragment {
                             if ( username.compareTo( mGroup.getmGroupCreator() ) == 0 ) {
                                 userStatusTextView.setText( "Admin" );
                                 userStatusTextView.setVisibility( View.VISIBLE );
+                            }
+
+                            else if(adminGroup) {
+                                Button removeMemberBtn =  memberCard.findViewById( R.id.btn_remove_member );
+                                removeMemberBtn.setVisibility(View.VISIBLE );
                             }
 
 
