@@ -17,9 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
@@ -72,9 +70,28 @@ public class GroupFragment extends Fragment {
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
-                String username = mMemberNameEt.getText().toString();
+                final String username = mMemberNameEt.getText().toString();
                 if ( checkIfUsernameIsValid( username ) ) {
-                    checkIfUserExists( username );
+                    DBListener userCheckListener = new DBListener() {
+                        public void onRetrievalFinished(Object retrievedData) {
+                            if(retrievedData == null) {
+                                Toast.makeText( getActivity(), "User not found: " + username, Toast.LENGTH_SHORT ).show();
+                            } else {
+                                String userId = (String) retrievedData;
+                                DBListener additionListener = new DBListener() {
+                                    public void onRetrievalFinished() {
+                                        mDBListeners.remove( this );
+                                    }
+                                };
+                                mDBListeners.add( additionListener );
+                                mGroup.addMember( username, userId, additionListener );
+                            }
+
+                            mDBListeners.remove( this );
+                        }
+                    };
+                    mDBListeners.add( userCheckListener );
+                    User.checkIfUserExists( username, userCheckListener );
                 } else {
                     Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
                 }
@@ -162,7 +179,7 @@ public class GroupFragment extends Fragment {
                         }
 
                         // Create group object
-                        mGroup = new Group( mGroup.getmGroupName(), mGroupId );
+
                         mGroup.setmGroupCreator( mGroup.getmGroupCreator() );
                         mGroup.setMembers( dbMembers );
                         mDBListeners.remove( this );
@@ -263,43 +280,5 @@ public class GroupFragment extends Fragment {
         return username != null && username.compareTo( "" ) != 0;
     }
 
-    /**
-     * Checks if there is a user with the argument username
-     * If not, show error message
-     * If so, find the user ID and call addUserToGroup
-     *
-     * @param username
-     */
-    private void checkIfUserExists( final String username ) {
-        Toast.makeText( getActivity(), "Searching for user: " + username, Toast.LENGTH_SHORT ).show();
 
-        // Path to the username child
-        String path = "usernames/" + username;
-
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    Toast.makeText( getActivity(), "User found: " + username, Toast.LENGTH_SHORT ).show();
-                    String userId = dataSnapshot.getValue().toString();
-                    DBListener additionListener = new DBListener() {
-                        public void onRetrievalFinished() {
-                            mDBListeners.remove( this );
-                        }
-                    };
-                    mDBListeners.add( additionListener );
-                    mGroup.addMember( username, userId, additionListener );
-                } else {
-                    Toast.makeText( getActivity(), "Username not found", Toast.LENGTH_SHORT ).show();
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
 }

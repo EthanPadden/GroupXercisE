@@ -122,6 +122,28 @@ public class User {
         }
     }
 
+    public static void checkIfUserExists(String username, final DBListener listener) {
+        // Path to the username child
+        String path = "usernames/" + username;
+
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    String userId = dataSnapshot.getValue().toString();
+                    if ( listener != null && listener.isActive() ) listener.onRetrievalFinished(userId);
+                } else {
+                    if ( listener != null && listener.isActive() ) listener.onRetrievalFinished(null);
+                }
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
     /**
      * Retrieves the user details from the DB
      * If there are no details saved in the DB, it does nothing
