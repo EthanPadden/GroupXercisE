@@ -180,10 +180,18 @@ public class GroupFragment extends Fragment {
                     mGroupGoalsLoadingText.setVisibility( View.GONE );
 
                     for ( Goal goal : mGroup.getGoals() ) {
-                        TextView textView = new TextView( getActivity() );
-                        textView.setText( goal.getmExerciseName() + ": " + goal.getmTarget() );
+                        View goalView = getLayoutInflater().inflate( R.layout.layout_goal_list_item, null );
+                        TextView exerciseNameText = goalView.findViewById( R.id.goal_exercise_name );
+                        TextView currentStatusText = goalView.findViewById( R.id.goal_current_status );
+                        TextView dividerText = goalView.findViewById( R.id.goal_divider );
+                        TextView targetText = goalView.findViewById( R.id.goal_target );
+                        exerciseNameText.setText( goal.getmExerciseName() );
+                        currentStatusText.setVisibility( View.GONE );
+                        dividerText.setVisibility( View.GONE );
+                        targetText.setText( Float.toString(  goal.getmTarget()) );
 
-                        mGroupGoalsLayout.addView( textView );
+
+                        mGroupGoalsLayout.addView( goalView );
                     }
                 }
                 mDBListeners.remove( this );
