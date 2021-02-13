@@ -285,7 +285,13 @@ public class GroupFragment extends Fragment {
                 if ( dataSnapshot.exists() ) {
                     Toast.makeText( getActivity(), "User found: " + username, Toast.LENGTH_SHORT ).show();
                     String userId = dataSnapshot.getValue().toString();
-                    addUserToGroup( username, userId );
+                    DBListener additionListener = new DBListener() {
+                        public void onRetrievalFinished() {
+                            mDBListeners.remove( this );
+                        }
+                    };
+                    mDBListeners.add( additionListener );
+                    mGroup.addMember( username, userId, additionListener );
                 } else {
                     Toast.makeText( getActivity(), "Username not found", Toast.LENGTH_SHORT ).show();
                 }
@@ -296,42 +302,4 @@ public class GroupFragment extends Fragment {
             }
         } );
     }
-
-    /**
-     * Adds a user to the group, updating both the groups and user_groups subtrees
-     *
-     * @param username the username of the user to add
-     * @param userId   the ID of the user to add
-     */
-    private void addUserToGroup( String username, String userId ) {
-        /** Updating groups subtree */
-        // Path to this groups members child
-        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
-
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference groupsChildRef = homeScreenActivity.getmRootRef().child( thisGroupMembersPath );
-
-        groupsChildRef.child( username ).setValue( false );
-
-        // TODO: check if the user is already a member - error?
-
-        /** Updating user_groups subtree */
-        String userGroupsPath = "user_groups/" + userId;
-        DatabaseReference userGroupsChildRef = homeScreenActivity.getmRootRef().child( userGroupsPath );
-        userGroupsChildRef.child( mGroupId ).setValue( false );
-
-        /** Updating group in memory and UI */
-        mGroup.getMembers().add( username );
-
-        /** Create subtree for the progress of that user towards the goals */
-        for ( Goal goal : mGroup.getGoals() ) {
-            User user = new User();
-            user.setUsername( username );
-            goal.matchUserProgressToGroup( userId, user, mGroup );
-        }
-
-    }
-
-
-
 }

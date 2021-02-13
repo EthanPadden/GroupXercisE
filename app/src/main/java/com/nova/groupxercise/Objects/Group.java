@@ -123,7 +123,7 @@ public class Group {
 
     }
 
-    public void retrieveGroupProgress(final DBListener listener  ){
+    public void retrieveGroupProgress( final DBListener listener ) {
         // Path to the group
         final String path = "groups/" + mGroupId + "/members";
 
@@ -133,7 +133,8 @@ public class Group {
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
-                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished(dataSnapshot);
+                if ( listener != null && listener.isActive() )
+                    listener.onRetrievalFinished( dataSnapshot );
             }
 
             @Override
@@ -144,12 +145,42 @@ public class Group {
 
     }
 
-    public void removeMember(final String username,final DBListener listener ){
+    public void addMember( final String username, final String userId, final DBListener listener ) {
         /** Updating groups subtree */
         // Path to this groups members child
         String thisGroupMembersPath = "groups/" + mGroupId + "/members";
 
-       final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference groupsChildRef = rootRef.child( thisGroupMembersPath );
+
+        groupsChildRef.child( username ).setValue( false );
+
+        // TODO: check if the user is already a member - error?
+
+        /** Updating user_groups subtree */
+        String userGroupsPath = "user_groups/" + userId;
+        DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
+        userGroupsChildRef.child( mGroupId ).setValue( false );
+
+        /** Updating group in memory and UI */
+        members.add( username );
+
+        /** Create subtree for the progress of that user towards the goals */
+        for ( Goal goal : goals ) {
+            User user = new User();
+            user.setUsername( username );
+            goal.matchUserProgressToGroup( userId, user, this );
+        }
+
+        if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
+    }
+
+    public void removeMember( final String username, final DBListener listener ) {
+        /** Updating groups subtree */
+        // Path to this groups members child
+        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
+
+        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
         DatabaseReference groupsChildRef = rootRef.child( thisGroupMembersPath );
 
         // TODO: check if the user is already a member - error?
