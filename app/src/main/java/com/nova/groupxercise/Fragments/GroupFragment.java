@@ -1,9 +1,7 @@
 package com.nova.groupxercise.Fragments;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -71,6 +68,8 @@ public class GroupFragment extends Fragment {
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
         mUpdateStatusBtn = view.findViewById( R.id.btn_update_status );
 
+        mDBListeners = new ArrayList<>(  );
+
         // Set event listeners
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -103,12 +102,6 @@ public class GroupFragment extends Fragment {
             @Override
             public void onClick( View view ) {
                 deleteGroup();
-            }
-        } );
-        mUpdateStatusBtn.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( View view ) {
-                updateMyStatuses();
             }
         } );
 
@@ -150,69 +143,6 @@ public class GroupFragment extends Fragment {
         super.onAttach( context );
         mDBListeners = new ArrayList<>(  );
     }
-
-    private void updateMyStatuses() {
-        /** For every goal in the group, get my current status in memory and UI */
-        for ( final Goal goal : mGroup.getGoals() ) {
-            DBListener statusUpdateListener = new DBListener() {
-                public void onRetrievalFinished( Object retrievedData ) {
-                    Goal retrievedGoal = (Goal) retrievedData;
-                    goal.setmCurrentStatus( retrievedGoal.getmCurrentStatus() );
-                    updateStatusUI( goal );
-                    mDBListeners.remove( this );
-                }
-            };
-            mDBListeners.add( statusUpdateListener );
-            mGroup.updateMyStatusFromPersonalGoals( goal, statusUpdateListener );
-        }
-
-        /** Update the progress in the group goal progress */
-    }
-
-    private void updateMyStatusFromPersonalGoals( final Goal goal ) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        String path = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
-
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        final DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    Object currentStatusObj = dataSnapshot.getValue();
-                    float currentStatus;
-                    if ( currentStatusObj instanceof Long ) {
-                        currentStatus = ( ( Long ) currentStatusObj ).floatValue();
-                    } else {
-                        currentStatus = ( ( Float ) currentStatusObj ).floatValue();
-                    }
-                    goal.setmCurrentStatus( currentStatus );
-                    Log.d( "jar", "" + currentStatus );
-
-                    updateStatusUI( goal );
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
-
-    private void updateStatusUI( Goal goal ) {
-        String currentUsername = User.getInstance().getUsername();
-        String progressId = currentUsername + goal.getmExerciseName();
-        int hashedProgressId = progressId.hashCode();
-        Log.d( "Update", progressId );
-
-        TextView textView = getView().findViewById( hashedProgressId );
-        if ( textView != null )
-            textView.setText( goal.getmExerciseName() + ": " + goal.getmCurrentStatus() );
-    }
-
-
 
     /**
      * Removes all members from the group (including the creator)
@@ -383,40 +313,41 @@ public class GroupFragment extends Fragment {
                     String username = memberDataSnapshot.getKey();
                     dbMembers.add( username );
 
-                    LinearLayout linearLayout = new LinearLayout( getActivity() );
-                    linearLayout.setOrientation( LinearLayout.VERTICAL );
+                    // For each member
+                    View memberCard = getLayoutInflater().inflate(R.layout.layout_group_member_card, null);
+                    LinearLayout memberCardRootLayout = memberCard.findViewById( R.id.layout_card_root );
 
-                    TextView usernameTextView = new TextView( getActivity() );
-                    usernameTextView.setText( username.toUpperCase() );
-                    if(username.compareTo( dbGroupCreator ) == 0) usernameTextView.setTextColor( Color.BLUE );
-                    linearLayout.addView( usernameTextView );
 
-                    String currentUsername = User.getInstance().getUsername();
-                    int hashedUsername = currentUsername.hashCode();
-                    linearLayout.setId( hashedUsername );
+                    View memberNameView = getLayoutInflater().inflate(R.layout.layout_group_member_name, memberCardRootLayout);
+                    TextView usernameTextView = memberNameView.findViewById( R.id.text_member_name );
+                    TextView userStatusTextView = memberNameView.findViewById( R.id.text_member_status );
+                    usernameTextView.setText( username );
+                    if(username.compareTo( dbGroupCreator ) == 0){
+                        userStatusTextView.setText( "Admin" );
+                        userStatusTextView.setVisibility( View.VISIBLE );
+                    }
+
+
 
                     for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
                         String exerciseName = progressDataSnapshot.getKey();
-                        Object currentStatusObj = progressDataSnapshot.getValue();
-                        float currentStatus;
-                        if ( currentStatusObj instanceof Long ) {
-                            currentStatus = ( ( Long ) currentStatusObj ).floatValue();
+                        Object progressObj = progressDataSnapshot.getValue();
+                        float progress;
+                        if ( progressObj instanceof Long ) {
+                            progress = ( ( Long ) progressObj ).floatValue();
                         } else {
-                            currentStatus = ( ( Float ) currentStatusObj ).floatValue();
+                            progress = ( ( Float ) progressObj ).floatValue();
                         }
-                        String progress = exerciseName + ": " + currentStatus;
-                        TextView progressTextView = new TextView( getActivity() );
-                        progressTextView.setText( progress );
 
-                        String progressId = username + exerciseName;
-
-                        int hashedProgressId = progressId.hashCode();
-                        progressTextView.setId( hashedProgressId );
-                        linearLayout.addView( progressTextView );
+                        View progressView = getLayoutInflater().inflate(R.layout.layout_group_member_progress, memberCardRootLayout);
+                        TextView exerciseNameText = progressView.findViewById( R.id.text_progress_exercise_name );
+                        TextView progressText = progressView.findViewById( R.id.text_progress );
+                        exerciseNameText.setText( exerciseName );
+                        progressText.setText( Float.toString( progress ) );
 
                     }
 
-                    mGroupMembersLayout.addView( linearLayout );
+                    mGroupMembersLayout.addView( memberCard );
                 }
 
                 // Create group object
