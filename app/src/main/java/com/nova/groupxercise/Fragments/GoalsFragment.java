@@ -130,9 +130,10 @@ public class GoalsFragment extends Fragment {
      */
     private void addGroupGoalsToUI( Group group ) {
         // Group title
-        TextView groupTitleText = new TextView( getActivity() );
-        groupTitleText.setText( group.getmGroupName().toUpperCase() );
-        mGroupGoalsLayout.addView( groupTitleText );
+        View groupTitleView = getLayoutInflater().inflate( R.layout.text_group_subtitle, null );
+        TextView groupTitleText = groupTitleView.findViewById( R.id.goal_group_name );
+        groupTitleText.setText( group.getmGroupName() );
+        mGroupGoalsLayout.addView( groupTitleView );
 
         if ( group.getGoals() != null ) {
             ListView groupListView = createGroupGoalsListView( group );
