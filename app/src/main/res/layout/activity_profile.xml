@@ -11,113 +11,127 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        </androidx.appcompat.widget.Toolbar>
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarTheme">
 
-        <TableLayout
-            android:id="@+id/table_heading"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/toolbar"
-            android:stretchColumns="1">
-
-            <TableRow android:layout_margin="5dp">
-
-                <TextView
-                    android:gravity="center"
-                    android:text="Username: " />
-
-                <TextView
-                    android:id="@+id/text_username"
-                    android:gravity="center" />
-
-            </TableRow>
-
-            <TableRow android:layout_margin="5dp">
-
-                <TextView
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="About you" />
-            </TableRow>
-
-        </TableLayout>
-
-        <TextView
-            android:id="@+id/text_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/table_heading"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="20dp"
-            android:text="Loading..." />
-
-        <TableLayout
-            android:id="@+id/table_user_details"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/text_info"
-            android:stretchColumns="1"
-            android:visibility="invisible">
-
-            <TableRow android:layout_margin="5dp">
-
-                <TextView
-                    android:gravity="center"
-                    android:text="DOB" />
-
-                <TextView
-                    android:id="@+id/text_dob"
-                    android:gravity="center" />
-
-            </TableRow>
-
-            <TableRow android:layout_margin="5dp">
-
-                <TextView
-                    android:gravity="center"
-                    android:text="Weight" />
+            </androidx.appcompat.widget.Toolbar>
 
 
-                <TextView
-                    android:id="@+id/text_weight"
-                    android:gravity="center" />
-
-                <TextView
-                    android:gravity="center"
-                    android:text="kg" />
-
-            </TableRow>
-
-            <TableRow android:layout_margin="5dp">
-
-                <TextView
-                    android:gravity="center"
-                    android:text="Sex" />
+            <TextView
+                android:id="@+id/text_username"
+                android:layout_margin="15dp"
+                style="@style/listItemTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
 
 
-                <TextView
-                    android:id="@+id/text_sex"
-                    android:gravity="center" />
-            </TableRow>
+            <TextView
+                android:id="@+id/text_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="20dp"
+                android:text="Loading..." />
 
-        </TableLayout>
+            <LinearLayout
+                android:id="@+id/layout_user_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-        <Button
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:gravity="center"
+
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="DOB" />
+
+                    <TextView
+                        android:id="@+id/text_dob"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:gravity="center"
+
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Weight" />
+
+
+                    <TextView
+                        android:id="@+id/text_weight"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp">
+
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:gravity="center"
+
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sex" />
+
+
+                    <TextView
+                        android:id="@+id/text_sex"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btn_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/table_user_details"
-            android:text="Edit" />
+            android:clickable="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="20dp"
+            app:srcCompat="@drawable/ic_edit_black_24dp" />
     </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView

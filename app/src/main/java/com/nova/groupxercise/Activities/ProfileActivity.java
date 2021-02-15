@@ -5,8 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TableLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.nova.groupxercise.Objects.User;
@@ -25,12 +25,12 @@ public class ProfileActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private DrawerLayout mDrawerContainer;
     private NavigationView mDrawer;
-    private Button mEditBtn;
+    private FloatingActionButton mEditBtn;
     private TextView mInfoText;
     private TextView mDobText;
     private TextView mWeightText;
     private TextView mSexText;
-    private TableLayout mUserDetailsTable;
+    private LinearLayout mUserDetailsTable;
     private TextView mUsernameText;
 
     @Override
@@ -55,7 +55,7 @@ public class ProfileActivity extends AppCompatActivity {
         mDobText = findViewById( R.id.text_dob );
         mWeightText = findViewById( R.id.text_weight );
         mSexText = findViewById( R.id.text_sex );
-        mUserDetailsTable = findViewById( R.id.table_user_details );
+        mUserDetailsTable = findViewById( R.id.layout_user_details );
         mUsernameText = findViewById( R.id.text_username );
 
         // Set event listeners
@@ -103,7 +103,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             mDobText.setText( String.format( "%d/%d/%d", dobDay, dobMonth + 1, dobYear ) );
 
-            mWeightText.setText( Float.toString( currentUser.getWeight() ) );
+            mWeightText.setText( Float.toString( currentUser.getWeight() ) + " kg" );
             mSexText.setText( currentUser.getSex().toString() );
 
             mUserDetailsTable.setVisibility( View.VISIBLE );
