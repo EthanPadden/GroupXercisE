@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -20,7 +21,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.Adapters.GoalItemsAdapter;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.ExerciseActivity;
 import com.nova.groupxercise.Objects.Goal;
@@ -39,7 +39,8 @@ public class LogActivityActivity extends AppCompatActivity {
     private Goal mSelectedGoal;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     private ArrayList< Goal > mGoalsList;
-    private GoalItemsAdapter mItemsAdapter;
+    private ArrayList< String > mGoalsNameList;
+    private ArrayAdapter mItemsAdapter;
     private TextView mLoadingText;
     private ListView mListView;
     private ArrayList< Group > mGroups;
@@ -69,10 +70,12 @@ public class LogActivityActivity extends AppCompatActivity {
 //        retrieveGoals();
         mGoalsList = new ArrayList<>();
 
-        mDBListeners = new ArrayList<>(  ) ;
+        mDBListeners = new ArrayList<>();
 
-        // Set the list as the list for the items adapter
-        mItemsAdapter = new GoalItemsAdapter( this, mGoalsList );
+
+        // Set the list as the list for the items adapter]
+        mGoalsNameList = new ArrayList<>();
+        mItemsAdapter = new ArrayAdapter< String >( this, android.R.layout.simple_list_item_1, mGoalsNameList );
         DBListener personalGoalsListener = new DBListener() {
             public void onRetrievalFinished() {
                 if ( mGoalsList.size() > 0 ) {
@@ -92,7 +95,8 @@ public class LogActivityActivity extends AppCompatActivity {
                 mGroups = new ArrayList<>();
 
                 DBListener groupNamesListener = new DBListener() {
-                    public void onRetrievalFinished() {                mDBListeners.remove( this );
+                    public void onRetrievalFinished() {
+                        mDBListeners.remove( this );
 
                         if ( mGroups.size() == 0 ) {
                             mLoadingText.setText( "You have no groups" );
@@ -215,6 +219,11 @@ public class LogActivityActivity extends AppCompatActivity {
 
     private void setupGoalsList() {
         mLoadingText.setVisibility( View.GONE );
+        for ( Goal goal:mGoalsList ) {
+            String goalName = goal.getmExerciseName();
+            if ( !mGoalsNameList.contains( goalName ) )
+                mGoalsNameList.add( goalName );
+        }
         mListView.setAdapter( mItemsAdapter );
 
         // Set event listeners
