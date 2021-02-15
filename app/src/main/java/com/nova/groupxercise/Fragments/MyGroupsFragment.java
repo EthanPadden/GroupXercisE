@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -17,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.nova.groupxercise.Activities.CreateGroupActivity;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 
 public class MyGroupsFragment extends Fragment {
-    private Button mCreateGroupBtn;
+    private FloatingActionButton mCreateGroupBtn;
     private ArrayList< Group > mGroups;
     private ArrayAdapter< String > mItemsAdapter;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
@@ -125,24 +125,28 @@ public class MyGroupsFragment extends Fragment {
      * Updates the UI with the group names and sets event listeners for the list items
      */
     private void setupGroupsList() {
-        mLoadingText.setVisibility( View.GONE );
-        mListView.setAdapter( mItemsAdapter );
+        if(mGroups.size() == 0) {
+            mLoadingText.setText( "You have no groups" );
+        }else {
+            mLoadingText.setVisibility( View.GONE );
+            mListView.setAdapter( mItemsAdapter );
 
-        // Set event listeners
-        mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
-                Group selectedGroup = ( Group ) mListView.getItemAtPosition( i );
+            // Set event listeners
+            mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
+                    Group selectedGroup = ( Group ) mListView.getItemAtPosition( i );
 
-                HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-                homeScreenActivity.getSupportActionBar().setTitle( selectedGroup.getmGroupName() );
+                    HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+                    homeScreenActivity.getSupportActionBar().setTitle( selectedGroup.getmGroupName() );
 
-                FragmentTransaction ft = homeScreenActivity.getSupportFragmentManager().beginTransaction();
-                GroupFragment groupFragment = new GroupFragment( selectedGroup.getmGroupId() );
-                ft.replace( R.id.frame_home_screen_fragment_placeholder, groupFragment );
-                ft.commit();
-            }
-        } );
+                    FragmentTransaction ft = homeScreenActivity.getSupportFragmentManager().beginTransaction();
+                    GroupFragment groupFragment = new GroupFragment( selectedGroup.getmGroupId() );
+                    ft.replace( R.id.frame_home_screen_fragment_placeholder, groupFragment );
+                    ft.commit();
+                }
+            } );
+        }
     }
 
 }

@@ -176,7 +176,7 @@ public class Group {
     }
 
     public void deleteGroup() {
-        for( String member : members ){
+        for ( String member : members ) {
             removeMember( member, null );
         }
         // Delete group subtree
@@ -186,7 +186,7 @@ public class Group {
         groupRef.removeValue();
     }
 
-    public void saveGoal( final Goal goal, final DBListener listener ){
+    public void saveGoal( final Goal goal, final DBListener listener ) {
         // Path to the group goal
         String path = "groups/" + mGroupId + "/goals/" + goal.getmExerciseName();
 
@@ -318,25 +318,30 @@ public class Group {
         // Necessary because of the async call within the for loop
         final int expectedSize = groupIds.size();
 
-        for ( final String groupId : groupIds ) {
-            String groupPath = "groups/" + groupId;
-            DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child( groupPath );
+        if ( expectedSize == 0 ) {
+            if ( listener != null && listener.isActive() )
+                listener.onRetrievalFinished();
+        } else {
+            for ( final String groupId : groupIds ) {
+                String groupPath = "groups/" + groupId;
+                DatabaseReference groupRef = FirebaseDatabase.getInstance().getReference().child( groupPath );
 
-            groupRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                @Override
-                public void onDataChange( DataSnapshot dataSnapshot ) {
-                    String groupName = dataSnapshot.child( "name" ).getValue().toString();
-                    groups.add( new Group( groupName, groupId ) );
-                    if ( groups.size() == expectedSize ) {
-                        if ( listener != null && listener.isActive() )
-                            listener.onRetrievalFinished();
+                groupRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                    @Override
+                    public void onDataChange( DataSnapshot dataSnapshot ) {
+                        String groupName = dataSnapshot.child( "name" ).getValue().toString();
+                        groups.add( new Group( groupName, groupId ) );
+                        if ( groups.size() == expectedSize ) {
+                            if ( listener != null && listener.isActive() )
+                                listener.onRetrievalFinished();
+                        }
                     }
-                }
 
-                @Override
-                public void onCancelled( DatabaseError databaseError ) {
-                }
-            } );
+                    @Override
+                    public void onCancelled( DatabaseError databaseError ) {
+                    }
+                } );
+            }
         }
     }
 
