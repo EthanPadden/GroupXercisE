@@ -12,87 +12,125 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme">
-
-        </androidx.appcompat.widget.Toolbar>
-
-        <TableLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/toolbar"
-            android:stretchColumns="1">
+            android:orientation="vertical">
 
-            <TableRow>
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarTheme">
 
-                <TextView
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="Enter details" />
-            </TableRow>
+            </androidx.appcompat.widget.Toolbar>
 
+            <TextView
+                style="@style/listItemTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:gravity="center"
 
-            <TableRow>
-
-                <TextView
-                    android:gravity="center"
-                    android:text="DOB" />
-
-                <TextView
-                    android:id="@+id/text_dob"
-                    android:gravity="center" />
-
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:gravity="center"
-                    android:text="Weight" />
+                android:text="Enter details" />
 
 
-                <EditText
-                    android:id="@+id/et_weight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:inputType="number" />
-
-                <TextView
-                    android:gravity="center"
-                    android:text="kg" />
-
-            </TableRow>
-
-            <TableRow>
-
-                <TextView
-                    android:gravity="center"
-                    android:text="Sex" />
+            <LinearLayout
+                android:id="@+id/layout_user_details"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
 
-                <Spinner
-                    android:id="@+id/spinner_sex"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </TableRow>
-
-            <TableRow>
-
-                <Button
-                    android:id="@+id/btn_update"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Update" />
-            </TableRow>
+                    android:layout_margin="20dp">
 
-        </TableLayout>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:gravity="center"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="DOB" />
+
+                    <TextView
+                        android:id="@+id/text_dob"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"  />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:gravity="center"
+
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Weight" />
+
+
+                    <EditText
+                        android:id="@+id/et_weight"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:hint="kg"
+                        android:inputType="number" />
+
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:gravity="center"
+
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sex" />
+
+
+                    <Spinner
+                        android:id="@+id/spinner_sex"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp">
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="20dp"
+            app:srcCompat="@drawable/ic_save_black_24dp" />
     </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView
