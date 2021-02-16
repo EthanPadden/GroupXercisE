@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 
 public class GoalsFragment extends Fragment {
-    private ArrayList< Goal > mGoalsList;
+    private ArrayList< Goal > mPersonalGoalsList;
     private GoalItemsAdapter mItemsAdapter;
     private ListView mListView;
     private TextView mLoadingText;
@@ -54,7 +54,7 @@ public class GoalsFragment extends Fragment {
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
 
         // Set the list as the list for the items adapter
-        mItemsAdapter = new GoalItemsAdapter( getActivity(), mGoalsList );
+        mItemsAdapter = new GoalItemsAdapter( getActivity(), mPersonalGoalsList );
 
         mGroups = new ArrayList<>(  );
         mLoadingText.setVisibility( View.INVISIBLE );
@@ -63,13 +63,13 @@ public class GoalsFragment extends Fragment {
 
 
 
-        mGoalsList = new ArrayList<>(  );
+        mPersonalGoalsList = new ArrayList<>(  );
 
         // Set the list as the list for the items adapter
-        mItemsAdapter = new GoalItemsAdapter( getActivity(), mGoalsList );
+        mItemsAdapter = new GoalItemsAdapter( getActivity(), mPersonalGoalsList );
         DBListener pesonalGoalsListener =   new DBListener() {
             public void onRetrievalFinished() {
-                if(mGoalsList.size() > 0){
+                if( mPersonalGoalsList.size() > 0){
                     mLoadingText.setVisibility( View.GONE );
                     mListView.setAdapter( mItemsAdapter );
                 }
@@ -77,7 +77,7 @@ public class GoalsFragment extends Fragment {
             }
         };
         mDBListeners.add( pesonalGoalsListener );
-        Goal.retrievePersonalGoals( mGoalsList, pesonalGoalsListener);
+        Goal.retrievePersonalGoals( mPersonalGoalsList, pesonalGoalsListener);
 
 
 
@@ -136,12 +136,21 @@ public class GoalsFragment extends Fragment {
         mGroupGoalsLayout.addView( groupTitleView );
 
         if ( group.getGoals() != null ) {
+            for(Goal groupGoal:group.getGoals()) {
+                for( Goal personalGoal : mPersonalGoalsList) {
+                    if(groupGoal.getmExerciseName().compareTo( personalGoal.getmExerciseName() ) == 0){
+                        groupGoal.setmCurrentStatus( personalGoal.getmCurrentStatus() );
+                    }
+                }
+            }
+
             ListView groupListView = createGroupGoalsListView( group );
 
             // Append to layout
             mGroupGoalsLayout.addView( groupListView );
 
         } else {
+
             // Display that the group has no goals
             TextView noGoalsText = new TextView( getActivity() );
             noGoalsText.setText( "No goals" );
