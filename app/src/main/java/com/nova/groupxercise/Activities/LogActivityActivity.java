@@ -230,8 +230,12 @@ public class LogActivityActivity extends AppCompatActivity {
         mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
-                Goal selectedGoal = ( Goal ) mListView.getItemAtPosition( i );
-                mSelectedGoal = selectedGoal;
+                String selectedGoalName = ( String ) mListView.getItemAtPosition( i );
+                for(Goal goal:mGoalsList) {
+                    if(goal.getmExerciseName().compareTo( selectedGoalName ) == 0){
+                        mSelectedGoal = goal;
+                    }
+                }
             }
         } );
     }

@@ -29,7 +29,7 @@ public class SimpleGroupItemsAdapter extends ArrayAdapter {
 
         Group currentGroup = ( Group ) getItem( position );
 
-        TextView groupNameText = ( TextView)listItemView.getRootView();
+        TextView groupNameText = ( TextView)listItemView.findViewById( android.R.id.text1);
         groupNameText.setText( currentGroup.getmGroupName() );
 
 
