@@ -1,6 +1,7 @@
 package com.nova.groupxercise.Activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -214,13 +215,13 @@ public class LogActivityActivity extends AppCompatActivity {
         childRef.child( activityTimeStampStr ).setValue( exerciseActivity.getmLevel() );
 
         Intent intent = new Intent( LogActivityActivity.this, HomeScreenActivity.class );
-        intent.putExtra("FRAGMENT_ID", R.id.navigation_activities);
+        intent.putExtra( "FRAGMENT_ID", R.id.navigation_activities );
         startActivity( intent );
     }
 
     private void setupGoalsList() {
         mLoadingText.setVisibility( View.GONE );
-        for ( Goal goal:mGoalsList ) {
+        for ( Goal goal : mGoalsList ) {
             String goalName = goal.getmExerciseName();
             if ( !mGoalsNameList.contains( goalName ) )
                 mGoalsNameList.add( goalName );
@@ -232,11 +233,18 @@ public class LogActivityActivity extends AppCompatActivity {
             @Override
             public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
                 String selectedGoalName = ( String ) mListView.getItemAtPosition( i );
-                for(Goal goal:mGoalsList) {
-                    if(goal.getmExerciseName().compareTo( selectedGoalName ) == 0){
+                for ( Goal goal : mGoalsList ) {
+                    if ( goal.getmExerciseName().compareTo( selectedGoalName ) == 0 ) {
                         mSelectedGoal = goal;
                     }
                 }
+
+                for ( int j = 0; j < mListView.getCount(); j++ ) {
+                    mListView.getChildAt( j ).setBackgroundColor( Color.WHITE );
+                }
+                view.setBackgroundColor( getResources().getColor( R.color.colorPrimary ) );
+
+
             }
         } );
     }

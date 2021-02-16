@@ -99,9 +99,6 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         mDrawer = findViewById( R.id.drawer );
         setupDrawerContent();
 
-        BottomNavigationView bottomNavigationView;
-        bottomNavigationView = (BottomNavigationView) findViewById(R.id.nav_view);
-
         // Set event listeners
         navView.setOnNavigationItemSelectedListener( mOnNavigationItemSelectedListener );
 
