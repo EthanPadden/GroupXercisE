@@ -345,6 +345,33 @@ public class Group {
         }
     }
 
+    public void retrieveMemberProgress( final DBListener listener, final Goal goal ) {
+        String username = User.getInstance().getUsername();
+        String path = "groups/" + mGroupId + "/members/" + username + "/progress/" + goal.getmExerciseName();
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    Object progressObj = dataSnapshot.getValue();
+                    float progress;
+                    if ( progressObj instanceof Long ) {
+                        progress = ( ( Long ) progressObj ).floatValue();
+                    } else {
+                        progress = ( ( Float ) progressObj ).floatValue();
+                    }
+                    goal.setmCurrentStatus( progress );
+                }
+
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
 
     public void updateMyStatusFromPersonalGoals( final Goal goal, final DBListener listener ) {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();

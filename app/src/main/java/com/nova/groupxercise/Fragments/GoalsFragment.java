@@ -128,27 +128,34 @@ public class GoalsFragment extends Fragment {
     /**
      * Builds a list for every group to display the group goals
      */
-    private void addGroupGoalsToUI( Group group ) {
+    private void addGroupGoalsToUI( final Group group ) {
         // Group title
         View groupTitleView = getLayoutInflater().inflate( R.layout.text_group_subtitle, null );
         TextView groupTitleText = groupTitleView.findViewById( R.id.goal_group_name );
         groupTitleText.setText( group.getmGroupName() );
-        mGroupGoalsLayout.addView( groupTitleView );
+        final LinearLayout groupLayout = new LinearLayout( getActivity() );
+        groupLayout.setOrientation( LinearLayout.VERTICAL );
+        groupLayout.setId( group.getmGroupId().hashCode() );
+        groupLayout.addView( groupTitleView );
+        mGroupGoalsLayout.addView( groupLayout );
+
+
 
         if ( group.getGoals() != null ) {
+
+            final ListView groupListView = createGroupGoalsListView( group );
+            groupLayout.addView( groupListView );
+
             for(Goal groupGoal:group.getGoals()) {
-                for( Goal personalGoal : mPersonalGoalsList) {
-                    if(groupGoal.getmExerciseName().compareTo( personalGoal.getmExerciseName() ) == 0){
-                        groupGoal.setmCurrentStatus( personalGoal.getmCurrentStatus() );
+                final DBListener memberProgressListener = new DBListener() {
+                    public void onRetrievalFinished() {
+                        ((GoalItemsAdapter)groupListView.getAdapter()).notifyDataSetChanged();
+                        mDBListeners.remove( this );
                     }
-                }
+                };
+                mDBListeners.add( memberProgressListener );
+                group.retrieveMemberProgress( memberProgressListener, groupGoal );
             }
-
-            ListView groupListView = createGroupGoalsListView( group );
-
-            // Append to layout
-            mGroupGoalsLayout.addView( groupListView );
-
         } else {
 
             // Display that the group has no goals
