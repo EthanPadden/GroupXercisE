@@ -214,6 +214,7 @@ public class LogActivityActivity extends AppCompatActivity {
         childRef.child( activityTimeStampStr ).setValue( exerciseActivity.getmLevel() );
 
         Intent intent = new Intent( LogActivityActivity.this, HomeScreenActivity.class );
+        intent.putExtra("FRAGMENT_ID", R.id.navigation_activities);
         startActivity( intent );
     }
 

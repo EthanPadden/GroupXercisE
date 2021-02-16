@@ -99,19 +99,25 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         mDrawer = findViewById( R.id.drawer );
         setupDrawerContent();
 
+        BottomNavigationView bottomNavigationView;
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.nav_view);
+
         // Set event listeners
         navView.setOnNavigationItemSelectedListener( mOnNavigationItemSelectedListener );
-
-        // Create Discoveries Fragment
-        DiscoveriesFragment discoveriesFragment = new DiscoveriesFragment();
 
         // Set the default toolbar title
         getSupportActionBar().setTitle( R.string.title_discoveries );
 
         // Set the fragment to be displayed in the frame view
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace( R.id.frame_home_screen_fragment_placeholder, discoveriesFragment );
-        ft.commit();
+
+        if ( getIntent().getExtras() != null ) {
+            int fragmentNumber = getIntent().getExtras().getInt( "FRAGMENT_ID" );
+            navView.setSelectedItemId(fragmentNumber);
+        } else {
+            navView.setSelectedItemId(R.id.navigation_discoveries);
+        }
+
 
         // If the user details are not set locally, retrieve them from the database
         User currentUser = User.getInstance();
@@ -120,7 +126,7 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         }
 
         // If the username is not set locally, retrieve it from the database
-        if(currentUser.getUsername() == null) {
+        if ( currentUser.getUsername() == null ) {
             currentUser.retrieveUsername();
         }
     }
@@ -143,7 +149,6 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         }
         return super.onOptionsItemSelected( item );
     }
-
 
 
     public FirebaseAuth getmAuth() {
