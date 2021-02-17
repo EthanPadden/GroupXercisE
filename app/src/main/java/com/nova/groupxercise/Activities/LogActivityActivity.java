@@ -200,7 +200,6 @@ public class LogActivityActivity extends AppCompatActivity {
     }
 
     private void logActivity( ExerciseActivity exerciseActivity ) {
-        Toast.makeText( LogActivityActivity.this, exerciseActivity.toString(), Toast.LENGTH_SHORT ).show();
 
         // Path to the subtree
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -213,6 +212,8 @@ public class LogActivityActivity extends AppCompatActivity {
         String activityTimeStampStr = Long.toString( activityTimeStamp );
 
         childRef.child( activityTimeStampStr ).setValue( exerciseActivity.getmLevel() );
+
+        Toast.makeText( LogActivityActivity.this, "Activity logged", Toast.LENGTH_SHORT ).show();
 
         Intent intent = new Intent( LogActivityActivity.this, HomeScreenActivity.class );
         intent.putExtra( "FRAGMENT_ID", R.id.navigation_activities );

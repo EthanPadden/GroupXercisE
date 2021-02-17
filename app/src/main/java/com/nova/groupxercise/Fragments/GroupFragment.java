@@ -83,6 +83,7 @@ public class GroupFragment extends Fragment {
                                 };
                                 mDBListeners.add( additionListener );
                                 mGroup.addMember( username, userId, additionListener );
+                                Toast.makeText( getActivity(), "Member added: " + username, Toast.LENGTH_SHORT ).show();
                             }
 
                             mDBListeners.remove( this );
@@ -113,6 +114,7 @@ public class GroupFragment extends Fragment {
 
         DBListener groupInfoListener = new DBListener() {
             public void onRetrievalFinished() {
+                // If the current user is the admin, show the controls
                 User currentUser = User.getInstance();
                 String currentUsername = currentUser.getUsername();
                 if ( mGroup.getmGroupCreator().compareTo( currentUsername ) == 0 ) {
@@ -121,6 +123,7 @@ public class GroupFragment extends Fragment {
                     mDeleteGroupBtn.setVisibility( View.VISIBLE );
                     adminGroup = true;
                 }
+
                 DBListener groupProgressListener = new DBListener() {
                     public void onRetrievalFinished( Object retrievedData ) {
                         DataSnapshot membersDataSnapshot = ( DataSnapshot ) retrievedData;
@@ -128,60 +131,9 @@ public class GroupFragment extends Fragment {
                         for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
                             final String username = memberDataSnapshot.getKey();
                             dbMembers.add( username );
-
-                            View memberCard = getLayoutInflater().inflate( R.layout.layout_group_member_card, null );
-                            LinearLayout memberCardRootLayout = memberCard.findViewById( R.id.layout_card_root );
-
-
-                            View memberNameView = getLayoutInflater().inflate( R.layout.layout_group_member_name, memberCardRootLayout );
-                            TextView usernameTextView = memberNameView.findViewById( R.id.text_member_name );
-                            TextView userStatusTextView = memberNameView.findViewById( R.id.text_member_status );
-                            usernameTextView.setText( username );
-                            if ( username.compareTo( mGroup.getmGroupCreator() ) == 0 ) {
-                                userStatusTextView.setText( "Admin" );
-                                userStatusTextView.setVisibility( View.VISIBLE );
-                            }
-
-                            else if(adminGroup) {
-                                final Button removeMemberBtn =  memberCard.findViewById( R.id.btn_remove_member );
-                                removeMemberBtn.setVisibility(View.VISIBLE );
-                                removeMemberBtn.setOnClickListener( new View.OnClickListener() {
-                                    @Override
-                                    public void onClick( View view ) {
-                                        DBListener removalListener = new DBListener() {
-                                            public void onRetrievalFinished() {
-                                                mDBListeners.remove( this );
-                                            }
-                                        };
-                                        mDBListeners.add( removalListener );
-                                        mGroup.removeMember( username, removalListener );
-                                    }
-                                } );
-                            }
-
-
-                            for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
-                                String exerciseName = progressDataSnapshot.getKey();
-                                Object progressObj = progressDataSnapshot.getValue();
-                                float progress;
-                                if ( progressObj instanceof Long ) {
-                                    progress = ( ( Long ) progressObj ).floatValue();
-                                } else {
-                                    progress = ( ( Float ) progressObj ).floatValue();
-                                }
-
-                                View progressView = getLayoutInflater().inflate( R.layout.layout_group_member_progress, null );
-                                TextView exerciseNameText = progressView.findViewById( R.id.text_progress_exercise_name );
-                                TextView progressText = progressView.findViewById( R.id.text_progress );
-                                exerciseNameText.setText( exerciseName );
-                                progressText.setText( Float.toString( progress ) );
-                                memberCardRootLayout.addView( progressView );
-                            }
-
+                            View memberCard = createMemberUIComponent( memberDataSnapshot, adminGroup );
                             mGroupMembersLayout.addView( memberCard );
                         }
-
-                        // Create group object
 
                         mGroup.setmGroupCreator( mGroup.getmGroupCreator() );
                         mGroup.setMembers( dbMembers );
@@ -206,17 +158,7 @@ public class GroupFragment extends Fragment {
                     mGroupGoalsLoadingText.setVisibility( View.GONE );
 
                     for ( Goal goal : mGroup.getGoals() ) {
-                        View goalView = getLayoutInflater().inflate( R.layout.layout_goal_list_item, null );
-                        TextView exerciseNameText = goalView.findViewById( R.id.goal_exercise_name );
-                        TextView currentStatusText = goalView.findViewById( R.id.goal_current_status );
-                        TextView dividerText = goalView.findViewById( R.id.goal_divider );
-                        TextView targetText = goalView.findViewById( R.id.goal_target );
-                        exerciseNameText.setText( goal.getmExerciseName() );
-                        currentStatusText.setVisibility( View.GONE );
-                        dividerText.setVisibility( View.GONE );
-                        targetText.setText( Float.toString(  goal.getmTarget()) );
-
-
+                        View goalView = createGroupGoalUIComponent( goal );
                         mGroupGoalsLayout.addView( goalView );
                     }
                 }
@@ -226,6 +168,72 @@ public class GroupFragment extends Fragment {
         };
         mDBListeners.add( groupGoalListener );
         mGroup.retrieveGroupGoals( groupGoalListener );
+    }
+
+    private View createGroupGoalUIComponent(Goal goal){
+        View goalView = getLayoutInflater().inflate( R.layout.layout_goal_list_item, null );
+        TextView exerciseNameText = goalView.findViewById( R.id.goal_exercise_name );
+        TextView currentStatusText = goalView.findViewById( R.id.goal_current_status );
+        TextView dividerText = goalView.findViewById( R.id.goal_divider );
+        TextView targetText = goalView.findViewById( R.id.goal_target );
+        exerciseNameText.setText( goal.getmExerciseName() );
+        currentStatusText.setVisibility( View.GONE );
+        dividerText.setVisibility( View.GONE );
+        targetText.setText( Float.toString(  goal.getmTarget()) );
+        return goalView;
+    }
+
+    private View createMemberUIComponent(DataSnapshot memberDataSnapshot, boolean adminGroup) {
+        final String username = memberDataSnapshot.getKey();
+        View memberCard = getLayoutInflater().inflate( R.layout.layout_group_member_card, null );
+        LinearLayout memberCardRootLayout = memberCard.findViewById( R.id.layout_card_root );
+
+
+        View memberNameView = getLayoutInflater().inflate( R.layout.layout_group_member_name, memberCardRootLayout );
+        TextView usernameTextView = memberNameView.findViewById( R.id.text_member_name );
+        TextView userStatusTextView = memberNameView.findViewById( R.id.text_member_status );
+        usernameTextView.setText( username );
+        if ( username.compareTo( mGroup.getmGroupCreator() ) == 0 ) {
+            userStatusTextView.setText( "Admin" );
+            userStatusTextView.setVisibility( View.VISIBLE );
+        }
+
+        else if(adminGroup) {
+            final Button removeMemberBtn =  memberCard.findViewById( R.id.btn_remove_member );
+            removeMemberBtn.setVisibility(View.VISIBLE );
+            removeMemberBtn.setOnClickListener( new View.OnClickListener() {
+                @Override
+                public void onClick( View view ) {
+                    DBListener removalListener = new DBListener() {
+                        public void onRetrievalFinished() {
+                            mDBListeners.remove( this );
+                        }
+                    };
+                    mDBListeners.add( removalListener );
+                    mGroup.removeMember( username, removalListener );
+                }
+            } );
+        }
+
+        for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
+            String exerciseName = progressDataSnapshot.getKey();
+            Object progressObj = progressDataSnapshot.getValue();
+            float progress;
+            if ( progressObj instanceof Long ) {
+                progress = ( ( Long ) progressObj ).floatValue();
+            } else {
+                progress = ( ( Float ) progressObj ).floatValue();
+            }
+
+            View progressView = getLayoutInflater().inflate( R.layout.layout_group_member_progress, null );
+            TextView exerciseNameText = progressView.findViewById( R.id.text_progress_exercise_name );
+            TextView progressText = progressView.findViewById( R.id.text_progress );
+            exerciseNameText.setText( exerciseName );
+            progressText.setText( Float.toString( progress ) );
+            memberCardRootLayout.addView( progressView );
+        }
+
+        return memberCard;
     }
 
     @Override
