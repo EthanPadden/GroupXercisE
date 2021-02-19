@@ -31,22 +31,18 @@
 
         </TableLayout>
 
-        <LinearLayout
-            android:id="@+id/layout_members"
+
+        <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_below="@+id/table_group_details"
-            android:orientation="vertical">
-
-
-        </LinearLayout>
-
+            android:id="@+id/recycler_members"/>
 
         <EditText
             android:id="@+id/et_member_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/layout_members"
+            android:layout_below="@+id/recycler_members"
             android:layout_margin="10dp"
             android:hint="Add member..."
             android:visibility="gone" />

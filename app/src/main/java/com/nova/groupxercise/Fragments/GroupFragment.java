@@ -15,11 +15,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DataSnapshot;
+import com.nova.groupxercise.Adapters.GroupMemberRecyclerAdapter;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
+import com.nova.groupxercise.Objects.MemberProgress;
 import com.nova.groupxercise.Objects.User;
 import com.nova.groupxercise.R;
 
@@ -32,10 +36,13 @@ public class GroupFragment extends Fragment {
     private Button mDeleteGroupBtn;
     private EditText mMemberNameEt;
     private TextView mGroupGoalsLoadingText;
-    private LinearLayout mGroupMembersLayout;
+//    private LinearLayout mGroupMembersLayout;
     private LinearLayout mGroupGoalsLayout;
     private ArrayList< DBListener > mDBListeners;
     private boolean adminGroup;
+    private RecyclerView mGroupMembersRecycler;
+    private ArrayList< MemberProgress > mMemberProgresses;
+    private GroupMemberRecyclerAdapter mGroupMemberRecyclerAdapter;
 
 
     public GroupFragment( String mGroupId ) {
@@ -59,8 +66,9 @@ public class GroupFragment extends Fragment {
         mMemberNameEt = view.findViewById( R.id.et_member_name );
         mDeleteGroupBtn = view.findViewById( R.id.btn_delete_group );
         mGroupGoalsLoadingText = view.findViewById( R.id.text_group_goals_loading );
-        mGroupMembersLayout = view.findViewById( R.id.layout_members );
+//        mGroupMembersLayout = view.findViewById( R.id.layout_members );
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
+        mGroupMembersRecycler = view.findViewById( R.id.recycler_members );
 
         mDBListeners = new ArrayList<>();
 
@@ -110,6 +118,7 @@ public class GroupFragment extends Fragment {
         } );
 
         mGroup = new Group( mGroupId );
+        mMemberProgresses = new ArrayList<>(  );
 //        retrieveGroupInfo();
 
         DBListener groupInfoListener = new DBListener() {
@@ -131,9 +140,31 @@ public class GroupFragment extends Fragment {
                         for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
                             final String username = memberDataSnapshot.getKey();
                             dbMembers.add( username );
-                            View memberCard = createMemberUIComponent( memberDataSnapshot, adminGroup );
-                            mGroupMembersLayout.addView( memberCard );
+                            MemberProgress memberProgress = new MemberProgress( username );
+                            for(DataSnapshot goalDataSnaphot: memberDataSnapshot.child( "progress" ).getChildren()){
+                                String exerciseName = goalDataSnaphot.getKey();
+                                Object personalProgressObj = goalDataSnaphot.getValue();
+
+                                float personalProgress;
+                                if ( personalProgressObj instanceof Long ) {
+                                    personalProgress = ( ( Long ) personalProgressObj ).floatValue();
+                                } else {
+                                    personalProgress = ( ( Float ) personalProgressObj ).floatValue();
+                                }
+
+                                Goal goal = new Goal( exerciseName, personalProgress, 0.0f );
+                                memberProgress.getMemberProgresses().add( goal );
+                            }
+
+                            mMemberProgresses.add( memberProgress );
+
+//                            View memberCard = createMemberUIComponent( memberDataSnapshot, adminGroup );
+//                            mGroupMembersLayout.addView( memberCard );
                         }
+
+                        mGroupMembersRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+                        mGroupMemberRecyclerAdapter = new GroupMemberRecyclerAdapter(getContext(), mMemberProgresses);
+                        mGroupMembersRecycler.setAdapter(mGroupMemberRecyclerAdapter);
 
                         mGroup.setmGroupCreator( mGroup.getmGroupCreator() );
                         mGroup.setMembers( dbMembers );
@@ -183,58 +214,58 @@ public class GroupFragment extends Fragment {
         return goalView;
     }
 
-    private View createMemberUIComponent(DataSnapshot memberDataSnapshot, boolean adminGroup) {
-        final String username = memberDataSnapshot.getKey();
-        View memberCard = getLayoutInflater().inflate( R.layout.layout_group_member_card, null );
-        LinearLayout memberCardRootLayout = memberCard.findViewById( R.id.layout_card_root );
-
-
-        View memberNameView = getLayoutInflater().inflate( R.layout.layout_group_member_name, memberCardRootLayout );
-        TextView usernameTextView = memberNameView.findViewById( R.id.text_member_name );
-        TextView userStatusTextView = memberNameView.findViewById( R.id.text_member_status );
-        usernameTextView.setText( username );
-        if ( username.compareTo( mGroup.getmGroupCreator() ) == 0 ) {
-            userStatusTextView.setText( "Admin" );
-            userStatusTextView.setVisibility( View.VISIBLE );
-        }
-
-        else if(adminGroup) {
-            final Button removeMemberBtn =  memberCard.findViewById( R.id.btn_remove_member );
-            removeMemberBtn.setVisibility(View.VISIBLE );
-            removeMemberBtn.setOnClickListener( new View.OnClickListener() {
-                @Override
-                public void onClick( View view ) {
-                    DBListener removalListener = new DBListener() {
-                        public void onRetrievalFinished() {
-                            mDBListeners.remove( this );
-                        }
-                    };
-                    mDBListeners.add( removalListener );
-                    mGroup.removeMember( username, removalListener );
-                }
-            } );
-        }
-
-        for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
-            String exerciseName = progressDataSnapshot.getKey();
-            Object progressObj = progressDataSnapshot.getValue();
-            float progress;
-            if ( progressObj instanceof Long ) {
-                progress = ( ( Long ) progressObj ).floatValue();
-            } else {
-                progress = ( ( Float ) progressObj ).floatValue();
-            }
-
-            View progressView = getLayoutInflater().inflate( R.layout.layout_group_member_progress, null );
-            TextView exerciseNameText = progressView.findViewById( R.id.text_progress_exercise_name );
-            TextView progressText = progressView.findViewById( R.id.text_progress );
-            exerciseNameText.setText( exerciseName );
-            progressText.setText( Float.toString( progress ) );
-            memberCardRootLayout.addView( progressView );
-        }
-
-        return memberCard;
-    }
+//    private View createMemberUIComponent(DataSnapshot memberDataSnapshot, boolean adminGroup) {
+//        final String username = memberDataSnapshot.getKey();
+//        View memberCard = getLayoutInflater().inflate( R.layout.layout_group_member_card, null );
+//        LinearLayout memberCardRootLayout = memberCard.findViewById( R.id.layout_card_root );
+//
+//
+//        View memberNameView = getLayoutInflater().inflate( R.layout.layout_group_member_name, memberCardRootLayout );
+//        TextView usernameTextView = memberNameView.findViewById( R.id.text_member_name );
+//        TextView userStatusTextView = memberNameView.findViewById( R.id.text_member_status );
+//        usernameTextView.setText( username );
+//        if ( username.compareTo( mGroup.getmGroupCreator() ) == 0 ) {
+//            userStatusTextView.setText( "Admin" );
+//            userStatusTextView.setVisibility( View.VISIBLE );
+//        }
+//
+//        else if(adminGroup) {
+//            final Button removeMemberBtn =  memberCard.findViewById( R.id.btn_remove_member );
+//            removeMemberBtn.setVisibility(View.VISIBLE );
+//            removeMemberBtn.setOnClickListener( new View.OnClickListener() {
+//                @Override
+//                public void onClick( View view ) {
+//                    DBListener removalListener = new DBListener() {
+//                        public void onRetrievalFinished() {
+//                            mDBListeners.remove( this );
+//                        }
+//                    };
+//                    mDBListeners.add( removalListener );
+//                    mGroup.removeMember( username, removalListener );
+//                }
+//            } );
+//        }
+//
+//        for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
+//            String exerciseName = progressDataSnapshot.getKey();
+//            Object progressObj = progressDataSnapshot.getValue();
+//            float progress;
+//            if ( progressObj instanceof Long ) {
+//                progress = ( ( Long ) progressObj ).floatValue();
+//            } else {
+//                progress = ( ( Float ) progressObj ).floatValue();
+//            }
+//
+//            View progressView = getLayoutInflater().inflate( R.layout.layout_group_member_progress, null );
+//            TextView exerciseNameText = progressView.findViewById( R.id.text_progress_exercise_name );
+//            TextView progressText = progressView.findViewById( R.id.text_progress );
+//            exerciseNameText.setText( exerciseName );
+//            progressText.setText( Float.toString( progress ) );
+//            memberCardRootLayout.addView( progressView );
+//        }
+//
+//        return memberCard;
+//    }
 
     @Override
     public void onDestroy() {
