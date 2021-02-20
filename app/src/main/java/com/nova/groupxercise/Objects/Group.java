@@ -106,12 +106,6 @@ public class Group {
                 String dbGroupCreator = dataSnapshot.child( "creator" ).getValue().toString();
                 setmGroupCreator( dbGroupCreator );
 
-                DataSnapshot membersDataSnapshot = dataSnapshot.child( "members" );
-                for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
-                    String username = memberDataSnapshot.getKey();
-                    members.add( username );
-                }
-
                 if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
             }
 
@@ -165,14 +159,16 @@ public class Group {
         /** Updating group in memory and UI */
         members.add( username );
 
-        /** Create subtree for the progress of that user towards the goals */
-        for ( Goal goal : goals ) {
+//        /MATCHING
+        for(Goal goal:goals) {
             User user = new User();
             user.setUsername( username );
             goal.matchUserProgressToGroup( userId, user, this );
+            goal.matchGroupProgressToUser( userId, user, this );
         }
 
-        if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
+
+        if ( listener != null && listener.isActive() ) listener.onRetrievalFinished(goals);
     }
 
     public void deleteGroup() {

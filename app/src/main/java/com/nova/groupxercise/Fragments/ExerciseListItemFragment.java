@@ -368,7 +368,7 @@ public class ExerciseListItemFragment extends Fragment {
                             String userId = dataSnapshot.getValue().toString();
                             User user = new User();
                             user.setUsername( username );
-                            goal.matchUserProgressToGroup( userId, user, new Group( groupId ) );
+//                            goal.matchUserProgressToGroup( userId, user, new Group( groupId ) );
                         }
 
                         @Override
@@ -431,7 +431,7 @@ public class ExerciseListItemFragment extends Fragment {
 
                     // Check does the user have progress towards this exercise in a group
                     for ( String groupId : mGroupIds ) {
-                        goal.matchGroupProgressToUser( userId, User.getInstance(), new Group( groupId ) );
+//                        goal.matchGroupProgressToUser( userId, User.getInstance(), new Group( groupId ) );
                     }
                 }
 

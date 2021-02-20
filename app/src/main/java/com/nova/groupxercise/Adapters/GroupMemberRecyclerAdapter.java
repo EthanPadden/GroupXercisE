@@ -38,6 +38,9 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
     public void onBindViewHolder(ViewHolder holder, int position) {
         MemberProgress memberProgress = mData.get(position);
         holder.memberNameText.setText(memberProgress.getUsername());
+        if(memberProgress.getUsername().compareTo( "vicky" ) == 0) {
+            holder.memberNameText.setText(memberProgress.getUsername());
+        }
         holder.displayProgresses( memberProgress.getMemberProgresses() );
     }
 
