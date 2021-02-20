@@ -45,7 +45,6 @@ public class GroupFragment extends Fragment {
     private ArrayList< DBListener > mDBListeners;
     private boolean adminGroup;
     private RecyclerView mGroupMembersRecycler;
-    private ArrayList< MemberProgress > mMemberProgresses;
     private GroupMemberRecyclerAdapter mGroupMemberRecyclerAdapter;
     private DatabaseReference mGroupMembersRef;
     private ValueEventListener mGroupMembersListener;
@@ -82,7 +81,6 @@ public class GroupFragment extends Fragment {
         mDBListeners = new ArrayList<>();
 
         // Create group object in memory
-        mGroup = new Group( mGroupId );
 
 
         // Set event listeners
@@ -177,8 +175,10 @@ public class GroupFragment extends Fragment {
 
     private void setupGroupMemberListeners() {
         final String path = "groups/" + mGroupId + "/members";
+        mGroupMembersRecycler.setLayoutManager( new LinearLayoutManager( getContext() ) );
+        mGroupMemberRecyclerAdapter = new GroupMemberRecyclerAdapter( getContext(), mGroup );
+        mGroupMembersRecycler.setAdapter( mGroupMemberRecyclerAdapter );
 
-        mMemberProgresses = new ArrayList<>();
         // Get the DB reference
         mGroupMembersRef = FirebaseDatabase.getInstance().getReference().child( path );
 
@@ -190,11 +190,11 @@ public class GroupFragment extends Fragment {
                 for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
                     final String username = memberDataSnapshot.getKey();
                     MemberProgress memberProgress = new MemberProgress( username );
-                    mMemberProgresses.add( memberProgress );
+                    mGroup.getmMemberProgresses().add( memberProgress );
                 }
-                mGroupMembersRecycler.setLayoutManager( new LinearLayoutManager( getContext() ) );
-                mGroupMemberRecyclerAdapter = new GroupMemberRecyclerAdapter( getContext(), mMemberProgresses );
-                mGroupMembersRecycler.setAdapter( mGroupMemberRecyclerAdapter );
+
+                mGroupMemberRecyclerAdapter.notifyDataSetChanged();
+
                 setupGroupProgressListeners();
             }
 
@@ -208,23 +208,18 @@ public class GroupFragment extends Fragment {
     }
 
     private void setupGroupProgressListeners() {
-        // MOVE TO GROUP - BY MOVING MEMBERPROGRESSES
-        for ( final MemberProgress memberProgress : mMemberProgresses ) {
+
+
             DBListener listener = new DBListener() {
                 public void onRetrievalFinished() {
 
-
-                    // Update UI
-                    mGroupMembersRecycler.setLayoutManager( new LinearLayoutManager( getContext() ) );
-                    mGroupMemberRecyclerAdapter = new GroupMemberRecyclerAdapter( getContext(), mMemberProgresses );
-                    mGroupMembersRecycler.setAdapter( mGroupMemberRecyclerAdapter );
+                    mGroupMemberRecyclerAdapter.notifyDataSetChanged();
 
                     mDBListeners.remove( this );
                 }
             };
             mDBListeners.add( listener );
-            mGroup.retrieveMemberProgress(memberProgress, listener);
-        }
+            mGroup.retrieveMemberProgresses(listener);
 
 
 
@@ -259,6 +254,7 @@ public class GroupFragment extends Fragment {
     public void onAttach( @NonNull Context context ) {
         super.onAttach( context );
         mDBListeners = new ArrayList<>();
+        mGroup = new Group( mGroupId );
     }
 
 

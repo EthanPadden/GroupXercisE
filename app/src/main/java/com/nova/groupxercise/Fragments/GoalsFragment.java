@@ -154,7 +154,7 @@ public class GoalsFragment extends Fragment {
                     }
                 };
                 mDBListeners.add( memberProgressListener );
-                group.retrieveMemberProgress( memberProgressListener, groupGoal );
+                group.retrieveThisMembersProgress( memberProgressListener, groupGoal );
             }
         } else {
 

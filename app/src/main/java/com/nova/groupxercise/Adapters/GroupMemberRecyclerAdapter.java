@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nova.groupxercise.Objects.Goal;
+import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Objects.MemberProgress;
 import com.nova.groupxercise.R;
 
@@ -20,11 +21,13 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
     private ArrayList<MemberProgress> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private Group mGroup;
     //https://stackoverflow.com/questions/40584424/simple-android-recyclerview-example
 
-    public GroupMemberRecyclerAdapter( Context context, ArrayList< MemberProgress > data) {
+    public GroupMemberRecyclerAdapter( Context context, Group group) {
         this.mInflater = LayoutInflater.from(context);
-        this.mData = data;
+        this.mGroup = group;
+        this.mData = group.getmMemberProgresses();
     }
 
     @Override

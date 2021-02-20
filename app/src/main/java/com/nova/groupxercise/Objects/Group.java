@@ -18,6 +18,7 @@ public class Group {
     private String mGroupCreator;
     private ArrayList< String > members;
     private ArrayList< Goal > goals;
+    private ArrayList<MemberProgress> mMemberProgresses;
 
     public Group( String mGroupName, String mGroupId ) {
         this( mGroupId );
@@ -28,39 +29,50 @@ public class Group {
         this.mGroupId = mGroupId;
         members = new ArrayList<>();
         goals = new ArrayList<>();
+        mMemberProgresses = new ArrayList<>(  );
     }
 
-    public void retrieveMemberProgress( final MemberProgress memberProgress, final DBListener listener) {
-        String path = "groups/"+mGroupId+ "/members/" + memberProgress.getUsername() + "/progress";
+    public ArrayList< MemberProgress > getmMemberProgresses() {
+        return mMemberProgresses;
+    }
 
+    public void setmMemberProgresses( ArrayList< MemberProgress > mMemberProgresses ) {
+        this.mMemberProgresses = mMemberProgresses;
+    }
 
-        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot progressSnapshot : dataSnapshot.getChildren() ) {
-                    String exerciseName = progressSnapshot.getKey();
-                    Object personalProgressObj = progressSnapshot.getValue();
+    public void retrieveMemberProgresses( final DBListener listener) {
+        for(final MemberProgress memberProgress : mMemberProgresses) {
+            String path = "groups/"+mGroupId+ "/members/" + memberProgress.getUsername() + "/progress";
 
-                    float personalProgress;
-                    if ( personalProgressObj instanceof Long ) {
-                        personalProgress = ( ( Long ) personalProgressObj ).floatValue();
-                    } else {
-                        personalProgress = ( ( Float ) personalProgressObj ).floatValue();
+            DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+            childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange( DataSnapshot dataSnapshot ) {
+                    for ( DataSnapshot progressSnapshot : dataSnapshot.getChildren() ) {
+                        String exerciseName = progressSnapshot.getKey();
+                        Object personalProgressObj = progressSnapshot.getValue();
+
+                        float personalProgress;
+                        if ( personalProgressObj instanceof Long ) {
+                            personalProgress = ( ( Long ) personalProgressObj ).floatValue();
+                        } else {
+                            personalProgress = ( ( Float ) personalProgressObj ).floatValue();
+                        }
+
+                        Goal goal = new Goal( exerciseName, personalProgress, 0.0f );
+                        memberProgress.getMemberProgresses().add( goal );
+
                     }
 
-                    Goal goal = new Goal( exerciseName, personalProgress, 0.0f );
-                    memberProgress.getMemberProgresses().add( goal );
-
+                    if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
                 }
 
-                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
-            }
+                @Override
+                public void onCancelled( DatabaseError databaseError ) {
+                }
+            } );
+        }
 
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
     }
 
     public static void retrieveGroupIds( @NotNull final ArrayList< String > groupIds, final DBListener listener ) {
@@ -374,7 +386,7 @@ public class Group {
         }
     }
 
-    public void retrieveMemberProgress( final DBListener listener, final Goal goal ) {
+    public void retrieveThisMembersProgress( final DBListener listener, final Goal goal ) {
         String username = User.getInstance().getUsername();
         String path = "groups/" + mGroupId + "/members/" + username + "/progress/" + goal.getmExerciseName();
         DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
