@@ -30,6 +30,39 @@ public class Group {
         goals = new ArrayList<>();
     }
 
+    public void retrieveMemberProgress( final MemberProgress memberProgress, final DBListener listener) {
+        String path = "groups/"+mGroupId+ "/members/" + memberProgress.getUsername() + "/progress";
+
+
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                for ( DataSnapshot progressSnapshot : dataSnapshot.getChildren() ) {
+                    String exerciseName = progressSnapshot.getKey();
+                    Object personalProgressObj = progressSnapshot.getValue();
+
+                    float personalProgress;
+                    if ( personalProgressObj instanceof Long ) {
+                        personalProgress = ( ( Long ) personalProgressObj ).floatValue();
+                    } else {
+                        personalProgress = ( ( Float ) personalProgressObj ).floatValue();
+                    }
+
+                    Goal goal = new Goal( exerciseName, personalProgress, 0.0f );
+                    memberProgress.getMemberProgresses().add( goal );
+
+                }
+
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
     public static void retrieveGroupIds( @NotNull final ArrayList< String > groupIds, final DBListener listener ) {
 
         // Get the current user ID
