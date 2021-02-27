@@ -105,7 +105,7 @@ public class LogActivityActivity extends AppCompatActivity {
                             for ( final Group group : mGroups ) {
                                 DBListener groupGoalsListener = new DBListener() {
                                     public void onRetrievalFinished() {
-                                        for ( Goal goal : group.getGoals() ) {
+                                        for ( Goal goal : group.getmGoals() ) {
                                             mGoalsList.add( goal );
                                             setupGoalsList();
                                         }

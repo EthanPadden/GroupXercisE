@@ -12,13 +12,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
-import com.nova.groupxercise.Objects.MemberProgress;
+import com.nova.groupxercise.Objects.Member;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
 
 public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMemberRecyclerAdapter.ViewHolder> {
-    private ArrayList<MemberProgress> mData;
+    private ArrayList< Member > mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Group mGroup;
@@ -27,7 +27,7 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
     public GroupMemberRecyclerAdapter( Context context, Group group) {
         this.mInflater = LayoutInflater.from(context);
         this.mGroup = group;
-        this.mData = group.getmMemberProgresses();
+        this.mData = group.getmMembers();
     }
 
     @Override
@@ -39,12 +39,12 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        MemberProgress memberProgress = mData.get(position);
-        holder.memberNameText.setText(memberProgress.getUsername());
-        if(memberProgress.getUsername().compareTo( "vicky" ) == 0) {
-            holder.memberNameText.setText(memberProgress.getUsername());
+        Member member = mData.get(position);
+        holder.memberNameText.setText(member.getmUsername());
+        if(member.getmUsername().compareTo( "vicky" ) == 0) {
+            holder.memberNameText.setText(member.getmUsername());
         }
-        holder.displayProgresses( memberProgress.getMemberProgresses() );
+        holder.displayProgresses( member.getmProgress() );
     }
 
     // total number of rows
@@ -96,7 +96,7 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
     }
 
     // convenience method for getting data at click position
-    MemberProgress getItem(int id) {
+    Member getItem(int id) {
         return mData.get(id);
     }
 

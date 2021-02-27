@@ -132,7 +132,7 @@ public class GoalsFragment extends Fragment {
         // Group title
         View groupTitleView = getLayoutInflater().inflate( R.layout.text_group_subtitle, null );
         TextView groupTitleText = groupTitleView.findViewById( R.id.goal_group_name );
-        groupTitleText.setText( group.getmGroupName() );
+        groupTitleText.setText( group.getmName() );
         final LinearLayout groupLayout = new LinearLayout( getActivity() );
         groupLayout.setOrientation( LinearLayout.VERTICAL );
         groupLayout.setId( group.getmGroupId().hashCode() );
@@ -141,12 +141,12 @@ public class GoalsFragment extends Fragment {
 
 
 
-        if ( group.getGoals() != null ) {
+        if ( group.getmGoals() != null ) {
 
             final ListView groupListView = createGroupGoalsListView( group );
             groupLayout.addView( groupListView );
 
-            for(Goal groupGoal:group.getGoals()) {
+            for(Goal groupGoal:group.getmGoals()) {
                 final DBListener memberProgressListener = new DBListener() {
                     public void onRetrievalFinished() {
                         ((GoalItemsAdapter)groupListView.getAdapter()).notifyDataSetChanged();
@@ -167,7 +167,7 @@ public class GoalsFragment extends Fragment {
 
     private ListView createGroupGoalsListView(Group group) {
         ListView listView = new ListView( getActivity() );
-        GoalItemsAdapter itemsAdapter = new GoalItemsAdapter( getActivity(), group.getGoals() );
+        GoalItemsAdapter itemsAdapter = new GoalItemsAdapter( getActivity(), group.getmGoals() );
         listView.setAdapter( itemsAdapter );
         return listView;
     }

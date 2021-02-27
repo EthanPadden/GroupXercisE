@@ -9,12 +9,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +25,7 @@ import com.nova.groupxercise.Adapters.GroupMemberRecyclerAdapter;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
-import com.nova.groupxercise.Objects.MemberProgress;
+import com.nova.groupxercise.Objects.Member;
 import com.nova.groupxercise.Objects.User;
 import com.nova.groupxercise.R;
 
@@ -84,60 +82,60 @@ public class GroupFragment extends Fragment {
 
 
         // Set event listeners
-        mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( View view ) {
-                // Get the username of the user to be added
-                final String username = mMemberNameEt.getText().toString();
-
-                if ( User.checkIfUsernameIsValid( username ) ) {
-                    // If the username is valid, check does the user exist
-                    DBListener userCheckListener = new DBListener() {
-                        public void onRetrievalFinished( Object retrievedData ) {
-                            if ( retrievedData == null ) {
-                                // The user does not exist
-                                Toast.makeText( getActivity(), "User not found: " + username, Toast.LENGTH_SHORT ).show();
-                            } else {
-                                // The user exists - get the user ID and add the user to the group
-                                String userId = ( String ) retrievedData;
-                                DBListener additionListener = new DBListener() {
-                                    public void onRetrievalFinished( Object retrievedData ) {
-                                        Toast.makeText( getActivity(), "Member added: " + username, Toast.LENGTH_SHORT ).show();
-                                        mDBListeners.remove( this );
-                                    }
-                                };
-                                mDBListeners.add( additionListener );
-                                mGroup.addMember( username, userId, additionListener );
-                            }
-
-                            mDBListeners.remove( this );
-                        }
-                    };
-                    mDBListeners.add( userCheckListener );
-                    User.checkIfUserExists( username, userCheckListener );
-                } else {
-                    Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
-                }
-            }
-        } );
-        mDeleteGroupBtn.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( View view ) {
-                mGroup.deleteGroup();
-                // Return to my groups fragment
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
-                ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
-                ft.commit();
-            }
-        } );
+//        mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
+//            @Override
+//            public void onClick( View view ) {
+//                // Get the username of the user to be added
+//                final String username = mMemberNameEt.getText().toString();
+//
+//                if ( User.checkIfUsernameIsValid( username ) ) {
+//                    // If the username is valid, check does the user exist
+//                    DBListener userCheckListener = new DBListener() {
+//                        public void onRetrievalFinished( Object retrievedData ) {
+//                            if ( retrievedData == null ) {
+//                                // The user does not exist
+//                                Toast.makeText( getActivity(), "User not found: " + username, Toast.LENGTH_SHORT ).show();
+//                            } else {
+//                                // The user exists - get the user ID and add the user to the group
+//                                String userId = ( String ) retrievedData;
+//                                DBListener additionListener = new DBListener() {
+//                                    public void onRetrievalFinished( Object retrievedData ) {
+//                                        Toast.makeText( getActivity(), "Member added: " + username, Toast.LENGTH_SHORT ).show();
+//                                        mDBListeners.remove( this );
+//                                    }
+//                                };
+//                                mDBListeners.add( additionListener );
+////                                mGroup.addMember( username, userId, additionListener );
+//                            }
+//
+//                            mDBListeners.remove( this );
+//                        }
+//                    };
+//                    mDBListeners.add( userCheckListener );
+//                    User.checkIfUserExists( username, userCheckListener );
+//                } else {
+//                    Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
+//                }
+//            }
+//        } );
+//        mDeleteGroupBtn.setOnClickListener( new View.OnClickListener() {
+//            @Override
+//            public void onClick( View view ) {
+//                mGroup.deleteGroup();
+//                // Return to my groups fragment
+//                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+//                MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
+//                ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
+//                ft.commit();
+//            }
+//        } );
 
         // Retrieve the group information
         DBListener groupInfoListener = new DBListener() {
             public void onRetrievalFinished() {
                 // If the current user is the admin, show the controls
                 String currentUsername = User.getInstance().getUsername();
-                if ( mGroup.getmGroupCreator().compareTo( currentUsername ) == 0 ) {
+                if ( mGroup.getmCreator().compareTo( currentUsername ) == 0 ) {
                     mAddMemberBtn.setVisibility( View.VISIBLE );
                     mMemberNameEt.setVisibility( View.VISIBLE );
                     mDeleteGroupBtn.setVisibility( View.VISIBLE );
@@ -155,12 +153,12 @@ public class GroupFragment extends Fragment {
 
         DBListener groupGoalListener = new DBListener() {
             public void onRetrievalFinished() {
-                if ( mGroup.getGoals().size() == 0 ) {
+                if ( mGroup.getmGoals().size() == 0 ) {
                     mGroupGoalsLoadingText.setText( "No goals" );
                 } else {
                     mGroupGoalsLoadingText.setVisibility( View.GONE );
 
-                    for ( Goal goal : mGroup.getGoals() ) {
+                    for ( Goal goal : mGroup.getmGoals() ) {
                         View goalView = createGroupGoalUIComponent( goal );
                         mGroupGoalsLayout.addView( goalView );
                     }
@@ -173,6 +171,10 @@ public class GroupFragment extends Fragment {
         mGroup.retrieveGroupGoals( groupGoalListener );
     }
 
+    /**
+     * Creates a listener for the members subtree of the group in the DB
+     * When it chagnes (including the initial call), it updates the UI
+     */
     private void setupGroupMemberListeners() {
         final String path = "groups/" + mGroupId + "/members";
         mGroupMembersRecycler.setLayoutManager( new LinearLayoutManager( getContext() ) );
@@ -182,20 +184,41 @@ public class GroupFragment extends Fragment {
         // Get the DB reference
         mGroupMembersRef = FirebaseDatabase.getInstance().getReference().child( path );
 
-        // Create listener
         mGroupMembersListener = new ValueEventListener() {
             @Override
             public void onDataChange( @NonNull DataSnapshot membersDataSnapshot ) {
-                // Parse the snapshot, updating the group in memory
+//                 Parse the snapshot, updating the group in memory
                 for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
+                    // Retrieve member username and create member object
                     final String username = memberDataSnapshot.getKey();
-                    MemberProgress memberProgress = new MemberProgress( username );
-                    mGroup.getmMemberProgresses().add( memberProgress );
+                    Member member = new Member( username );
+
+                    // For every progress in the progress subtree, create a goal object
+                    // and add to the member object
+                    for(DataSnapshot progressDataSnapshot:memberDataSnapshot.child( "progress" ).getChildren()) {
+                        // Get the exercise name
+                        String exerciseName = progressDataSnapshot.getKey();
+
+                        // Get the current status (member progress towards that goal
+                        Object currentStatusObj = progressDataSnapshot.getValue();
+                        float currentStatus;
+                        if ( currentStatusObj instanceof Long ) {
+                            currentStatus = ( ( Long ) currentStatusObj ).floatValue();
+                        } else {
+                            currentStatus = ( ( Float ) currentStatusObj ).floatValue();
+                        }
+
+                        // We are not concerned with the target, it is stored in the group goal
+                        float target = 0;
+
+                        Goal goal = new Goal( exerciseName, currentStatus, target );
+                        member.getmProgress().add( goal );
+                    }
+
+                    mGroup.getmMembers().add( member );
                 }
 
                 mGroupMemberRecyclerAdapter.notifyDataSetChanged();
-
-                setupGroupProgressListeners();
             }
 
             @Override
@@ -205,25 +228,6 @@ public class GroupFragment extends Fragment {
         };
 
         mGroupMembersRef.addValueEventListener( mGroupMembersListener );
-    }
-
-    private void setupGroupProgressListeners() {
-
-
-            DBListener listener = new DBListener() {
-                public void onRetrievalFinished() {
-
-                    mGroupMemberRecyclerAdapter.notifyDataSetChanged();
-
-                    mDBListeners.remove( this );
-                }
-            };
-            mDBListeners.add( listener );
-            mGroup.retrieveMemberProgresses(listener);
-
-
-
-
     }
 
     private View createGroupGoalUIComponent( Goal goal ) {

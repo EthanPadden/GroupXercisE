@@ -87,16 +87,16 @@ public class MyGroupsFragment extends Fragment {
                 DBListener groupNameListener = new DBListener() {
                     public void onRetrievalFinished() {
                         setupGroupsList();
-                        for ( Group group : mGroups ) {
-                            DBListener groupMembersListener = new DBListener() {
-                                public void onRetrievalFinished() {
-                                    setupGroupsList();
-                                    mDBListeners.remove( this );
-                                }
-                            };
-                            mDBListeners.add( groupMembersListener );
-                            group.retrieveGroupMembers( groupMembersListener );
-                        }
+//                        for ( Group group : mGroups ) {
+//                            DBListener groupMembersListener = new DBListener() {
+//                                public void onRetrievalFinished() {
+//                                    setupGroupsList();
+//                                    mDBListeners.remove( this );
+//                                }
+//                            };
+//                            mDBListeners.add( groupMembersListener );
+////                            group.retrieveGroupMembers( groupMembersListener );
+//                        }
                         mDBListeners.remove( this );
                     }
                 };
@@ -138,7 +138,7 @@ public class MyGroupsFragment extends Fragment {
                     Group selectedGroup = ( Group ) mListView.getItemAtPosition( i );
 
                     HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-                    homeScreenActivity.getSupportActionBar().setTitle( selectedGroup.getmGroupName() );
+                    homeScreenActivity.getSupportActionBar().setTitle( selectedGroup.getmName() );
 
                     FragmentTransaction ft = homeScreenActivity.getSupportFragmentManager().beginTransaction();
                     GroupFragment groupFragment = new GroupFragment( selectedGroup.getmGroupId() );

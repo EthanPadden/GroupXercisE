@@ -31,9 +31,9 @@ public class GroupItemsAdapter extends ArrayAdapter {
         Group currentGroup = ( Group ) getItem( position );
 
         TextView groupNameText = listItemView.findViewById( R.id.text_group_name );
-        groupNameText.setText( currentGroup.getmGroupName() );
+        groupNameText.setText( currentGroup.getmName() );
         TextView memberCountText = listItemView.findViewById( R.id.text_group_members_count );
-        int numMembers = currentGroup.getMembers().size();
+        int numMembers = currentGroup.getmMembers().size();
         String countUnit = numMembers == 1? "member":"members";
         memberCountText.setText( numMembers + " " + countUnit );
 
