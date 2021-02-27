@@ -41,4 +41,5 @@ public class GoalItemsAdapter extends ArrayAdapter {
 
         return listItemView;
     }
+
 }

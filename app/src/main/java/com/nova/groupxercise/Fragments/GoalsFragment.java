@@ -17,6 +17,8 @@ import com.nova.groupxercise.Adapters.GoalItemsAdapter;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
+import com.nova.groupxercise.Objects.Member;
+import com.nova.groupxercise.Objects.User;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class GoalsFragment extends Fragment {
     @Override
     public void onAttach( @NonNull Context context ) {
         super.onAttach( context );
-        mDBListeners = new ArrayList<>(  );
+        mDBListeners = new ArrayList<>();
     }
 
     @Override
@@ -56,20 +58,16 @@ public class GoalsFragment extends Fragment {
         // Set the list as the list for the items adapter
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mPersonalGoalsList );
 
-        mGroups = new ArrayList<>(  );
+        mGroups = new ArrayList<>();
         mLoadingText.setVisibility( View.INVISIBLE );
-//        retrieveGoals();
-
-
-
-
-        mPersonalGoalsList = new ArrayList<>(  );
+//
+        mPersonalGoalsList = new ArrayList<>();
 
         // Set the list as the list for the items adapter
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mPersonalGoalsList );
-        DBListener pesonalGoalsListener =   new DBListener() {
+        DBListener pesonalGoalsListener = new DBListener() {
             public void onRetrievalFinished() {
-                if( mPersonalGoalsList.size() > 0){
+                if ( mPersonalGoalsList.size() > 0 ) {
                     mLoadingText.setVisibility( View.GONE );
                     mListView.setAdapter( mItemsAdapter );
                 }
@@ -77,22 +75,21 @@ public class GoalsFragment extends Fragment {
             }
         };
         mDBListeners.add( pesonalGoalsListener );
-        Goal.retrievePersonalGoals( mPersonalGoalsList, pesonalGoalsListener);
-
+        Goal.retrievePersonalGoals( mPersonalGoalsList, pesonalGoalsListener );
 
 
         DBListener groupIdsListener = new DBListener() {
-            public void onRetrievalFinished(Object retrievedData) {
-                ArrayList<String> retrievedGroupIds = (ArrayList< String>)  retrievedData;
+            public void onRetrievalFinished( Object retrievedData ) {
+                ArrayList< String > retrievedGroupIds = ( ArrayList< String > ) retrievedData;
                 DBListener groupNamesListener = new DBListener() {
                     public void onRetrievalFinished() {
-                        if(mGroups.size() == 0) {
+                        if ( mGroups.size() == 0 ) {
                             mLoadingText.setText( "You have no groups" );
                         } else {
-                            for( final Group group: mGroups) {
+                            for ( final Group group : mGroups ) {
                                 DBListener groupGoalsListener = new DBListener() {
                                     public void onRetrievalFinished() {
-                                        addGroupGoalsToUI(group);
+                                        addGroupGoalsToUI( group );
                                         mDBListeners.remove( this );
 
                                     }
@@ -114,13 +111,13 @@ public class GoalsFragment extends Fragment {
             }
         };
         mDBListeners.add( groupIdsListener );
-        Group.retrieveGroupIds(groupIdsListener);
+        Group.retrieveGroupIds( groupIdsListener );
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        for(DBListener dbListener : mDBListeners) {
+        for ( DBListener dbListener : mDBListeners ) {
             dbListener.setActive( false );
         }
     }
@@ -139,23 +136,25 @@ public class GoalsFragment extends Fragment {
         groupLayout.addView( groupTitleView );
         mGroupGoalsLayout.addView( groupLayout );
 
-
-
         if ( group.getmGoals() != null ) {
-
             final ListView groupListView = createGroupGoalsListView( group );
+            final ArrayList<Goal> goals = new ArrayList<>(  );
+            GoalItemsAdapter goalItemsAdapter = new GoalItemsAdapter( getActivity(),  goals);
             groupLayout.addView( groupListView );
 
-            for(Goal groupGoal:group.getmGoals()) {
-                final DBListener memberProgressListener = new DBListener() {
-                    public void onRetrievalFinished() {
-                        ((GoalItemsAdapter)groupListView.getAdapter()).notifyDataSetChanged();
-                        mDBListeners.remove( this );
-                    }
-                };
-                mDBListeners.add( memberProgressListener );
-                group.retrieveThisMembersProgress( memberProgressListener, groupGoal );
-            }
+            final DBListener memberProgressListener = new DBListener() {
+                public void onRetrievalFinished( Object retrievedData ) {
+                    Member member = ( Member ) retrievedData;
+                    for(Goal progress : member.getmProgress()) goals.add( progress );
+
+                    groupListView.setAdapter( new GoalItemsAdapter(getActivity(), goals));
+
+                    mDBListeners.remove( this );
+                }
+            };
+            mDBListeners.add( memberProgressListener );
+            group.retrieveMemberProgress( memberProgressListener, User.getInstance().getUsername() );
+
         } else {
 
             // Display that the group has no goals
@@ -165,13 +164,12 @@ public class GoalsFragment extends Fragment {
         }
     }
 
-    private ListView createGroupGoalsListView(Group group) {
+    private ListView createGroupGoalsListView( Group group ) {
         ListView listView = new ListView( getActivity() );
         GoalItemsAdapter itemsAdapter = new GoalItemsAdapter( getActivity(), group.getmGoals() );
         listView.setAdapter( itemsAdapter );
         return listView;
     }
-
 
 
     private void retreiveGroupGoals() {
