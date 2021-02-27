@@ -195,7 +195,7 @@ public class GroupFragment extends Fragment {
 
                     // For every progress in the progress subtree, create a goal object
                     // and add to the member object
-                    for(DataSnapshot progressDataSnapshot:memberDataSnapshot.child( "progress" ).getChildren()) {
+                    for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
                         // Get the exercise name
                         String exerciseName = progressDataSnapshot.getKey();
 
@@ -260,6 +260,4 @@ public class GroupFragment extends Fragment {
         mDBListeners = new ArrayList<>();
         mGroup = new Group( mGroupId );
     }
-
-
 }

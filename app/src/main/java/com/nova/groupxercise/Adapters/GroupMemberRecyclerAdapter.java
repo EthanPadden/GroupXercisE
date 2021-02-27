@@ -41,8 +41,8 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
     public void onBindViewHolder(ViewHolder holder, int position) {
         Member member = mData.get(position);
         holder.memberNameText.setText(member.getmUsername());
-        if(member.getmUsername().compareTo( "vicky" ) == 0) {
-            holder.memberNameText.setText(member.getmUsername());
+        if(member.getmUsername().compareTo( mGroup.getmCreator() ) == 0) {
+            holder.memberStatusText.setVisibility( View.VISIBLE );
         }
         holder.displayProgresses( member.getmProgress() );
     }
@@ -57,12 +57,14 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView memberNameText;
+        TextView memberStatusText;
         LinearLayout progressLayout;
 
         ViewHolder(View itemView) {
             super(itemView);
             memberNameText = itemView.findViewById(R.id.text_member_name);
             progressLayout = itemView.findViewById( R.id.layout_progresses );
+            memberStatusText = itemView.findViewById(R.id.text_member_status);
             itemView.setOnClickListener(this);
         }
 
