@@ -39,8 +39,11 @@ public class Group {
         this.mMembers = mMembers;
     }
 
-
-    public static void retrieveGroupIds( @NotNull final ArrayList< String > groupIds, final DBListener listener ) {
+    /**
+     * Navigates to the user_groups subtree and retrieves all the group IDs of groups that the current user is a member of
+     * @param listener called when the retrieval is finished
+     */
+    public static void retrieveGroupIds( final DBListener listener ) {
 
         // Get the current user ID
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -54,11 +57,12 @@ public class Group {
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
+                ArrayList<String> groupIds = new ArrayList<>(  );
                 for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
                     groupIds.add( usersGroupsDataSnapshot.getKey() );
                 }
 
-                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished(groupIds);
             }
 
             @Override

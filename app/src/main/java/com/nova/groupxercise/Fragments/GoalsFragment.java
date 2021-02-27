@@ -81,9 +81,9 @@ public class GoalsFragment extends Fragment {
 
 
 
-        final ArrayList<String> groupIds = new ArrayList<>(  );
         DBListener groupIdsListener = new DBListener() {
-            public void onRetrievalFinished() {
+            public void onRetrievalFinished(Object retrievedData) {
+                ArrayList<String> retrievedGroupIds = (ArrayList< String>)  retrievedData;
                 DBListener groupNamesListener = new DBListener() {
                     public void onRetrievalFinished() {
                         if(mGroups.size() == 0) {
@@ -108,13 +108,13 @@ public class GoalsFragment extends Fragment {
                 };
                 mDBListeners.add( groupNamesListener );
                 mDBListeners.remove( this );
-                Group.retrieveGroupNames( groupIds, mGroups, groupNamesListener );
+                Group.retrieveGroupNames( retrievedGroupIds, mGroups, groupNamesListener );
                 mDBListeners.remove( this );
 
             }
         };
         mDBListeners.add( groupIdsListener );
-        Group.retrieveGroupIds( groupIds, groupIdsListener);
+        Group.retrieveGroupIds(groupIdsListener);
     }
 
     @Override

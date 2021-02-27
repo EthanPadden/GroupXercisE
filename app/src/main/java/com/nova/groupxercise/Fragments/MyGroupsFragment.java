@@ -75,9 +75,9 @@ public class MyGroupsFragment extends Fragment {
             }
         } );
 
-        final ArrayList< String > groupIds = new ArrayList<>();
         DBListener groupIdListener = new DBListener() {
-            public void onRetrievalFinished() {
+            public void onRetrievalFinished( Object retrievedData ) {
+                ArrayList<String> retrievedGroupIds = (ArrayList< String>) retrievedData;
                 // Create an empty list for the group names
                 mGroups = new ArrayList<>();
 
@@ -101,7 +101,7 @@ public class MyGroupsFragment extends Fragment {
                     }
                 };
                 mDBListeners.add( groupNameListener );
-                Group.retrieveGroupNames( groupIds, mGroups, groupNameListener );
+                Group.retrieveGroupNames( retrievedGroupIds, mGroups, groupNameListener );
 
 
 
@@ -109,7 +109,7 @@ public class MyGroupsFragment extends Fragment {
             }
         };
         mDBListeners.add( groupIdListener );
-        Group.retrieveGroupIds( groupIds, groupIdListener );
+        Group.retrieveGroupIds( groupIdListener );
     }
 
 

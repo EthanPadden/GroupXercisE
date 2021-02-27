@@ -89,9 +89,9 @@ public class LogActivityActivity extends AppCompatActivity {
         mDBListeners.add( personalGoalsListener );
         Goal.retrievePersonalGoals( mGoalsList, personalGoalsListener );
 //        retrieveGroupIds();
-        final ArrayList< String > groupIds = new ArrayList<>();
         DBListener groupIdsListener = new DBListener() {
-            public void onRetrievalFinished() {
+            public void onRetrievalFinished(Object retrievedData) {
+                ArrayList<String> retrievedGroupIds = (ArrayList< String>)  retrievedData;
                 // Create an empty list for the group names
                 mGroups = new ArrayList<>();
 
@@ -122,13 +122,13 @@ public class LogActivityActivity extends AppCompatActivity {
                     }
                 };
                 mDBListeners.add( groupNamesListener );
-                Group.retrieveGroupNames( groupIds, mGroups, groupNamesListener );
+                Group.retrieveGroupNames( retrievedGroupIds, mGroups, groupNamesListener );
                 mDBListeners.remove( this );
 
             }
         };
         mDBListeners.add( groupIdsListener );
-        Group.retrieveGroupIds( groupIds, groupIdsListener );
+        Group.retrieveGroupIds( groupIdsListener );
     }
 
 
