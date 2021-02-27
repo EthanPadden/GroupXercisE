@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -17,8 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.nova.groupxercise.Activities.CreateGroupActivity;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
 import com.nova.groupxercise.Adapters.GroupItemsAdapter;
@@ -32,8 +29,7 @@ import java.util.ArrayList;
 public class MyGroupsFragment extends Fragment {
     private FloatingActionButton mCreateGroupBtn;
     private ArrayList< Group > mGroups;
-    private ArrayAdapter< String > mItemsAdapter;
-    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private GroupItemsAdapter mItemsAdapter;
     private TextView mLoadingText;
     private ListView mListView;
     private ArrayList< DBListener > mDBListeners;
@@ -87,16 +83,17 @@ public class MyGroupsFragment extends Fragment {
                 DBListener groupNameListener = new DBListener() {
                     public void onRetrievalFinished() {
                         setupGroupsList();
-//                        for ( Group group : mGroups ) {
-//                            DBListener groupMembersListener = new DBListener() {
-//                                public void onRetrievalFinished() {
-//                                    setupGroupsList();
-//                                    mDBListeners.remove( this );
-//                                }
-//                            };
-//                            mDBListeners.add( groupMembersListener );
-////                            group.retrieveGroupMembers( groupMembersListener );
-//                        }
+                        for ( Group group : mGroups ) {
+                            DBListener groupMembersListener = new DBListener() {
+                                public void onRetrievalFinished() {
+                                    mDBListeners.remove( this );
+                                    mItemsAdapter.notifyDataSetChanged();
+                                }
+                            };
+                            mDBListeners.add( groupMembersListener );
+                            group.retrieveGroupMembers( groupMembersListener );
+                        }
+                        mItemsAdapter.notifyDataSetChanged();
                         mDBListeners.remove( this );
                     }
                 };
@@ -111,6 +108,7 @@ public class MyGroupsFragment extends Fragment {
         mDBListeners.add( groupIdListener );
         Group.retrieveGroupIds( groupIdListener );
     }
+
 
 
     @Override
