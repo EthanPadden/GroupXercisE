@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -22,12 +23,14 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Group mGroup;
+    private boolean adminGroup;
     //https://stackoverflow.com/questions/40584424/simple-android-recyclerview-example
 
-    public GroupMemberRecyclerAdapter( Context context, Group group) {
+    public GroupMemberRecyclerAdapter( Context context, Group group, boolean adminGroup ) {
         this.mInflater = LayoutInflater.from(context);
         this.mGroup = group;
         this.mData = group.getmMembers();
+        this.adminGroup = adminGroup;
     }
 
     @Override
@@ -39,10 +42,20 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Member member = mData.get(position);
+        final Member member = mData.get(position);
         holder.memberNameText.setText(member.getmUsername());
         if(member.getmUsername().compareTo( mGroup.getmCreator() ) == 0) {
             holder.memberStatusText.setVisibility( View.VISIBLE );
+        }
+        if(adminGroup && member.getmUsername().compareTo( mGroup.getmCreator() ) != 0) {
+            holder.removeMemberBtn.setOnClickListener( new View.OnClickListener() {
+                @Override
+                public void onClick( View view ) {
+                    mGroup.removeMember( member );
+                    mData.remove( member );
+                }
+            } );
+            holder.removeMemberBtn.setVisibility( View.VISIBLE );
         }
         holder.displayProgresses( member.getmProgress() );
     }
@@ -59,12 +72,14 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
         TextView memberNameText;
         TextView memberStatusText;
         LinearLayout progressLayout;
+        Button removeMemberBtn;
 
         ViewHolder(View itemView) {
             super(itemView);
             memberNameText = itemView.findViewById(R.id.text_member_name);
             progressLayout = itemView.findViewById( R.id.layout_progresses );
             memberStatusText = itemView.findViewById(R.id.text_member_status);
+            removeMemberBtn = itemView.findViewById(R.id.btn_remove_member);
             itemView.setOnClickListener(this);
         }
 

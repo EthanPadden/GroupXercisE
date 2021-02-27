@@ -41,6 +41,7 @@ public class Group {
 
     /**
      * Navigates to the user_groups subtree and retrieves all the group IDs of groups that the current user is a member of
+     *
      * @param listener called when the retrieval is finished
      */
     public static void retrieveGroupIds( final DBListener listener ) {
@@ -57,12 +58,13 @@ public class Group {
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
-                ArrayList<String> groupIds = new ArrayList<>(  );
+                ArrayList< String > groupIds = new ArrayList<>();
                 for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
                     groupIds.add( usersGroupsDataSnapshot.getKey() );
                 }
 
-                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished(groupIds);
+                if ( listener != null && listener.isActive() )
+                    listener.onRetrievalFinished( groupIds );
             }
 
             @Override
@@ -230,43 +232,41 @@ public class Group {
         } );
     }
 
-//    public void removeMember( final String username, final DBListener listener ) {
-//        /** Updating groups subtree */
-//        // Path to this groups members child
-//        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
-//
-//        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-//        DatabaseReference groupsChildRef = rootRef.child( thisGroupMembersPath );
-//
-//        // TODO: check if the user is already a member - error?
-//        // TODO: what if that user is not a member? = error?
-//        groupsChildRef.child( username ).removeValue();
-//
-//
-//        /** Updating user_groups subtree */
-//        String usernamePath = "usernames/" + username;
-//        DatabaseReference usernameChildRef = rootRef.child( usernamePath );
-//        usernameChildRef.addListenerForSingleValueEvent( new ValueEventListener() {
-//            @Override
-//            public void onDataChange( DataSnapshot dataSnapshot ) {
-//                String userId = dataSnapshot.getValue().toString();
-//
-//                String userGroupsPath = "user_groups/" + userId;
-//                DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
-//                userGroupsChildRef.child( mGroupId ).removeValue();
-//
-//                /** Updating group in memory and UI */
-//                members.remove( username );
-//
-//                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
-//            }
-//
-//
-//            @Override
-//            public void onCancelled( DatabaseError databaseError ) {
-//            }
-//        } );
-//    }
+    public void removeMember( final Member member ) {
+        /** Updating groups subtree */
+        // Path to this groups members child
+        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
+
+        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference groupsChildRef = rootRef.child( thisGroupMembersPath );
+
+        // TODO: check if the user is already a member - error?
+        // TODO: what if that user is not a member? = error?
+        groupsChildRef.child( member.getmUsername() ).removeValue();
+
+
+        /** Updating user_groups subtree */
+        String usernamePath = "usernames/" + member.getmUsername();
+        DatabaseReference usernameChildRef = rootRef.child( usernamePath );
+        usernameChildRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                String userId = dataSnapshot.getValue().toString();
+
+                String userGroupsPath = "user_groups/" + userId;
+                DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
+                userGroupsChildRef.child( mGroupId ).removeValue();
+
+                /** Updating group in memory and UI */
+                mMembers.remove( member );
+            }
+
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
 
     /**
      * Retrieves the group goals from the DB and attaches to the object
@@ -309,6 +309,7 @@ public class Group {
 
     /**
      * Retrieves group members (excluding progresses) from the DB and attaches to the object
+     *
      * @param listener called when retrieval is finished
      */
     public void retrieveGroupMembers( final DBListener listener ) {
@@ -377,7 +378,7 @@ public class Group {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
                 if ( dataSnapshot.exists() ) {
-                    for(DataSnapshot progressDataSnapshot:dataSnapshot.getChildren()){
+                    for ( DataSnapshot progressDataSnapshot : dataSnapshot.getChildren() ) {
                         // Get the exercise name
                         String exerciseName = progressDataSnapshot.getKey();
 
@@ -401,7 +402,8 @@ public class Group {
                     mMembers.add( member );
                 }
 
-                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished(member);
+                if ( listener != null && listener.isActive() )
+                    listener.onRetrievalFinished( member );
             }
 
             @Override

@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -178,7 +179,7 @@ public class GroupFragment extends Fragment {
     private void setupGroupMemberListeners() {
         final String path = "groups/" + mGroupId + "/members";
         mGroupMembersRecycler.setLayoutManager( new LinearLayoutManager( getContext() ) );
-        mGroupMemberRecyclerAdapter = new GroupMemberRecyclerAdapter( getContext(), mGroup );
+        mGroupMemberRecyclerAdapter = new GroupMemberRecyclerAdapter( getContext(), mGroup, adminGroup);
         mGroupMembersRecycler.setAdapter( mGroupMemberRecyclerAdapter );
 
         // Get the DB reference
