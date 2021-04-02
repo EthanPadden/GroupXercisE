@@ -22,7 +22,7 @@ public class User {
 
     private Sex sex;
 
-    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference mRootRef;
     private boolean userDetailsAreSet = false;
 
     // Singleton class
@@ -33,6 +33,7 @@ public class User {
     // Constructors
     public User() {
         mAuth = FirebaseAuth.getInstance();
+        mRootRef = FirebaseDatabase.getInstance().getReference();
     }
 
     public static User getInstance() {
@@ -118,7 +119,7 @@ public class User {
      *      Return true in the listener
      * @param username the username to check
      */
-    public void setUsernameInDatabase( final String username, final DBListener listener ) {
+    public void setUsernameInDatabase( final String username, final DatabaseReference.CompletionListener completionListener ) {
         // Path to the username child
         String path = "usernames/";
 
@@ -130,16 +131,14 @@ public class User {
                 DataSnapshot thisUsernameDataSnapshot = dataSnapshot.child( username );
                 if ( thisUsernameDataSnapshot.exists() ) {
                     // If the username exists, return this in the listener
-                    listener.onRetrievalFinished(new Boolean( false ));
+                    completionListener.onComplete(DatabaseError.fromStatus("", "Username unavailable" ), childRef );
                 } else {
-                    // If not, set the username
-                    String userId = mAuth.getCurrentUser().getUid();
-                    childRef.child( username ).setValue( userId );
-
                     // Set the username on the local user object
                     setUsername( username );
 
-                    listener.onRetrievalFinished(new Boolean( true ));
+                    // If not, set the username
+                    String userId = mAuth.getCurrentUser().getUid();
+                    childRef.child( username ).setValue( userId, completionListener );
                 }
             }
 

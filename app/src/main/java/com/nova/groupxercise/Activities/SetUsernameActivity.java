@@ -7,12 +7,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.User;
 import com.nova.groupxercise.R;
 
@@ -40,21 +42,19 @@ public class SetUsernameActivity extends AppCompatActivity {
             public void onClick( View v ) {
                 String username = mUsernameEt.getText().toString();
                 if(User.checkIfUsernameIsValid( username )){
-                    DBListener checkForUsernameListener = new DBListener() {
-                        public void onRetrievalFinished(Object retrievedData){
-                            boolean isAvailable = (Boolean) retrievedData;
-                            if(isAvailable) {
+                    User.getInstance().setUsernameInDatabase( username, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete( @Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference ) {
+                            if(databaseError != null) {
+                                Toast.makeText( SetUsernameActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT ).show();
+                            } else {
                                 Toast.makeText( SetUsernameActivity.this, "Username set!", Toast.LENGTH_SHORT ).show();
-
                                 // Go to the home screen
                                 Intent intent = new Intent( SetUsernameActivity.this, HomeScreenActivity.class );
                                 startActivity( intent );
-                            } else {
-                                Toast.makeText( SetUsernameActivity.this, "Username unavailable", Toast.LENGTH_SHORT ).show();
                             }
-                        };
-                    };
-                    User.getInstance().setUsernameInDatabase( username, checkForUsernameListener );
+                        }
+                    } );
                 } else {
                     Toast.makeText( SetUsernameActivity.this, "Invalid username", Toast.LENGTH_SHORT ).show();
                 }
