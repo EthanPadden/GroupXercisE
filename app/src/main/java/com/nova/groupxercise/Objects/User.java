@@ -110,6 +110,46 @@ public class User {
     }
 
     /**
+     * Checks if another user already has the argument username
+     * If so: return false in the listener
+     * If not:
+     *      Save the username as the username for this user in the database
+     *      Save the username as the username for the singleton User instance
+     *      Return true in the listener
+     * @param username the username to check
+     */
+    public void setUsernameInDatabase( final String username, final DBListener listener ) {
+        // Path to the username child
+        String path = "usernames/";
+
+        final DatabaseReference childRef = mRootRef.child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                DataSnapshot thisUsernameDataSnapshot = dataSnapshot.child( username );
+                if ( thisUsernameDataSnapshot.exists() ) {
+                    // If the username exists, return this in the listener
+                    listener.onRetrievalFinished(new Boolean( false ));
+                } else {
+                    // If not, set the username
+                    String userId = mAuth.getCurrentUser().getUid();
+                    childRef.child( username ).setValue( userId );
+
+                    // Set the username on the local user object
+                    setUsername( username );
+
+                    listener.onRetrievalFinished(new Boolean( true ));
+                }
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    /**
      * Sign out the user that is currently logged in using Firebase method
      */
     public void signOutUser() {

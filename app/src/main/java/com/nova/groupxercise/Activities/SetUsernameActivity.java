@@ -10,13 +10,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.R;
+import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.User;
+import com.nova.groupxercise.R;
 
 public class SetUsernameActivity extends AppCompatActivity {
     private EditText mUsernameEt;
@@ -42,7 +40,21 @@ public class SetUsernameActivity extends AppCompatActivity {
             public void onClick( View v ) {
                 String username = mUsernameEt.getText().toString();
                 if(User.checkIfUsernameIsValid( username )){
-                    checkIfUsernameIsAvailable( username );
+                    DBListener checkForUsernameListener = new DBListener() {
+                        public void onRetrievalFinished(Object retrievedData){
+                            boolean isAvailable = (Boolean) retrievedData;
+                            if(isAvailable) {
+                                Toast.makeText( SetUsernameActivity.this, "Username set!", Toast.LENGTH_SHORT ).show();
+
+                                // Go to the home screen
+                                Intent intent = new Intent( SetUsernameActivity.this, HomeScreenActivity.class );
+                                startActivity( intent );
+                            } else {
+                                Toast.makeText( SetUsernameActivity.this, "Username unavailable", Toast.LENGTH_SHORT ).show();
+                            }
+                        };
+                    };
+                    User.getInstance().setUsernameInDatabase( username, checkForUsernameListener );
                 } else {
                     Toast.makeText( SetUsernameActivity.this, "Invalid username", Toast.LENGTH_SHORT ).show();
                 }
@@ -51,45 +63,7 @@ public class SetUsernameActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * Checks if another user already has the argument username
-     * If so, display an error message
-     * If not, save the username as the username for this user and go to the home screen
-     * @param username the username to check
-     */
-    private void checkIfUsernameIsAvailable( final String username ) {
-        // Path to the username child
-        String path = "usernames/";
 
-        final DatabaseReference childRef = mRootRef.child( path );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                DataSnapshot thisUsernameDataSnapshot = dataSnapshot.child( username );
-                if ( thisUsernameDataSnapshot.exists() ) {
-                    // If the username exists, display an error message
-                    Toast.makeText( SetUsernameActivity.this, "Username unavailable", Toast.LENGTH_SHORT ).show();
-                } else {
-                    // If not, set the username
-                    String userId = mAuth.getCurrentUser().getUid();
-                    childRef.child( username ).setValue( userId );
-
-                    // Set the username on the local user object
-                    User currentUser = User.getInstance();
-                    currentUser.setUsername( username );
-
-                    // Go to the home screen
-                    Intent intent = new Intent( SetUsernameActivity.this, HomeScreenActivity.class );
-                    startActivity( intent );
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
 
 
 }
