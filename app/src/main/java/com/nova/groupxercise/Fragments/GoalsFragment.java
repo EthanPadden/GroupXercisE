@@ -59,7 +59,7 @@ public class GoalsFragment extends Fragment {
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mPersonalGoalsList );
 
         mGroups = new ArrayList<>();
-        mLoadingText.setVisibility( View.INVISIBLE );
+        mLoadingText.setText( "Loading..." );
 //
         mPersonalGoalsList = new ArrayList<>();
 

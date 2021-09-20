@@ -71,6 +71,8 @@ public class MyGroupsFragment extends Fragment {
             }
         } );
 
+        mLoadingText.setText( "Loading..." );
+
         DBListener groupIdListener = new DBListener() {
             public void onRetrievalFinished( Object retrievedData ) {
                 ArrayList<String> retrievedGroupIds = (ArrayList< String>) retrievedData;
