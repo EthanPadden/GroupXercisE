@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -33,17 +35,40 @@ public class MyGroupsFragment extends Fragment {
     private TextView mLoadingText;
     private ListView mListView;
     private ArrayList< DBListener > mDBListeners;
+    private boolean backButtonPressed;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        backButtonPressed = false;
+
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                if(!backButtonPressed) {
+                    Toast.makeText( getActivity(), "Press back button again to exit", Toast.LENGTH_SHORT ).show();
+                    backButtonPressed = true;
+                } else {
+                    // Back button pressed twice - exit appp
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    startActivity(intent);
+                    backButtonPressed = false;
+                }
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
+    }
 
     @Override
     public void onAttach( @NonNull Context context ) {
         super.onAttach( context );
         mDBListeners = new ArrayList<>();
-    }
-
-    @Override
-    public void onCreate( Bundle savedInstanceState ) {
-        super.onCreate( savedInstanceState );
-
     }
 
     @Override

@@ -79,6 +79,8 @@ public class CreateGroupActivity extends AppCompatActivity {
         String currentUserId = mAuth.getCurrentUser().getUid();
         usersGroupsChildRef.child( currentUserId ).child( groupId ).setValue( true );
 
+        Toast.makeText( CreateGroupActivity.this, "Group " + groupName + " created", Toast.LENGTH_SHORT ).show();
+
         Intent intent = new Intent( CreateGroupActivity.this, HomeScreenActivity.class );
         startActivity( intent );
     }
