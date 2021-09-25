@@ -37,23 +37,13 @@ public class CreateGroupActivity extends AppCompatActivity {
             @Override
             public void onClick( View view ) {
                 String groupName = mGroupNameEt.getText().toString();
-                checkIfGroupNameIsValid( groupName );
+                if ( groupName == null || groupName.compareTo( "" ) == 0 ) {
+                    Toast.makeText( CreateGroupActivity.this, "Invalid group name", Toast.LENGTH_SHORT ).show();
+                } else {
+                    createGroup( groupName );
+                }
             }
         } );
-    }
-
-    /**
-     * Check if the argument string is a valid group name
-     * If so, calls createGroup
-     * If not, shows error message
-     * @param groupName the group name to be checked
-     */
-    private void checkIfGroupNameIsValid( String groupName ) {
-        if ( groupName == null || groupName.compareTo( "" ) == 0 ) {
-            Toast.makeText( CreateGroupActivity.this, "Invalid group name", Toast.LENGTH_SHORT ).show();
-        } else {
-            createGroup( groupName );
-        }
     }
 
     /**
@@ -73,7 +63,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         GroupDBObject groupDBObject = new GroupDBObject( groupName, currentUser.getUsername() );
         DatabaseReference groupRef = groupsChildRef.push();
         groupRef.setValue( groupDBObject );
-        groupRef.child( "members" ).child( currentUser.getUsername() ).setValue( true );
+          groupRef.child( "members" ).child( currentUser.getUsername() ).setValue( true );
 
         // Updating users_groups child
         String groupId = groupRef.getKey();
