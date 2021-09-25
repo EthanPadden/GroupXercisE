@@ -37,9 +37,14 @@ public class CreateGroupActivity extends AppCompatActivity {
             @Override
             public void onClick( View view ) {
                 String groupName = mGroupNameEt.getText().toString();
+                String username = User.getInstance().getUsername();
+
                 if ( groupName == null || groupName.compareTo( "" ) == 0 ) {
                     Toast.makeText( CreateGroupActivity.this, "Invalid group name", Toast.LENGTH_SHORT ).show();
-                } else {
+                } else if(username == null || username.compareTo( "" ) == 0) {
+                    Toast.makeText( CreateGroupActivity.this, "Invalid username", Toast.LENGTH_SHORT ).show();
+                }
+                else {
                     createGroup( groupName );
                 }
             }
