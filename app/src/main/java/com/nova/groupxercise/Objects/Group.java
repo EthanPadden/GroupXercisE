@@ -162,37 +162,33 @@ public class Group {
 
     }
 //
-//    public void addMember( final String username, final String userId, final DBListener listener ) {
-//        /** Updating groups subtree */
-//        // Path to this groups members child
-//        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
-//
-//        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-//        DatabaseReference groupsChildRef = rootRef.child( thisGroupMembersPath );
-//
-//        groupsChildRef.child( username ).setValue( false );
-//
-//        // TODO: check if the user is already a member - error?
-//
-//        /** Updating user_groups subtree */
-//        String userGroupsPath = "user_groups/" + userId;
-//        DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
-//        userGroupsChildRef.child( mGroupId ).setValue( false );
-//
-//        /** Updating group in memory and UI */
-//        members.add( username );
-//
-////        /MATCHING
-//        for ( Goal goal : mGoals ) {
-//            User user = new User();
-//            user.setUsername( username );
-//            goal.matchUserProgressToGroup( userId, user, this );
-//            goal.matchGroupProgressToUser( userId, user, this );
-//        }
-//
-//
-//        if ( listener != null && listener.isActive() ) listener.onRetrievalFinished( mGoals );
-//    }
+    public void addMember( final String username, final String userId, final DBListener listener ) {
+        /** Updating groups subtree */
+        // Path to this groups members child
+        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
+
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference groupsChildRef = rootRef.child( thisGroupMembersPath );
+
+        groupsChildRef.child( username ).setValue( false );
+
+        // TODO: check if the user is already a member - error?
+
+        /** Updating user_groups subtree */
+        String userGroupsPath = "user_groups/" + userId;
+        DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
+        userGroupsChildRef.child( mGroupId ).setValue( false );
+
+//        /MATCHING
+        for ( Goal goal : mGoals ) {
+            User user = new User();
+            user.setUsername( username );
+            goal.matchUserProgressToGroup( userId, user, this );
+            goal.matchGroupProgressToUser( userId, user, this );
+        }
+
+        if ( listener != null && listener.isActive() ) listener.onRetrievalFinished( mGoals );
+    }
 
 //    public void deleteGroup() {
 //        for ( String member : members ) {

@@ -83,42 +83,42 @@ public class GroupFragment extends Fragment {
 
 
         // Set event listeners
-//        mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
-//            @Override
-//            public void onClick( View view ) {
-//                // Get the username of the user to be added
-//                final String username = mMemberNameEt.getText().toString();
-//
-//                if ( User.checkIfUsernameIsValid( username ) ) {
-//                    // If the username is valid, check does the user exist
-//                    DBListener userCheckListener = new DBListener() {
-//                        public void onRetrievalFinished( Object retrievedData ) {
-//                            if ( retrievedData == null ) {
-//                                // The user does not exist
-//                                Toast.makeText( getActivity(), "User not found: " + username, Toast.LENGTH_SHORT ).show();
-//                            } else {
-//                                // The user exists - get the user ID and add the user to the group
-//                                String userId = ( String ) retrievedData;
-//                                DBListener additionListener = new DBListener() {
-//                                    public void onRetrievalFinished( Object retrievedData ) {
-//                                        Toast.makeText( getActivity(), "Member added: " + username, Toast.LENGTH_SHORT ).show();
-//                                        mDBListeners.remove( this );
-//                                    }
-//                                };
-//                                mDBListeners.add( additionListener );
-////                                mGroup.addMember( username, userId, additionListener );
-//                            }
-//
-//                            mDBListeners.remove( this );
-//                        }
-//                    };
-//                    mDBListeners.add( userCheckListener );
-//                    User.checkIfUserExists( username, userCheckListener );
-//                } else {
-//                    Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
-//                }
-//            }
-//        } );
+        mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View view ) {
+                // Get the username of the user to be added
+                final String username = mMemberNameEt.getText().toString();
+
+                if ( User.checkIfUsernameIsValid( username ) ) {
+                    // If the username is valid, check does the user exist
+                    DBListener userCheckListener = new DBListener() {
+                        public void onRetrievalFinished( Object retrievedData ) {
+                            if ( retrievedData == null ) {
+                                // The user does not exist
+                                Toast.makeText( getActivity(), "User not found: " + username, Toast.LENGTH_SHORT ).show();
+                            } else {
+                                // The user exists - get the user ID and add the user to the group
+                                String userId = ( String ) retrievedData;
+                                DBListener additionListener = new DBListener() {
+                                    public void onRetrievalFinished( Object retrievedData ) {
+                                        Toast.makeText( getActivity(), "Member added: " + username, Toast.LENGTH_SHORT ).show();
+                                        mDBListeners.remove( this );
+                                    }
+                                };
+                                mDBListeners.add( additionListener );
+                                mGroup.addMember( username, userId, additionListener );
+                            }
+
+                            mDBListeners.remove( this );
+                        }
+                    };
+                    mDBListeners.add( userCheckListener );
+                    User.checkIfUserExists( username, userCheckListener );
+                } else {
+                    Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
+                }
+            }
+        } );
 //        mDeleteGroupBtn.setOnClickListener( new View.OnClickListener() {
 //            @Override
 //            public void onClick( View view ) {
