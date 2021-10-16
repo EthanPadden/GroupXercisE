@@ -31,7 +31,8 @@ public class GoalsFragment extends Fragment {
     private ArrayList< Goal > mPersonalGoalsList;
     private GoalItemsAdapter mItemsAdapter;
     private ListView mListView;
-    private TextView mLoadingText;
+    private TextView mLoadingPersonalGoalsText;
+    private TextView mLoadingGroupGoalsText;
     private ArrayList< Group > mGroups;
     private LinearLayout mGroupGoalsLayout;
     protected ArrayList< DBListener > mDBListeners;
@@ -85,23 +86,29 @@ public class GoalsFragment extends Fragment {
 
         // Initialise components
         mListView = view.findViewById( R.id.goal_list );
-        mLoadingText = view.findViewById( R.id.text_loading_exercise_list );
+        mLoadingPersonalGoalsText = view.findViewById( R.id.goals_fgt_text_loading_personal_goals );
+        mLoadingGroupGoalsText = view.findViewById( R.id.goals_fgt_text_loading_group_goals );
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
 
         // Set the list as the list for the items adapter
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mPersonalGoalsList );
 
         mGroups = new ArrayList<>();
-        mLoadingText.setText( "Loading..." );
-//
+
+        // Set loading texts
+        mLoadingPersonalGoalsText.setText( "Loading personal goals..." );
+        mLoadingGroupGoalsText.setText( "Loading group goals..." );
+
         mPersonalGoalsList = new ArrayList<>();
 
         // Set the list as the list for the items adapter
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mPersonalGoalsList );
         DBListener pesonalGoalsListener = new DBListener() {
             public void onRetrievalFinished() {
-                if ( mPersonalGoalsList.size() > 0 ) {
-                    mLoadingText.setVisibility( View.GONE );
+                if (mPersonalGoalsList.size() == 0) {
+                    mLoadingPersonalGoalsText.setText( "You have no personal goals" );
+                } else {
+                    mLoadingPersonalGoalsText.setVisibility( View.GONE );
                     mListView.setAdapter( mItemsAdapter );
                 }
                 mDBListeners.remove( this );
@@ -117,14 +124,14 @@ public class GoalsFragment extends Fragment {
                 DBListener groupNamesListener = new DBListener() {
                     public void onRetrievalFinished() {
                         if ( mGroups.size() == 0 ) {
-                            mLoadingText.setText( "You have no groups" );
+                            mLoadingGroupGoalsText.setText( "You have no groups" );
                         } else {
+                            mLoadingGroupGoalsText.setVisibility( View.GONE );
                             for ( final Group group : mGroups ) {
                                 DBListener groupGoalsListener = new DBListener() {
                                     public void onRetrievalFinished() {
                                         addGroupGoalsToUI( group );
                                         mDBListeners.remove( this );
-
                                     }
                                 };
                                 mDBListeners.add( groupGoalsListener );
@@ -140,7 +147,6 @@ public class GoalsFragment extends Fragment {
                 mDBListeners.remove( this );
                 Group.retrieveGroupNames( retrievedGroupIds, mGroups, groupNamesListener );
                 mDBListeners.remove( this );
-
             }
         };
         mDBListeners.add( groupIdsListener );
@@ -170,42 +176,35 @@ public class GoalsFragment extends Fragment {
         mGroupGoalsLayout.addView( groupLayout );
 
         if ( group.getmGoals() != null ) {
-            final ListView groupListView = createGroupGoalsListView( group );
-            final ArrayList<Goal> goals = new ArrayList<>(  );
-            GoalItemsAdapter goalItemsAdapter = new GoalItemsAdapter( getActivity(),  goals);
-            groupLayout.addView( groupListView );
+            if (group.getmGoals().size() == 0) {
+                // Display that the group has no goals
+                TextView noGoalsText = new TextView( getActivity() );
+                noGoalsText.setText( "No goals" );
+                mGroupGoalsLayout.addView( noGoalsText );
+            } else {
+                final ListView groupListView = new ListView( getActivity() );
+                final ArrayList<Goal> goals = new ArrayList<>(  );
+                GoalItemsAdapter itemsAdapter = new GoalItemsAdapter( getActivity(), goals);
+                groupListView.setAdapter( itemsAdapter );
 
-            final DBListener memberProgressListener = new DBListener() {
-                public void onRetrievalFinished( Object retrievedData ) {
-                    Member member = ( Member ) retrievedData;
-                    for(Goal progress : member.getmProgress()) goals.add( progress );
+                groupLayout.addView( groupListView );
 
-                    groupListView.setAdapter( new GoalItemsAdapter(getActivity(), goals));
+                final DBListener memberProgressListener = new DBListener() {
+                    public void onRetrievalFinished( Object retrievedData ) {
+                        Member member = ( Member ) retrievedData;
 
-                    mDBListeners.remove( this );
-                }
-            };
-            mDBListeners.add( memberProgressListener );
-            group.retrieveMemberProgress( memberProgressListener, User.getInstance().getUsername() );
-
+                        for(Goal progress : member.getmProgress()) goals.add( progress );
+                        mDBListeners.remove( this );
+                    }
+                };
+                mDBListeners.add( memberProgressListener );
+                group.retrieveMemberProgress( memberProgressListener, User.getInstance().getUsername() );
+            }
         } else {
-
             // Display that the group has no goals
             TextView noGoalsText = new TextView( getActivity() );
             noGoalsText.setText( "No goals" );
             mGroupGoalsLayout.addView( noGoalsText );
         }
-    }
-
-    private ListView createGroupGoalsListView( Group group ) {
-        ListView listView = new ListView( getActivity() );
-        GoalItemsAdapter itemsAdapter = new GoalItemsAdapter( getActivity(), group.getmGoals() );
-        listView.setAdapter( itemsAdapter );
-        return listView;
-    }
-
-
-    private void retreiveGroupGoals() {
-
     }
 }
