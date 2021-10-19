@@ -26,8 +26,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
-import com.nova.groupxercise.Adapters.GroupItemsAdapter;
+import com.nova.groupxercise.Adapters.SimpleGroupItemsAdapter;
 import com.nova.groupxercise.DBObjects.GoalDBObject;
+import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Objects.User;
@@ -65,14 +66,14 @@ public class ExerciseListItemFragment extends Fragment {
     private RadioButton mGoalOptionsManualRatioBtn;
     private EditText mManualGoalET;
     private ArrayAdapter mItemsAdapter;
-    private ArrayList mAdminGroups;
+    private ArrayList <Group>mAdminGroups;
     private ListView mListView;
     private TextView mLoadingText;
-    private ArrayList<String> mGroupIds;
-
+    private ArrayList< String > mGroupIds;
+    private ArrayList< String > mAdminGroupIds;
     // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
-
+    private ArrayList< DBListener > mDBListeners;
     // DB root reference
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -86,6 +87,7 @@ public class ExerciseListItemFragment extends Fragment {
     public ExerciseListItemFragment() {
         // Required empty public constructor
     }
+
 
     /**
      * Use this factory method to create a new instance of
@@ -201,90 +203,72 @@ public class ExerciseListItemFragment extends Fragment {
         } );
 
         // Set the fragment title
-        mSetGoalTitleText.setText( R.string.set_goal_title + mExerciseName );
+        mSetGoalTitleText.setText( getResources().getString( R.string.set_goal_title ) + " " + mExerciseName );
+        mDBListeners = new ArrayList<>();
 
-        // Set defauls sets and reps
-        mSetsText.setText( "3" );
-        mRepsText.setText( "10" );
 
         // Get the strength standards from the DB based on the user details
-        retrieveStrengthStandards( mExerciseName );
-        retrieveGroupIds();
-    }
+//        retrieveStrengthStandards( mExerciseName );
+        DBListener strengthStandardsListener = new DBListener() {
+            public void onRetrievalFinished( Object retrievedData ) {
+                mStrengthStandards = ( DataSnapshot ) retrievedData;
+                calculateSuggestedWeight();
+                mDBListeners.remove( this );
 
-    /**
-     * Retrieves the group IDs that the user is an admin of from the DB
-     */
-    private void retrieveGroupIds() {
-        // Create empty list for the group IDs that the user is an admin of
-        final ArrayList< String > groupIds = new ArrayList<>();
-        mGroupIds = new ArrayList(  );
-
-        // Get the current user ID
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Path to the reference
-        final String usersGroupPath = "user_groups/" + currentUserId;
-        DatabaseReference childRef = mRootRef.child( usersGroupPath );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
-                    Boolean isAdmin = ( Boolean ) usersGroupsDataSnapshot.getValue();
-                    if ( isAdmin.booleanValue() == true ) {
-                        // If the current user is an admin of the group
-                        groupIds.add( usersGroupsDataSnapshot.getKey() );
-                    }
-                    mGroupIds.add( usersGroupsDataSnapshot.getKey() );
-                }
-
-                retrieveGroupNames( groupIds );
             }
+        };
+        mDBListeners.add( strengthStandardsListener );
 
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
+        // Get the current user
+        User currentUser = User.getInstance();
 
-    /**
-     * Given a list of group IDs, retrieves the group names from the DB
-     * @param groupIds list of group IDs
-     */
-    private void retrieveGroupNames( ArrayList< String > groupIds ) {
-        // Create an empty list for the group names
-        mAdminGroups = new ArrayList<>();
+        // Set the loading message
+        mSuggestedGoalText.setText( R.string.loading );
 
-        // Set the list as the list for the items adapter
-        mItemsAdapter = new GroupItemsAdapter( getActivity(), mAdminGroups );
-
-        // The UI is updated when all of the group names have been added
-        // Necessary because of the async call within the for loop
-        final int expectedSize = groupIds.size();
-
-        for ( final String groupId : groupIds ) {
-            String groupPath = "groups/" + groupId;
-            DatabaseReference groupRef = mRootRef.child( groupPath );
-
-            groupRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                @Override
-                public void onDataChange( DataSnapshot dataSnapshot ) {
-                    String groupName = dataSnapshot.child( "name" ).getValue().toString();
-                    mAdminGroups.add( new Group( groupName, groupId ) );
-                    if ( mAdminGroups.size() == expectedSize ) {
-                        // When we have all the group names retrieved
-                        setupGroupsList();
-                    }
-                }
-
-                @Override
-                public void onCancelled( DatabaseError databaseError ) {
-                }
-            } );
+        // Check if all user details are set correctly
+        if ( currentUser.isUserDetailsAreSet() && currentUser.detailsAreValid() ) {
+            Goal.retrieveStrengthStandards( mExerciseName, strengthStandardsListener );
+        } else {
+            mSuggestedGoalText.setText( "Invalid details" );
         }
-        if ( mAdminGroups.size() == 0 ) {
-            mLoadingText.setText( "You are the admin of no groups" );
+
+//        retrieveGroupIds();
+        mGroupIds = new ArrayList<>();
+        mAdminGroupIds = new ArrayList<>();
+        DBListener groupIdsListener = new DBListener() {
+
+            public void onRetrievalFinished() {
+
+                mAdminGroups = new ArrayList<>();
+                // Set the list as the list for the items adapter
+                mItemsAdapter = new SimpleGroupItemsAdapter( getActivity(), mAdminGroups );
+
+                DBListener groupNamesListener = new DBListener() {
+
+                    public void onRetrievalFinished() {
+                        setupGroupsList();
+                        mDBListeners.remove( this );
+                    }
+
+                };
+                mDBListeners.add( groupNamesListener );
+                Group.retrieveGroupNames( mAdminGroupIds, mAdminGroups, groupNamesListener );
+                mDBListeners.remove( this );
+
+            }
+
+
+        };
+        mDBListeners.add( groupIdsListener );
+        Group.retrieveGroupIds( mAdminGroupIds, mGroupIds, groupIdsListener );
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for ( DBListener dbListener : mDBListeners ) {
+            dbListener.setActive( false );
         }
     }
 
@@ -300,14 +284,29 @@ public class ExerciseListItemFragment extends Fragment {
             @Override
             public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
                 Group selectedGroup = ( Group ) mListView.getItemAtPosition( i );
-                String groupId = selectedGroup.getmGroupId();
+                final String groupId = selectedGroup.getmGroupId();
 
                 if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
                     User currentUser = User.getInstance();
                     if ( currentUser.isUserDetailsAreSet() ) {
                         // Automatic goal calculation option: use suggested goal
                         float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
-                        saveGroupGoal( groupId, new Goal( mExerciseName, 0, target ) );
+                        final Goal goal = new Goal( mExerciseName, 0, target );
+                        DBListener goalSaveListener = new DBListener() {
+                            public void onRetrievalFinished( Object retrievedData ) {
+                                boolean goalAlreadyExists = ( ( Boolean ) retrievedData ).booleanValue();
+                                if ( goalAlreadyExists ) {
+                                    Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
+                                } else {
+                                    Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
+                                    addGoalProgressToMembers( groupId, goal );
+                                }
+                                mDBListeners.remove( this );
+                            }
+                        };
+                        mDBListeners.add( goalSaveListener );
+                        Group group = new Group( groupId );
+                        group.saveGoal( goal, goalSaveListener );
                     } else {
                         Toast.makeText( getActivity(), "Invalid details", Toast.LENGTH_SHORT ).show();
                     }
@@ -317,7 +316,22 @@ public class ExerciseListItemFragment extends Fragment {
 
                     if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
                         float target = Float.parseFloat( targetStr );
-                        saveGroupGoal( groupId, new Goal( mExerciseName, 0, target ) );
+                        final Goal goal = new Goal( mExerciseName, 0, target );
+                        DBListener goalSaveListener = new DBListener() {
+                            public void onRetrievalFinished( Object retrievedData ) {
+                                boolean goalAlreadyExists = ( ( Boolean ) retrievedData ).booleanValue();
+                                if ( goalAlreadyExists ) {
+                                    Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
+                                } else {
+                                    Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
+                                    addGoalProgressToMembers( groupId, goal );
+                                }
+                                mDBListeners.remove( this );
+                            }
+                        };
+                        mDBListeners.add( goalSaveListener );
+                        Group group = new Group( groupId );
+                        group.saveGoal( goal, goalSaveListener );
                     } else {
                         Toast.makeText( getActivity(), R.string.error_no_target_entered, Toast.LENGTH_SHORT ).show();
                     }
@@ -330,38 +344,6 @@ public class ExerciseListItemFragment extends Fragment {
         mListView.setVisibility( View.VISIBLE );
     }
 
-    /**
-     * Saves the argument goal as a goal for the group with the argument group ID
-     * This updates the group goal if the group already has a goal for the exercise
-     * @param groupId the group ID of the group to set the goal
-     * @param goal  the goal object
-     */
-    private void saveGroupGoal( final String groupId, final Goal goal ) {
-        // Path to the group goal
-        String path = "groups/" + groupId + "/goals/" + goal.getmExerciseName();
-
-        // Get the DB reference
-        final DatabaseReference childRef = mRootRef.child( path );
-
-        // Check if we have a set of goals for that particular user
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
-
-                } else {
-                    Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
-                    addGoalProgressToMembers( groupId, goal );
-                }
-                childRef.setValue( goal.getmTarget() );
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
 
     private void addGoalProgressToMembers( final String groupId, final Goal goal ) {
         // Path to the group goal
@@ -386,7 +368,7 @@ public class ExerciseListItemFragment extends Fragment {
                             String userId = dataSnapshot.getValue().toString();
                             User user = new User();
                             user.setUsername( username );
-                            goal.matchUserProgressToGroup( userId, user, new Group( groupId ) );
+//                            goal.matchUserProgressToGroup( userId, user, new Group( groupId ) );
                         }
 
                         @Override
@@ -416,6 +398,7 @@ public class ExerciseListItemFragment extends Fragment {
         if ( goal == null ) {
             Toast.makeText( getActivity(), R.string.error_goal_setting, Toast.LENGTH_SHORT ).show();
         } else {
+
             // Path to the users goals
             final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             String path = "user_goals/" + userId + "/" + goal.getmExerciseName();
@@ -431,12 +414,15 @@ public class ExerciseListItemFragment extends Fragment {
                     // Get the DB object for the goal
                     GoalDBObject goalDBObject = goal.getmGoalDBObject();
 
-                    if ( dataSnapshot.exists() ) {
-                        // If so, the operation is an update
-                        Toast.makeText( getActivity(), R.string.info_updating_goal, Toast.LENGTH_SHORT ).show();
-                    } else {
-                        // If not, the operation is a create
-                        Toast.makeText( getActivity(), R.string.info_creating_goal, Toast.LENGTH_SHORT ).show();
+                    if ( getActivity() != null ) {
+                        // If we have not moved into another fragment
+                        if ( dataSnapshot.exists() ) {
+                            // If so, the operation is an update
+                            Toast.makeText( getActivity(), R.string.info_updating_goal, Toast.LENGTH_SHORT ).show();
+                        } else {
+                            // If not, the operation is a create
+                            Toast.makeText( getActivity(), R.string.info_creating_goal, Toast.LENGTH_SHORT ).show();
+                        }
                     }
 
                     // If no child exists, this will create a new one
@@ -444,8 +430,8 @@ public class ExerciseListItemFragment extends Fragment {
                     childRef.setValue( goalDBObject );
 
                     // Check does the user have progress towards this exercise in a group
-                    for(String groupId : mGroupIds) {
-                        goal.matchGroupProgressToUser( userId, User.getInstance(), new Group( groupId ) );
+                    for ( String groupId : mGroupIds ) {
+//                        goal.matchGroupProgressToUser( userId, User.getInstance(), new Group( groupId ) );
                     }
                 }
 
@@ -470,39 +456,6 @@ public class ExerciseListItemFragment extends Fragment {
      *
      * @param exerciseName the name of the exercise to retrieve
      */
-    public void retrieveStrengthStandards( String exerciseName ) {
-        // Get the current user
-        User currentUser = User.getInstance();
-
-        // Set the loading message
-        mSuggestedGoalText.setText( R.string.loading );
-
-        // Check if all user details are set correctly
-        if ( currentUser.isUserDetailsAreSet() && currentUser.detailsAreValid() ) {
-            // Build the path and retrieve the strength standards
-            int weightClass = getWeightClass( currentUser.getWeight() );
-            String path = "strength_standards/" + exerciseName + "/" + currentUser.getSex().toString() + "/" + weightClass;
-
-            DatabaseReference childRef = mRootRef.child( path );
-            childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                @Override
-                public void onDataChange( DataSnapshot dataSnapshot ) {
-                    // Store the standards in memory so that they do not have to be retrieved again
-                    mStrengthStandards = dataSnapshot;
-
-                    // Display the current suggested weight
-                    calculateSuggestedWeight();
-                }
-
-                @Override
-                public void onCancelled( DatabaseError databaseError ) {
-                }
-            } );
-        } else {
-            Toast.makeText( getActivity(), R.string.error_invalid_user_details, Toast.LENGTH_SHORT ).show();
-            mSuggestedGoalText.setText( R.string.error_invalid_user_details );
-        }
-    }
 
     /**
      * Display the current suggested weight based on the user details and selected level
@@ -517,15 +470,6 @@ public class ExerciseListItemFragment extends Fragment {
         }
     }
 
-    /**
-     * Return the weight class based on the user details for retrieving strength standards
-     *
-     * @param weight the user weight
-     * @return the weight class as listed in the DB
-     */
-    private int getWeightClass( float weight ) {
-        return ( int ) ( Math.floor( weight / 5 ) * 5 );
-    }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,

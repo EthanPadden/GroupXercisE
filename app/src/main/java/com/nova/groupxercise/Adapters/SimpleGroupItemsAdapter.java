@@ -8,14 +8,13 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.nova.groupxercise.Objects.Group;
-import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
 
-public class GroupItemsAdapter extends ArrayAdapter {
-    private static final String LOG_TAG = GroupItemsAdapter.class.getSimpleName();
+public class SimpleGroupItemsAdapter extends ArrayAdapter {
+    private static final String LOG_TAG = SimpleGroupItemsAdapter.class.getSimpleName();
 
-    public GroupItemsAdapter( Activity context, ArrayList< Group > groups ) {
+    public SimpleGroupItemsAdapter( Activity context, ArrayList< Group > groups ) {
         super( context, 0, groups );
     }
 
@@ -25,17 +24,14 @@ public class GroupItemsAdapter extends ArrayAdapter {
         View listItemView = convertView;
         if ( listItemView == null ) {
             listItemView = LayoutInflater.from( getContext() ).inflate(
-                    R.layout.layout_group_list_item, parent, false );
+                    android.R.layout.simple_list_item_1, parent, false );
         }
 
         Group currentGroup = ( Group ) getItem( position );
 
-        TextView groupNameText = listItemView.findViewById( R.id.text_group_name );
+        TextView groupNameText = ( TextView)listItemView.findViewById( android.R.id.text1);
         groupNameText.setText( currentGroup.getmName() );
-        TextView memberCountText = listItemView.findViewById( R.id.text_group_members_count );
-        int numMembers = currentGroup.getmMembers().size();
-        String countUnit = numMembers == 1? "member":"members";
-        memberCountText.setText( numMembers + " " + countUnit );
+
 
         return listItemView;
     }

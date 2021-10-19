@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -22,12 +23,19 @@
         android:paddingRight="10dp"
         android:paddingBottom="10dp"
         tools:context="com.nova.groupxercise.Activities.HomeScreenActivity" />
-    <Button
+
+
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_add_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/btn_add_activity"
+        android:clickable="true"
+        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:text="Add Activity"/>
+        android:layout_margin="20dp"
+        app:srcCompat="@drawable/ic_add_black_24dp" />
 
 
 </RelativeLayout>

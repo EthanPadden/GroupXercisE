@@ -10,12 +10,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
     <TextView
-        android:id="@+id/text_loading_exercise_list"
+        android:id="@+id/goals_fgt_text_loading_personal_goals"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
-        android:text="Loading..." />
+        android:text="Loading personal goals..." />
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -29,10 +29,18 @@
         android:paddingBottom="10dp"
         tools:context="com.nova.groupxercise.Activities.HomeScreenActivity" />
 
+    <TextView
+        android:id="@+id/goals_fgt_text_loading_group_goals"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="20dp"
+        android:text="Loading group goals..." />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:padding="10dp"
         android:id="@+id/layout_group_goals">
 
     </LinearLayout>

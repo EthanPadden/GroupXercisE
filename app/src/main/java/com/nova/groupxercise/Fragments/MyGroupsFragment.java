@@ -1,49 +1,74 @@
 package com.nova.groupxercise.Fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nova.groupxercise.Activities.CreateGroupActivity;
-import com.nova.groupxercise.Objects.Group;
-import com.nova.groupxercise.Adapters.GroupItemsAdapter;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.nova.groupxercise.Adapters.GroupItemsAdapter;
+import com.nova.groupxercise.Objects.DBListener;
+import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
 
 
 public class MyGroupsFragment extends Fragment {
-    private Button mCreateGroupBtn;
+    private FloatingActionButton mCreateGroupBtn;
     private ArrayList< Group > mGroups;
-    private ArrayAdapter< String > mItemsAdapter;
-    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private GroupItemsAdapter mItemsAdapter;
     private TextView mLoadingText;
     private ListView mListView;
+    private ArrayList< DBListener > mDBListeners;
+    private boolean backButtonPressed;
 
 
     @Override
-    public void onCreate( Bundle savedInstanceState ) {
-        super.onCreate( savedInstanceState );
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
+        backButtonPressed = false;
+
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                if(!backButtonPressed) {
+                    Toast.makeText( getActivity(), "Press back button again to exit", Toast.LENGTH_SHORT ).show();
+                    backButtonPressed = true;
+                } else {
+                    // Back button pressed twice - exit appp
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    startActivity(intent);
+                    backButtonPressed = false;
+                }
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
+    }
+
+    @Override
+    public void onAttach( @NonNull Context context ) {
+        super.onAttach( context );
+        mDBListeners = new ArrayList<>();
     }
 
     @Override
@@ -71,104 +96,82 @@ public class MyGroupsFragment extends Fragment {
             }
         } );
 
-        retrieveGroupIds();
-    }
+        mLoadingText.setText( "Loading..." );
 
-    /**
-     * Gets the IDs of the groups that the current user is a part of
-     * Calls retrieveGroupNames
-     */
-    private void retrieveGroupIds() {
-        // Create empty list for the group IDs
-        final ArrayList<String> groupIds = new ArrayList<>(  );
+        DBListener groupIdListener = new DBListener() {
+            public void onRetrievalFinished( Object retrievedData ) {
+                ArrayList<String> retrievedGroupIds = (ArrayList< String>) retrievedData;
+                // Create an empty list for the group names
+                mGroups = new ArrayList<>();
 
-        // Get the current user ID
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                // Set the list as the list for the items adapter
+                mItemsAdapter = new GroupItemsAdapter( getActivity(), mGroups );
 
-        // Path to the reference
-        String usersGroupPath = "user_groups/" + currentUserId;
-        DatabaseReference childRef = mRootRef.child( usersGroupPath );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot usersGroupsDataSnapshot : dataSnapshot.getChildren() ) {
-                    groupIds.add(  usersGroupsDataSnapshot.getKey());
-                }
-
-                retrieveGroupNames( groupIds );
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
-
-    /**
-     * Sets the list of group names using the list of group IDs
-     * Calls setupGroupsList
-     * @param groupIds the list of group IDs
-     */
-    private void retrieveGroupNames(ArrayList<String> groupIds) {
-        // Create an empty list for the group names
-        mGroups = new ArrayList<>();
-
-        // Set the list as the list for the items adapter
-        mItemsAdapter = new GroupItemsAdapter( getActivity(),  mGroups );
-
-        // The UI is updated when all of the group names have been added
-        // Necessary because of the async call within the for loop
-        final int expectedSize = groupIds.size();
-
-        for( final String groupId : groupIds) {
-            String groupPath = "groups/" + groupId;
-            DatabaseReference groupRef = mRootRef.child( groupPath );
-
-            groupRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                @Override
-                public void onDataChange( DataSnapshot dataSnapshot ) {
-                    String groupName = dataSnapshot.child( "name" ).getValue().toString();
-                    mGroups.add( new Group( groupName, groupId ) );
-                    if(mGroups.size() == expectedSize) {
-                        // When we have all the group names retrieved
+                DBListener groupNameListener = new DBListener() {
+                    public void onRetrievalFinished() {
                         setupGroupsList();
+                        for ( Group group : mGroups ) {
+                            DBListener groupMembersListener = new DBListener() {
+                                public void onRetrievalFinished() {
+                                    mDBListeners.remove( this );
+                                    mItemsAdapter.notifyDataSetChanged();
+                                }
+                            };
+                            mDBListeners.add( groupMembersListener );
+                            group.retrieveGroupMembers( groupMembersListener );
+                        }
+                        mItemsAdapter.notifyDataSetChanged();
+                        mDBListeners.remove( this );
                     }
-                }
+                };
+                mDBListeners.add( groupNameListener );
+                Group.retrieveGroupNames( retrievedGroupIds, mGroups, groupNameListener );
 
-                @Override
-                public void onCancelled( DatabaseError databaseError ) {
-                }
-            } );
-        }
-        if(mGroups.size() == 0) {
-            mLoadingText.setText( "You have no groups" );
-        }
 
+
+                mDBListeners.remove( this );
+            }
+        };
+        mDBListeners.add( groupIdListener );
+        Group.retrieveGroupIds( groupIdListener );
+    }
+
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for ( DBListener dbListener : mDBListeners ) {
+            dbListener.setActive( false );
+        }
     }
 
     /**
      * Updates the UI with the group names and sets event listeners for the list items
      */
     private void setupGroupsList() {
-        mLoadingText.setVisibility( View.GONE );
-        mListView.setAdapter( mItemsAdapter );
+        if(mGroups.size() == 0) {
+            mLoadingText.setText( "You have no groups" );
+        }else {
+            mLoadingText.setVisibility( View.GONE );
+            mListView.setAdapter( mItemsAdapter );
 
-        // Set event listeners
-        mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
-                Group selectedGroup = (Group) mListView.getItemAtPosition( i );
+            // Set event listeners
+            mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
+                    Group selectedGroup = ( Group ) mListView.getItemAtPosition( i );
 
-                HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-                homeScreenActivity.getSupportActionBar().setTitle( selectedGroup.getmGroupName() );
+                    HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+                    homeScreenActivity.getSupportActionBar().setTitle( selectedGroup.getmName() );
 
-                FragmentTransaction ft = homeScreenActivity.getSupportFragmentManager().beginTransaction();
-                GroupFragment groupFragment = new GroupFragment(selectedGroup.getmGroupId());
-                ft.replace( R.id.frame_home_screen_fragment_placeholder, groupFragment );
-                ft.commit();
-            }
-        } );
+                    FragmentTransaction ft = homeScreenActivity.getSupportFragmentManager().beginTransaction();
+                    GroupFragment groupFragment = new GroupFragment( selectedGroup.getmGroupId() );
+                    ft.replace( R.id.frame_home_screen_fragment_placeholder, groupFragment );
+                    ft.commit();
+                }
+            } );
+        }
     }
 
 }

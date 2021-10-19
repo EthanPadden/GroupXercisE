@@ -10,34 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".Activities.HomeScreenActivity">
+
         <TableLayout
             android:id="@+id/table_group_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:stretchColumns="1">
 
-            <TableRow android:layout_margin="5dp">
-
-                <TextView
-                    android:gravity="center"
-                    android:text="Group name:" />
-
-                <TextView
-                    android:id="@+id/text_group_name"
-                    android:gravity="center" />
-
-            </TableRow>
-            <TableRow android:layout_margin="5dp">
-
-                <TextView
-                    android:gravity="center"
-                    android:text="Creator:" />
-
-                <TextView
-                    android:id="@+id/text_creator"
-                    android:gravity="center" />
-
-            </TableRow>
 
             <TableRow android:layout_margin="5dp">
 
@@ -45,85 +24,72 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:padding="10dp"
-                    android:text="Members" />
+                    android:text="Members"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
             </TableRow>
 
         </TableLayout>
 
-        <LinearLayout
+
+        <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_height="match_parent"
             android:layout_below="@+id/table_group_details"
-            android:id="@+id/layout_members">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="MEMBERS"/>
-
-        </LinearLayout>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:id="@+id/btn_add_member"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/layout_members"
-            android:text="Add Member"
-            android:visibility="gone"/>
+            android:id="@+id/recycler_members"/>
 
         <EditText
+            android:id="@+id/et_member_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_add_member"
-            android:id="@+id/et_member_name"
-            android:visibility="gone"/>
+            android:layout_below="@+id/recycler_members"
+            android:layout_margin="10dp"
+            android:hint="Add member..."
+            android:visibility="gone" />
 
         <Button
+            android:id="@+id/btn_add_member"
             android:layout_width="wrap_content"
-            android:id="@+id/btn_delete_group"
             android:layout_height="wrap_content"
             android:layout_below="@id/et_member_name"
-            android:text="Delete Group"
-            android:visibility="gone"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:id="@+id/btn_remove_member"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/btn_delete_group"
-            android:text="Remove Member"
-            android:visibility="gone"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:id="@+id/btn_update_status"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/btn_remove_member"
-            android:text="Update Status"/>
-
-
-
-
+            android:layout_centerInParent="true"
+            android:text="Add Member"
+            android:visibility="gone" />
 
         <LinearLayout
+            android:id="@+id/layout_group_goals"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_below="@+id/btn_update_status"
-            android:id="@+id/layout_group_goals">
+            android:layout_below="@+id/et_member_name"
+            android:orientation="vertical">
+
             <TextView
+                android:id="@+id/text_group_goals_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Goals"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_group_goals_loading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="Goals:"
-                android:id="@+id/text_group_goals_title"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="Loading..."
-                android:id="@+id/text_group_goals_loading"/>
+                android:text="Loading..." />
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_delete_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/layout_group_goals"
+            android:layout_centerInParent="true"
+            android:text="Delete Group"
+            android:visibility="gone" />
 
     </RelativeLayout>
 

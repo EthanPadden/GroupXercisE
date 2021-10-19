@@ -1,7 +1,7 @@
 package com.nova.groupxercise.Fragments;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +14,19 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.nova.groupxercise.Adapters.GroupMemberRecyclerAdapter;
+import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
+import com.nova.groupxercise.Objects.Member;
 import com.nova.groupxercise.Objects.User;
 import com.nova.groupxercise.R;
 
@@ -32,17 +35,18 @@ import java.util.ArrayList;
 public class GroupFragment extends Fragment {
     private Group mGroup;
     private String mGroupId;
-    private TextView mGroupNameText;
-    private TextView mGroupCreatorText;
     private Button mAddMemberBtn;
     private Button mDeleteGroupBtn;
-    private Button mRemoveMemberBtn;
     private EditText mMemberNameEt;
     private TextView mGroupGoalsLoadingText;
-    private ArrayList< Goal > mGroupGoals;
-    private LinearLayout mGroupMembersLayout;
+    //    private LinearLayout mGroupMembersLayout;
     private LinearLayout mGroupGoalsLayout;
-    private Button mUpdateStatusBtn;
+    private ArrayList< DBListener > mDBListeners;
+    private boolean adminGroup;
+    private RecyclerView mGroupMembersRecycler;
+    private GroupMemberRecyclerAdapter mGroupMemberRecyclerAdapter;
+    private DatabaseReference mGroupMembersRef;
+    private ValueEventListener mGroupMembersListener;
 
 
     public GroupFragment( String mGroupId ) {
@@ -60,346 +64,143 @@ public class GroupFragment extends Fragment {
     public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
         super.onViewCreated( view, savedInstanceState );
 
+        // Initially assume that the current user is not a group admin
+        // This will be updated if it is found that they are
+        adminGroup = false;
+
         // Initialise components
-        mGroupNameText = view.findViewById( R.id.text_group_name );
-        mGroupCreatorText = view.findViewById( R.id.text_creator );
         mAddMemberBtn = view.findViewById( R.id.btn_add_member );
         mMemberNameEt = view.findViewById( R.id.et_member_name );
         mDeleteGroupBtn = view.findViewById( R.id.btn_delete_group );
-        mRemoveMemberBtn = view.findViewById( R.id.btn_remove_member );
         mGroupGoalsLoadingText = view.findViewById( R.id.text_group_goals_loading );
-        mGroupMembersLayout = view.findViewById( R.id.layout_members );
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
-        mUpdateStatusBtn = view.findViewById( R.id.btn_update_status );
+        mGroupMembersRecycler = view.findViewById( R.id.recycler_members );
+
+        // Create arraylist for DB single-value events
+        mDBListeners = new ArrayList<>();
+
+        // Create group object in memory
+
 
         // Set event listeners
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
-                String username = mMemberNameEt.getText().toString();
-                if ( checkIfUsernameIsValid( username ) ) {
-                    checkIfUserExists( username );
-                } else {
-                    Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
-                }
-            }
-        } );
-        mRemoveMemberBtn.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( View view ) {
-                String username = mMemberNameEt.getText().toString();
-                if ( checkIfUsernameIsValid( username ) ) {
-                    // You cannot remove the group creator
-                    if ( mGroup.getmGroupCreator().compareTo( username ) == 0 ) {
-                        Toast.makeText( getActivity(), "You cannot remove the creator", Toast.LENGTH_SHORT ).show();
-                    } else {
-                        removeMember( username );
-                    }
-                } else {
-                    Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
-                }
-            }
-        } );
-        mDeleteGroupBtn.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( View view ) {
-                deleteGroup();
-            }
-        } );
-        mUpdateStatusBtn.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( View view ) {
-                updateMyStatuses();
-            }
-        } );
+                // Get the username of the user to be added
+                final String username = mMemberNameEt.getText().toString();
 
-        retrieveGroupInfo();
-        retrieveGroupGoals();
-    }
+                if ( User.checkIfUsernameIsValid( username ) ) {
+                    // If the username is valid, check does the user exist
+                    DBListener userCheckListener = new DBListener() {
+                        public void onRetrievalFinished( Object retrievedData ) {
+                            if ( retrievedData == null ) {
+                                // The user does not exist
+                                Toast.makeText( getActivity(), "User not found: " + username, Toast.LENGTH_SHORT ).show();
+                            } else {
+                                // The user exists - get the user ID and add the user to the group
+                                String userId = ( String ) retrievedData;
+                                DBListener additionListener = new DBListener() {
+                                    public void onRetrievalFinished( Object retrievedData ) {
+                                        Toast.makeText( getActivity(), "Member added: " + username, Toast.LENGTH_SHORT ).show();
+                                        mDBListeners.remove( this );
+                                    }
+                                };
+                                mDBListeners.add( additionListener );
+                                mGroup.addMember( username, userId, additionListener );
+                            }
 
-    private void updateMyStatuses() {
-        /** For every goal in the group, get my current status in memory and UI */
-        for ( Goal goal : mGroupGoals ) {
-            updateMyStatusFromPersonalGoals( goal );
-        }
-
-        /** Update the progress in the group goal progress */
-    }
-
-    private void updateMyStatusFromPersonalGoals( final Goal goal ) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        Log.d( "jar", userId );
-
-        String path = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
-        Log.d( "jar", path );
-
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        final DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    Object currentStatusObj = dataSnapshot.getValue();
-                    float currentStatus;
-                    if ( currentStatusObj instanceof Long ) {
-                        currentStatus = ( ( Long ) currentStatusObj ).floatValue();
-                    } else {
-                        currentStatus = ( ( Float ) currentStatusObj ).floatValue();
-                    }
-                    goal.setmCurrentStatus( currentStatus );
-                    Log.d( "jar", "" + currentStatus );
-
-                    updateStatusUI( goal );
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
-
-    private void updateStatusUI( Goal goal ) {
-        String currentUsername = User.getInstance().getUsername();
-        String progressId = currentUsername + goal.getmExerciseName();
-        int hashedProgressId = progressId.hashCode();
-        Log.d( "Update", progressId );
-
-        TextView textView = getView().findViewById( hashedProgressId );
-        if ( textView != null )
-            textView.setText( goal.getmExerciseName() + ": " + goal.getmCurrentStatus() );
-    }
-
-
-    /**
-     * Retrieves the group goals from the DB
-     */
-    private void retrieveGroupGoals() {
-        // Path to group goals
-        String path = "groups/" + mGroupId + "/goals";
-
-        // Get the DB reference
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-        mGroupGoals = new ArrayList();
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    for ( DataSnapshot goalDataSnapshot : dataSnapshot.getChildren() ) {
-                        String exerciseName = goalDataSnapshot.getKey();
-                        // We have a goal for this exercise
-                        Object targetObj = goalDataSnapshot.getValue();
-                        float target;
-                        if ( targetObj instanceof Long ) {
-                            target = ( ( Long ) targetObj ).floatValue();
-                        } else {
-                            target = ( ( Float ) targetObj ).floatValue();
+                            mDBListeners.remove( this );
                         }
-                        mGroupGoals.add( new Goal( exerciseName, 0, target ) );
-                        mGroupGoalsLoadingText.setVisibility( View.GONE );
-
-                        TextView textView = new TextView( getActivity() );
-                        textView.setText( exerciseName + ": " + target );
-
-                        mGroupGoalsLayout.addView( textView );
-
-                    }
+                    };
+                    mDBListeners.add( userCheckListener );
+                    User.checkIfUserExists( username, userCheckListener );
                 } else {
+                    Toast.makeText( getActivity(), "Invalid username", Toast.LENGTH_SHORT ).show();
+                }
+            }
+        } );
+//        mDeleteGroupBtn.setOnClickListener( new View.OnClickListener() {
+//            @Override
+//            public void onClick( View view ) {
+//                mGroup.deleteGroup();
+//                // Return to my groups fragment
+//                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+//                MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
+//                ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
+//                ft.commit();
+//            }
+//        } );
+
+        // Retrieve the group information
+        DBListener groupInfoListener = new DBListener() {
+            public void onRetrievalFinished() {
+                // If the current user is the admin, show the controls
+                String currentUsername = User.getInstance().getUsername();
+                if ( mGroup.getmCreator().compareTo( currentUsername ) == 0 ) {
+                    mAddMemberBtn.setVisibility( View.VISIBLE );
+                    mMemberNameEt.setVisibility( View.VISIBLE );
+                    mDeleteGroupBtn.setVisibility( View.VISIBLE );
+                    adminGroup = true;
+                }
+
+                // Set up listener for changes to the members subtree
+                setupGroupMemberListeners();
+
+                mDBListeners.remove( this );
+            }
+        };
+        mDBListeners.add( groupInfoListener );
+        mGroup.retrieveGroupInfo( groupInfoListener );
+
+        DBListener groupGoalListener = new DBListener() {
+            public void onRetrievalFinished() {
+                if ( mGroup.getmGoals().size() == 0 ) {
                     mGroupGoalsLoadingText.setText( "No goals" );
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
-
-    /**
-     * Removes all members from the group (including the creator)
-     * Deletes the group
-     * Sets the fragment to be the my groups fragment
-     */
-    private void deleteGroup() {
-        // Remove all members
-        for ( String memberUsername : mGroup.getMembers() ) {
-            removeMember( memberUsername );
-        }
-
-        // Delete group subtree
-        String groupPath = "groups/" + mGroupId;
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference groupRef = homeScreenActivity.getmRootRef().child( groupPath );
-        groupRef.removeValue();
-
-        // Set the fragment to be the my groups fragment
-        FragmentTransaction ft = homeScreenActivity.getSupportFragmentManager().beginTransaction();
-        MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
-        ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
-        ft.commit();
-    }
-
-    /**
-     * Checks the argument string is a valid username
-     *
-     * @param username the username to check
-     * @return true if the username is valid
-     */
-    private boolean checkIfUsernameIsValid( String username ) {
-        return username != null && username.compareTo( "" ) != 0;
-    }
-
-    /**
-     * Checks if there is a user with the argument username
-     * If not, show error message
-     * If so, find the user ID and call addUserToGroup
-     *
-     * @param username
-     */
-    private void checkIfUserExists( final String username ) {
-        Toast.makeText( getActivity(), "Searching for user: " + username, Toast.LENGTH_SHORT ).show();
-
-        // Path to the username child
-        String path = "usernames/" + username;
-
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    Toast.makeText( getActivity(), "User found: " + username, Toast.LENGTH_SHORT ).show();
-                    String userId = dataSnapshot.getValue().toString();
-                    addUserToGroup( username, userId );
                 } else {
-                    Toast.makeText( getActivity(), "Username not found", Toast.LENGTH_SHORT ).show();
+                    mGroupGoalsLoadingText.setVisibility( View.GONE );
+
+                    for ( Goal goal : mGroup.getmGoals() ) {
+                        View goalView = createGroupGoalUIComponent( goal );
+                        mGroupGoalsLayout.addView( goalView );
+                    }
                 }
-            }
+                mDBListeners.remove( this );
 
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
             }
-        } );
+        };
+        mDBListeners.add( groupGoalListener );
+        mGroup.retrieveGroupGoals( groupGoalListener );
     }
 
     /**
-     * Adds a user to the group, updating both the groups and user_groups subtrees
-     *
-     * @param username the username of the user to add
-     * @param userId   the ID of the user to add
+     * Creates a listener for the members subtree of the group in the DB
+     * When it chagnes (including the initial call), it updates the UI
      */
-    private void addUserToGroup( String username, String userId ) {
-        /** Updating groups subtree */
-        // Path to this groups members child
-        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
-
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference groupsChildRef = homeScreenActivity.getmRootRef().child( thisGroupMembersPath );
-
-        groupsChildRef.child( username ).setValue( false );
-
-        // TODO: check if the user is already a member - error?
-
-        /** Updating user_groups subtree */
-        String userGroupsPath = "user_groups/" + userId;
-        DatabaseReference userGroupsChildRef = homeScreenActivity.getmRootRef().child( userGroupsPath );
-        userGroupsChildRef.child( mGroupId ).setValue( false );
-
-        /** Updating group in memory and UI */
-        mGroup.getMembers().add( username );
-
-        /** Create subtree for the progress of that user towards the goals */
-        for ( Goal goal : mGroupGoals ) {
-            User user = new User();
-            user.setUsername( username );
-            goal.matchUserProgressToGroup( userId, user, mGroup );
-        }
-
-    }
-
-    /**
-     * Removes a user from the group, updating both the groups and user_groups subtrees
-     *
-     * @param username the username of the user to remove
-     */
-    private void removeMember( final String username ) {
-
-        /** Updating groups subtree */
-        // Path to this groups members child
-        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
-
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference groupsChildRef = homeScreenActivity.getmRootRef().child( thisGroupMembersPath );
-
-        // TODO: check if the user is already a member - error?
-        // TODO: what if that user is not a member? = error?
-        groupsChildRef.child( username ).removeValue();
-
-
-        /** Updating user_groups subtree */
-        String usernamePath = "usernames/" + username;
-        final DatabaseReference rootRef = homeScreenActivity.getmRootRef();
-        DatabaseReference usernameChildRef = rootRef.child( usernamePath );
-        usernameChildRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                String userId = dataSnapshot.getValue().toString();
-
-                String userGroupsPath = "user_groups/" + userId;
-                DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
-                userGroupsChildRef.child( mGroupId ).removeValue();
-
-                /** Updating group in memory and UI */
-                mGroup.getMembers().remove( username );
-            }
-
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
-
-    /**
-     * Gets the group information from the DB using the group ID
-     */
-    private void retrieveGroupInfo() {
-        // Path to the group
-        final String path = "groups/" + mGroupId;
+    private void setupGroupMemberListeners() {
+        final String path = "groups/" + mGroupId + "/members";
+        mGroupMembersRecycler.setLayoutManager( new LinearLayoutManager( getContext() ) );
+        mGroupMemberRecyclerAdapter = new GroupMemberRecyclerAdapter( getContext(), mGroup, adminGroup);
+        mGroupMembersRecycler.setAdapter( mGroupMemberRecyclerAdapter );
 
         // Get the DB reference
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
+        mGroupMembersRef = FirebaseDatabase.getInstance().getReference().child( path );
 
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+        mGroupMembersListener = new ValueEventListener() {
             @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                // Get values
-                String dbGroupName = dataSnapshot.child( "name" ).getValue().toString();
-                String dbGroupCreator = dataSnapshot.child( "creator" ).getValue().toString();
-                DataSnapshot membersDataSnapshot = dataSnapshot.child( "members" );
-                ArrayList< String > dbMembers = new ArrayList<>();
+            public void onDataChange( @NonNull DataSnapshot membersDataSnapshot ) {
+//                 Parse the snapshot, updating the group in memory
                 for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
-                    String username = memberDataSnapshot.getKey();
-                    dbMembers.add( username );
+                    // Retrieve member username and create member object
+                    final String username = memberDataSnapshot.getKey();
+                    Member member = new Member( username );
 
-                    LinearLayout linearLayout = new LinearLayout( getActivity() );
-                    linearLayout.setOrientation( LinearLayout.VERTICAL );
-
-                    TextView usernameTextView = new TextView( getActivity() );
-                    usernameTextView.setText( username.toUpperCase() );
-                    linearLayout.addView( usernameTextView );
-
-                    String currentUsername = User.getInstance().getUsername();
-                    int hashedUsername = currentUsername.hashCode();
-                    linearLayout.setId( hashedUsername );
-
+                    // For every progress in the progress subtree, create a goal object
+                    // and add to the member object
                     for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
+                        // Get the exercise name
                         String exerciseName = progressDataSnapshot.getKey();
+
+                        // Get the current status (member progress towards that goal
                         Object currentStatusObj = progressDataSnapshot.getValue();
                         float currentStatus;
                         if ( currentStatusObj instanceof Long ) {
@@ -407,45 +208,57 @@ public class GroupFragment extends Fragment {
                         } else {
                             currentStatus = ( ( Float ) currentStatusObj ).floatValue();
                         }
-                        String progress = exerciseName + ": " + currentStatus;
-                        TextView progressTextView = new TextView( getActivity() );
-                        progressTextView.setText( progress );
 
-                        String progressId = username + exerciseName;
-                        Log.d( "Build", progressId );
+                        // We are not concerned with the target, it is stored in the group goal
+                        float target = 0;
 
-                        int hashedProgressId = progressId.hashCode();
-                        progressTextView.setId( hashedProgressId );
-                        linearLayout.addView( progressTextView );
-
+                        Goal goal = new Goal( exerciseName, currentStatus, target );
+                        member.getmProgress().add( goal );
                     }
 
-                    mGroupMembersLayout.addView( linearLayout );
+                    mGroup.getmMembers().add( member );
                 }
 
-                // Create group object
-                mGroup = new Group( dbGroupName, mGroupId );
-                mGroup.setmGroupCreator( dbGroupCreator );
-                mGroup.setMembers( dbMembers );
-
-                // Update UI
-                mGroupNameText.setText( mGroup.getmGroupName() );
-                mGroupCreatorText.setText( mGroup.getmGroupCreator() );
-
-                // If the user is the creator, show the components that allows the user admin controls
-                User currentUser = User.getInstance();
-                String currentUsername = currentUser.getUsername();
-                if ( mGroup.getmGroupCreator().compareTo( currentUsername ) == 0 ) {
-                    mAddMemberBtn.setVisibility( View.VISIBLE );
-                    mMemberNameEt.setVisibility( View.VISIBLE );
-                    mDeleteGroupBtn.setVisibility( View.VISIBLE );
-                    mRemoveMemberBtn.setVisibility( View.VISIBLE );
-                }
+                mGroupMemberRecyclerAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled( DatabaseError databaseError ) {
+            public void onCancelled( @NonNull DatabaseError databaseError ) {
+
             }
-        } );
+        };
+
+        mGroupMembersRef.addValueEventListener( mGroupMembersListener );
+    }
+
+    private View createGroupGoalUIComponent( Goal goal ) {
+        View goalView = getLayoutInflater().inflate( R.layout.layout_goal_list_item, null );
+        TextView exerciseNameText = goalView.findViewById( R.id.goal_exercise_name );
+        TextView currentStatusText = goalView.findViewById( R.id.goal_current_status );
+        TextView dividerText = goalView.findViewById( R.id.goal_divider );
+        TextView targetText = goalView.findViewById( R.id.goal_target );
+        exerciseNameText.setText( goal.getmExerciseName() );
+        currentStatusText.setVisibility( View.GONE );
+        dividerText.setVisibility( View.GONE );
+        targetText.setText( Float.toString( goal.getmTarget() ) );
+        return goalView;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for ( DBListener dbListener : mDBListeners ) {
+            // Deactivate any active listeners
+            dbListener.setActive( false );
+        }
+
+        mGroupMembersRef.removeEventListener( mGroupMembersListener );
+    }
+
+    @Override
+    public void onAttach( @NonNull Context context ) {
+        super.onAttach( context );
+        mDBListeners = new ArrayList<>();
+        mGroup = new Group( mGroupId );
     }
 }

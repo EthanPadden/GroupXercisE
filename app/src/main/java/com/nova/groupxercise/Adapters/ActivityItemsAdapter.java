@@ -7,8 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.nova.groupxercise.Activities.ExerciseActivity;
+import com.nova.groupxercise.Objects.ExerciseActivity;
 import com.nova.groupxercise.R;
+
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 
@@ -35,7 +38,11 @@ public class ActivityItemsAdapter extends ArrayAdapter {
         TextView levelText = listItemView.findViewById( R.id.activity_level );
         levelText.setText( Float.toString( currentActivity.getmLevel() ));
         TextView timeText = listItemView.findViewById( R.id.activity_time );
-        timeText.setText( currentActivity.getmTime().toString());
+        // Format for output
+        DateTimeFormatter dtfOut = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm");
+        // Printing the date
+        String timeStr = dtfOut.print(currentActivity.getmTime());
+        timeText.setText( timeStr);
 
         return listItemView;
     }

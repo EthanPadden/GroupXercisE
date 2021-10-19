@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,8 +23,8 @@ import com.nova.groupxercise.Fragments.DiscoveriesFragment;
 import com.nova.groupxercise.Fragments.ExerciseListItemFragment;
 import com.nova.groupxercise.Fragments.GoalsFragment;
 import com.nova.groupxercise.Fragments.MyGroupsFragment;
-import com.nova.groupxercise.R;
 import com.nova.groupxercise.Objects.User;
+import com.nova.groupxercise.R;
 
 public class HomeScreenActivity extends AppCompatActivity implements ExerciseListItemFragment.OnFragmentInteractionListener {
     private FirebaseAuth mAuth;
@@ -103,16 +102,19 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         // Set event listeners
         navView.setOnNavigationItemSelectedListener( mOnNavigationItemSelectedListener );
 
-        // Create Discoveries Fragment
-        DiscoveriesFragment discoveriesFragment = new DiscoveriesFragment();
-
         // Set the default toolbar title
         getSupportActionBar().setTitle( R.string.title_discoveries );
 
         // Set the fragment to be displayed in the frame view
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace( R.id.frame_home_screen_fragment_placeholder, discoveriesFragment );
-        ft.commit();
+
+        if ( getIntent().getExtras() != null ) {
+            int fragmentNumber = getIntent().getExtras().getInt( "FRAGMENT_ID" );
+            navView.setSelectedItemId(fragmentNumber);
+        } else {
+            navView.setSelectedItemId(R.id.navigation_discoveries);
+        }
+
 
         // If the user details are not set locally, retrieve them from the database
         User currentUser = User.getInstance();
@@ -121,7 +123,7 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         }
 
         // If the username is not set locally, retrieve it from the database
-        if(currentUser.getUsername() == null) {
+        if ( currentUser.getUsername() == null ) {
             currentUser.retrieveUsername();
         }
     }
@@ -145,26 +147,6 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
         return super.onOptionsItemSelected( item );
     }
 
-    /**
-     * Sign out the user that is currently logged in using Firebase method
-     * Toast with error message if no user is currently logged in
-     */
-    protected void signOutUser() {
-        // Check if there is a user currently logged in
-        if ( mAuth.getCurrentUser() != null ) {
-            // Reset the local user instance
-            User.getInstance().setUserDetailsAreSet( false );
-            User.getInstance().setUsername( null );
-            mAuth.signOut();
-        } else {
-            Toast.makeText( HomeScreenActivity.this, R.string.error_user_not_logged_in,
-                    Toast.LENGTH_SHORT ).show();
-        }
-
-        // Regardless, go to login screen
-        Intent intent = new Intent( HomeScreenActivity.this, LoginActivity.class );
-        startActivity( intent );
-    }
 
     public FirebaseAuth getmAuth() {
         return mAuth;
@@ -186,7 +168,9 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
                     Intent intent = new Intent( HomeScreenActivity.this, ProfileActivity.class );
                     startActivity( intent );
                 } else if ( item.getItemId() == R.id.drawer_logout ) {
-                    signOutUser();
+                    User.getInstance().signOutUser();
+                    Intent intent = new Intent( HomeScreenActivity.this, LoginActivity.class );
+                    startActivity( intent );
                 }
                 mDrawerContainer.closeDrawers();
                 return true;

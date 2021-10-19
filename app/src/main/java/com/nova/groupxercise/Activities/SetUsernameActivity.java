@@ -7,16 +7,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.R;
 import com.nova.groupxercise.Objects.User;
+import com.nova.groupxercise.R;
 
 public class SetUsernameActivity extends AppCompatActivity {
     private EditText mUsernameEt;
@@ -41,63 +41,29 @@ public class SetUsernameActivity extends AppCompatActivity {
         mSetUsernameBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 String username = mUsernameEt.getText().toString();
-                checkIfUsernameIsValid( username );
-            }
-        } );
-    }
-
-    /**
-     * Checks that the argument username is a valid username
-     * If so, calls checkIfUsernameIsAvailable
-     * @param username the username to check
-     */
-    private void checkIfUsernameIsValid( String username ) {
-        if ( username == null || username.compareTo( "" ) == 0 ) {
-            Toast.makeText( SetUsernameActivity.this, "Invalid username", Toast.LENGTH_SHORT ).show();
-        } else {
-            checkIfUsernameIsAvailable( username );
-        }
-    }
-
-    /**
-     * Checks if another user already has the argument username
-     * If so, display an error message
-     * If not, save the username as the username for this user and go to the home screen
-     * @param username the username to check
-     */
-    private void checkIfUsernameIsAvailable( final String username ) {
-        // Path to the username child
-        String path = "usernames/";
-
-        final DatabaseReference childRef = mRootRef.child( path );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                DataSnapshot thisUsernameDataSnapshot = dataSnapshot.child( username );
-                if ( thisUsernameDataSnapshot.exists() ) {
-                    // If the username exists, display an error message
-                    Toast.makeText( SetUsernameActivity.this, "Username unavailable", Toast.LENGTH_SHORT ).show();
+                if(User.checkIfUsernameIsValid( username )){
+                    User.getInstance().setUsernameInDatabase( username, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete( @Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference ) {
+                            if(databaseError != null) {
+                                Toast.makeText( SetUsernameActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT ).show();
+                            } else {
+                                Toast.makeText( SetUsernameActivity.this, "Username set!", Toast.LENGTH_SHORT ).show();
+                                // Go to the home screen
+                                Intent intent = new Intent( SetUsernameActivity.this, HomeScreenActivity.class );
+                                startActivity( intent );
+                            }
+                        }
+                    } );
                 } else {
-                    // If not, set the username
-                    String userId = mAuth.getCurrentUser().getUid();
-                    childRef.child( username ).setValue( userId );
-
-                    // Set the username on the local user object
-                    User currentUser = User.getInstance();
-                    currentUser.setUsername( username );
-
-                    // Go to the home screen
-                    Intent intent = new Intent( SetUsernameActivity.this, HomeScreenActivity.class );
-                    startActivity( intent );
+                    Toast.makeText( SetUsernameActivity.this, "Invalid username", Toast.LENGTH_SHORT ).show();
                 }
             }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
         } );
     }
+
+
+
 
 
 }

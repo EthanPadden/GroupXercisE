@@ -1,12 +1,14 @@
 package com.nova.groupxercise.Objects;
 
+import java.util.ArrayList;
+
 public class MemberProgress {
     private String username;
-    private float currentStatus;
+    private ArrayList<Goal> memberProgresses;
 
-    public MemberProgress( String username, float currentStatus ) {
+    public MemberProgress( String username ) {
         this.username = username;
-        this.currentStatus = currentStatus;
+        memberProgresses = new ArrayList<>(  );
     }
 
     public String getUsername() {
@@ -17,11 +19,7 @@ public class MemberProgress {
         this.username = username;
     }
 
-    public float getCurrentStatus() {
-        return currentStatus;
-    }
-
-    public void setCurrentStatus( float currentStatus ) {
-        this.currentStatus = currentStatus;
+    public ArrayList< Goal > getMemberProgresses() {
+        return memberProgresses;
     }
 }

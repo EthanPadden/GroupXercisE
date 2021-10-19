@@ -22,15 +22,18 @@ public class User {
 
     private Sex sex;
 
-    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference mRootRef;
     private boolean userDetailsAreSet = false;
 
     // Singleton class
     private static final User user = new User();
 
+    private FirebaseAuth mAuth;
+
     // Constructors
     public User() {
-
+        mAuth = FirebaseAuth.getInstance();
+        mRootRef = FirebaseDatabase.getInstance().getReference();
     }
 
     public static User getInstance() {
@@ -105,6 +108,83 @@ public class User {
             }
         } );
 
+    }
+
+    /**
+     * Checks if another user already has the argument username
+     * If so: return false in the listener
+     * If not:
+     *      Save the username as the username for this user in the database
+     *      Save the username as the username for the singleton User instance
+     *      Return true in the listener
+     * @param username the username to check
+     */
+    public void setUsernameInDatabase( final String username, final DatabaseReference.CompletionListener completionListener ) {
+        // Path to the username child
+        String path = "usernames/";
+
+        final DatabaseReference childRef = mRootRef.child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                DataSnapshot thisUsernameDataSnapshot = dataSnapshot.child( username );
+                if ( thisUsernameDataSnapshot.exists() ) {
+                    // If the username exists, return this in the listener
+                    completionListener.onComplete(DatabaseError.fromStatus("", "Username unavailable" ), childRef );
+                } else {
+                    // Set the username on the local user object
+                    setUsername( username );
+
+                    // If not, set the username
+                    String userId = mAuth.getCurrentUser().getUid();
+                    childRef.child( username ).setValue( userId, completionListener );
+                }
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    /**
+     * Sign out the user that is currently logged in using Firebase method
+     */
+    public void signOutUser() {
+        // Check if there is a user currently logged in
+        if ( mAuth.getCurrentUser() != null ) {
+            // Reset the local user instance
+            setUserDetailsAreSet( false );
+            setUsername( null );
+            mAuth.signOut();
+        }
+    }
+
+    public static void checkIfUserExists(String username, final DBListener listener) {
+        // Path to the username child
+        String path = "usernames/" + username;
+
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if ( dataSnapshot.exists() ) {
+                    String userId = dataSnapshot.getValue().toString();
+                    if ( listener != null && listener.isActive() ) listener.onRetrievalFinished(userId);
+                } else {
+                    if ( listener != null && listener.isActive() ) listener.onRetrievalFinished(null);
+                }
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    public static boolean checkIfUsernameIsValid( String username ) {
+        return username != null && username.compareTo( "" ) != 0;
     }
 
     /**

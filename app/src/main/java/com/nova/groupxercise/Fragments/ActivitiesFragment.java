@@ -1,31 +1,27 @@
 package com.nova.groupxercise.Fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.Adapters.ActivityItemsAdapter;
-import com.nova.groupxercise.Activities.ExerciseActivity;
-import com.nova.groupxercise.Activities.HomeScreenActivity;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nova.groupxercise.Activities.LogActivityActivity;
+import com.nova.groupxercise.Adapters.ActivityItemsAdapter;
+import com.nova.groupxercise.Objects.DBListener;
+import com.nova.groupxercise.Objects.ExerciseActivity;
 import com.nova.groupxercise.R;
-
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,8 +31,43 @@ public class ActivitiesFragment extends Fragment {
     private ListView mListView;
     private TextView mLoadingText;
     private ArrayAdapter< String > mItemsAdapter;
-    private Button mAddActivityBtn;
+    private FloatingActionButton mAddActivityBtn;
+    protected ArrayList< DBListener > mDBListeners;
+    private boolean backButtonPressed;
 
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        backButtonPressed = false;
+
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                if(!backButtonPressed) {
+                    Toast.makeText( getActivity(), "Press back button again to exit", Toast.LENGTH_SHORT ).show();
+                    backButtonPressed = true;
+                } else {
+                    // Back button pressed twice - exit appp
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    startActivity(intent);
+                    backButtonPressed = false;
+                }
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
+    }
+
+    @Override
+    public void onAttach( @NonNull Context context ) {
+        super.onAttach( context );
+        mDBListeners = new ArrayList<>(  );
+    }
 
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
@@ -64,50 +95,12 @@ public class ActivitiesFragment extends Fragment {
             }
         } );
 
-        retrieveActivities();
-    }
-
-    private void retrieveActivities() {
-        // Path to the users goals
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String path = "activities/" + userId;
-
-        // Get the DB reference
-        HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-        DatabaseReference childRef = homeScreenActivity.getmRootRef().child( path );
-
-        // Create an empty list for the goals
+//        retrieveActivities();
         mActivitesList = new ArrayList<>();
-
-        // Set the list as the list for the items adapter
         mItemsAdapter = new ActivityItemsAdapter( getActivity(), mActivitesList );
+        DBListener activitiesListener = new DBListener() {
 
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot exerciseDataSnapshot : dataSnapshot.getChildren() ) {
-                    // Get the exercise name
-                    String exerciseName = exerciseDataSnapshot.getKey();
-
-                    for ( DataSnapshot activityDataSnapshot : exerciseDataSnapshot.getChildren() ) {
-                        String timestampStr = activityDataSnapshot.getKey();
-                        long timestamp = Long.parseLong( timestampStr );
-                        DateTime time = new DateTime( timestamp );
-
-                        Object levelObj = activityDataSnapshot.getValue();
-                        float level;
-                        if ( levelObj instanceof Long ) {
-                            level = ( ( Long ) levelObj ).floatValue();
-                        } else {
-                            level = ( ( Float ) levelObj ).floatValue();
-                        }
-
-
-                        ExerciseActivity activity = new ExerciseActivity( exerciseName, time, level );
-                        mActivitesList.add( activity );
-                    }
-                }
-
+            public void onRetrievalFinished() {
                 if ( mActivitesList.isEmpty() ) {
                     mLoadingText.setText( "No activities" );
                 } else {
@@ -117,11 +110,23 @@ public class ActivitiesFragment extends Fragment {
                     mLoadingText.setVisibility( View.GONE );
                     mListView.setAdapter( mItemsAdapter );
                 }
+                mDBListeners.remove( this );
             }
 
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
+
+        };
+        mDBListeners.add( activitiesListener );
+        ExerciseActivity.retrieveActivities( mActivitesList,  activitiesListener);
+
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        for(DBListener dbListener : mDBListeners) {
+            dbListener.setActive( false );
+        }
     }
 }

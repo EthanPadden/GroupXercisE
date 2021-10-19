@@ -2,12 +2,16 @@ package com.nova.groupxercise.Objects;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.annotations.NotNull;
 import com.nova.groupxercise.DBObjects.GoalDBObject;
+
+import java.util.ArrayList;
 
 public class Goal {
     private String mExerciseName;
@@ -26,7 +30,7 @@ public class Goal {
         setmGoalDBObject( new GoalDBObject( mCurrentStatus, mTarget ) );
     }
 
-    public void matchUserProgressToGroup( String userId, User user, final Group group) {
+    public void matchUserProgressToGroup( String userId, User user, final Group group ) {
         String personalGoalProgressPath = "user_goals/" + userId + "/" + mExerciseName + "/current_status";
         final String groupGoalProgressPath = "groups/" + group.getmGroupId() + "/members/" + user.getUsername() + "/progress/" + mExerciseName;
 
@@ -40,7 +44,7 @@ public class Goal {
                 groupGoalProgressRef.addListenerForSingleValueEvent( new ValueEventListener() {
                     @Override
                     public void onDataChange( @NonNull DataSnapshot groupGoalProgressDataSnapshot ) {
-                        if(personalGoalDataSnapshot.exists() && groupGoalProgressDataSnapshot.exists()) {
+                        if ( personalGoalDataSnapshot.exists() && groupGoalProgressDataSnapshot.exists() ) {
                             Object personalProgressObj = personalGoalDataSnapshot.getValue();
                             Object groupGoalProgressObj = groupGoalProgressDataSnapshot.getValue();
                             float personalProgress;
@@ -59,11 +63,11 @@ public class Goal {
                             }
 
                             // Compare values
-                            if(personalProgress > groupGoalProgress) {
+                            if ( personalProgress > groupGoalProgress ) {
                                 groupGoalProgressRef.setValue( personalProgress );
                             }
 
-                        } else if(personalGoalDataSnapshot.exists()) {
+                        } else if ( personalGoalDataSnapshot.exists() ) {
                             Object personalProgressObj = personalGoalDataSnapshot.getValue();
 
                             float personalProgress;
@@ -75,7 +79,7 @@ public class Goal {
                             groupGoalProgressRef.setValue( personalProgress );
 
 
-                        }else {
+                        } else {
                             groupGoalProgressRef.setValue( 0.0f );
                         }
                     }
@@ -95,7 +99,7 @@ public class Goal {
         } );
     }
 
-    public void matchGroupProgressToUser( String userId, User user, final Group group) {
+    public void matchGroupProgressToUser( String userId, User user, final Group group ) {
         String personalGoalProgressPath = "user_goals/" + userId + "/" + mExerciseName + "/current_status";
         final String groupGoalProgressPath = "groups/" + group.getmGroupId() + "/members/" + user.getUsername() + "/progress/" + mExerciseName;
 
@@ -109,7 +113,7 @@ public class Goal {
                 groupGoalProgressRef.addListenerForSingleValueEvent( new ValueEventListener() {
                     @Override
                     public void onDataChange( @NonNull DataSnapshot groupGoalProgressDataSnapshot ) {
-                        if(personalGoalDataSnapshot.exists() && groupGoalProgressDataSnapshot.exists()) {
+                        if ( personalGoalDataSnapshot.exists() && groupGoalProgressDataSnapshot.exists() ) {
                             Object personalProgressObj = personalGoalDataSnapshot.getValue();
                             Object groupGoalProgressObj = groupGoalProgressDataSnapshot.getValue();
                             float personalProgress;
@@ -128,11 +132,11 @@ public class Goal {
                             }
 
                             // Compare values
-                            if(groupGoalProgress > personalProgress) {
+                            if ( groupGoalProgress > personalProgress ) {
                                 personalGoalProgressRef.setValue( groupGoalProgress );
                             }
 
-                        } else  {
+                        } else {
                             personalGoalProgressRef.setValue( 0.0f );
                         }
                     }
@@ -150,6 +154,81 @@ public class Goal {
 
             }
         } );
+    }
+
+    public static void retrievePersonalGoals( @NotNull final ArrayList< Goal > goals, final DBListener listener ) {
+        // Path to the users goals
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String path = "user_goals/" + userId;
+
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                for ( DataSnapshot exerciseDataSnapshot : dataSnapshot.getChildren() ) {
+                    // Get the exercise name
+                    String exerciseName = exerciseDataSnapshot.getKey();
+
+                    // Get the current status as a float value
+                    DataSnapshot currentStatusDataSnapshot = exerciseDataSnapshot.child( "current_status" );
+                    float currentStatus = 0.0f;
+                    if ( currentStatusDataSnapshot.exists() ) {
+                        Long currentStatusLong = ( Long ) currentStatusDataSnapshot.getValue();
+                        currentStatus = currentStatusLong.floatValue();
+                    }
+
+                    // Get the target as a float value
+                    DataSnapshot targetStatusDataSnapshot = exerciseDataSnapshot.child( "target" );
+                    float target = 0.0f;
+                    if ( targetStatusDataSnapshot.exists() ) {
+                        Long targetLong = ( Long ) targetStatusDataSnapshot.getValue();
+                        target = targetLong.floatValue();
+                    }
+
+                    // Add the goal to the list
+                    goals.add( new Goal( exerciseName, currentStatus, target ) );
+                }
+
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    public static void retrieveStrengthStandards( final String exerciseName, final DBListener listener ) {
+
+        User currentUser = User.getInstance();
+
+        // Build the path and retrieve the strength standards
+        int weightClass = getWeightClass( currentUser.getWeight() );
+        String path = "strength_standards/" + exerciseName + "/" + currentUser.getSex().toString() + "/" + weightClass;
+
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                // Store the standards in memory so that they do not have to be retrieved again
+                if ( listener != null && listener.isActive() )  listener.onRetrievalFinished( dataSnapshot );
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    /**
+     * Return the weight class based on the user details for retrieving strength standards
+     *
+     * @param weight the user weight
+     * @return the weight class as listed in the DB
+     */
+    private static int getWeightClass( float weight ) {
+        return ( int ) ( Math.floor( weight / 5 ) * 5 );
     }
     @Override
     public String toString() {
