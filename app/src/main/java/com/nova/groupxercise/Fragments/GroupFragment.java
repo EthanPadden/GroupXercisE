@@ -79,9 +79,6 @@ public class GroupFragment extends Fragment {
         // Create arraylist for DB single-value events
         mDBListeners = new ArrayList<>();
 
-        // Create group object in memory
-
-
         // Set event listeners
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -165,7 +162,6 @@ public class GroupFragment extends Fragment {
                     }
                 }
                 mDBListeners.remove( this );
-
             }
         };
         mDBListeners.add( groupGoalListener );

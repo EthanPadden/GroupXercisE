@@ -244,7 +244,7 @@ public class Group {
     public void retrieveGroupGoals( final DBListener listener ) {
 
         // Path to group mGoals
-        String path = "groups/" + mGroupId + "/mGoals";
+        String path = "groups/" + mGroupId + "/goals";
 
         DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
 
