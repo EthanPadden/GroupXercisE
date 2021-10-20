@@ -287,29 +287,7 @@ public class ExerciseListItemFragment extends Fragment {
                 final String groupId = selectedGroup.getmGroupId();
 
                 if ( mSelectedGoalOption == GoalOption.AUTOMATIC ) {
-                    User currentUser = User.getInstance();
-                    if ( currentUser.isUserDetailsAreSet() ) {
-                        // Automatic goal calculation option: use suggested goal
-                        float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
-                        final Goal goal = new Goal( mExerciseName, 0, target );
-                        DBListener goalSaveListener = new DBListener() {
-                            public void onRetrievalFinished( Object retrievedData ) {
-                                boolean goalAlreadyExists = ( ( Boolean ) retrievedData ).booleanValue();
-                                if ( goalAlreadyExists ) {
-                                    Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
-                                } else {
-                                    Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
-                                    addGoalProgressToMembers( groupId, goal );
-                                }
-                                mDBListeners.remove( this );
-                            }
-                        };
-                        mDBListeners.add( goalSaveListener );
-                        Group group = new Group( groupId );
-                        group.saveGoal( goal, goalSaveListener );
-                    } else {
-                        Toast.makeText( getActivity(), "Invalid details", Toast.LENGTH_SHORT ).show();
-                    }
+                    Toast.makeText( getActivity(), "Cannot group goal based on personal details", Toast.LENGTH_SHORT ).show();
                 } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
                     // Manual goal calculation option: use user-set goal
                     String targetStr = ( mManualGoalET.getText().toString() );
