@@ -357,11 +357,6 @@ public class ExerciseListItemFragment extends Fragment {
                     // If no child exists, this will create a new one
                     // If one does, this will update it
                     childRef.setValue( goalDBObject );
-
-                    // Check does the user have progress towards this exercise in a group
-                    for ( String groupId : mGroupIds ) {
-//                        goal.matchGroupProgressToUser( userId, User.getInstance(), new Group( groupId ) );
-                    }
                 }
 
                 @Override
