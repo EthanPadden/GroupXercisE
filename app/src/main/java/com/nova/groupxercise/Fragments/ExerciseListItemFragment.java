@@ -16,7 +16,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -296,14 +295,8 @@ public class ExerciseListItemFragment extends Fragment {
                         float target = Float.parseFloat( targetStr );
                         final Goal goal = new Goal( mExerciseName, 0, target );
                         DBListener goalSaveListener = new DBListener() {
-                            public void onRetrievalFinished( Object retrievedData ) {
-                                boolean goalAlreadyExists = ( ( Boolean ) retrievedData ).booleanValue();
-                                if ( goalAlreadyExists ) {
-                                    Toast.makeText( getActivity(), "Updating group goal...", Toast.LENGTH_SHORT ).show();
-                                } else {
-                                    Toast.makeText( getActivity(), "Creating group goal...", Toast.LENGTH_SHORT ).show();
-                                    addGoalProgressToMembers( groupId, goal );
-                                }
+                            public void onRetrievalFinished() {
+                                Toast.makeText( getActivity(), "Group goal set", Toast.LENGTH_SHORT ).show();
                                 mDBListeners.remove( this );
                             }
                         };
@@ -320,48 +313,6 @@ public class ExerciseListItemFragment extends Fragment {
         } );
 
         mListView.setVisibility( View.VISIBLE );
-    }
-
-
-    private void addGoalProgressToMembers( final String groupId, final Goal goal ) {
-        // Path to the group goal
-        String path = "groups/" + groupId + "/members";
-
-        // Get the DB reference
-        final DatabaseReference childRef = mRootRef.child( path );
-
-        // Check if we have a set of goals for that particular user
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                for ( DataSnapshot memberDataSnapshot : dataSnapshot.getChildren() ) {
-                    final String username = memberDataSnapshot.getKey();
-
-                    String usernamePath = "usernames/" + username;
-                    final DatabaseReference usernameRef = mRootRef.child( usernamePath );
-
-                    usernameRef.addListenerForSingleValueEvent( new ValueEventListener() {
-                        @Override
-                        public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
-                            String userId = dataSnapshot.getValue().toString();
-                            User user = new User();
-                            user.setUsername( username );
-//                            goal.matchUserProgressToGroup( userId, user, new Group( groupId ) );
-                        }
-
-                        @Override
-                        public void onCancelled( @NonNull DatabaseError databaseError ) {
-
-                        }
-                    } );
-
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
     }
 
     /**
