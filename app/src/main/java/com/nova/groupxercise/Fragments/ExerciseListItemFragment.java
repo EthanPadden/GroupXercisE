@@ -26,7 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
 import com.nova.groupxercise.Adapters.SimpleGroupItemsAdapter;
-import com.nova.groupxercise.DBObjects.GoalDBObject;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
@@ -330,7 +329,7 @@ public class ExerciseListItemFragment extends Fragment {
 
             // Path to the users goals
             final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            String path = "user_goals/" + userId + "/" + goal.getmExerciseName();
+            String path = "personal_goals/" + userId + "/" + goal.getmExerciseName();
 
             // Get the DB reference
             HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
@@ -340,10 +339,7 @@ public class ExerciseListItemFragment extends Fragment {
             childRef.addListenerForSingleValueEvent( new ValueEventListener() {
                 @Override
                 public void onDataChange( DataSnapshot dataSnapshot ) {
-                    // Get the DB object for the goal
-                    GoalDBObject goalDBObject = goal.getmGoalDBObject();
-
-                    if ( getActivity() != null ) {
+                  if ( getActivity() != null ) {
                         // If we have not moved into another fragment
                         if ( dataSnapshot.exists() ) {
                             // If so, the operation is an update
@@ -356,7 +352,7 @@ public class ExerciseListItemFragment extends Fragment {
 
                     // If no child exists, this will create a new one
                     // If one does, this will update it
-                    childRef.setValue( goalDBObject );
+                    // TODO: save goal
                 }
 
                 @Override

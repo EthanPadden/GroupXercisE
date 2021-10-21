@@ -7,7 +7,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.NotNull;
-import com.nova.groupxercise.DBObjects.GoalDBObject;
 
 import java.util.ArrayList;
 
@@ -15,7 +14,6 @@ public class Goal {
     private String mExerciseName;
     private float mCurrentStatus;
     private float mTarget;
-    private GoalDBObject mGoalDBObject;
 
     public Goal( String mExerciseName ) {
         setmExerciseName( mExerciseName );
@@ -25,7 +23,6 @@ public class Goal {
         this( mExerciseName );
         setmCurrentStatus( mCurrentStatus );
         setmTarget( mTarget );
-        setmGoalDBObject( new GoalDBObject( mCurrentStatus, mTarget ) );
     }
 
     public static void retrievePersonalGoals( @NotNull final ArrayList< Goal > goals, final DBListener listener ) {
@@ -129,13 +126,5 @@ public class Goal {
 
     public void setmTarget( float mTarget ) {
         this.mTarget = mTarget;
-    }
-
-    public GoalDBObject getmGoalDBObject() {
-        return mGoalDBObject;
-    }
-
-    public void setmGoalDBObject( GoalDBObject mGoalDBObject ) {
-        this.mGoalDBObject = mGoalDBObject;
     }
 }
