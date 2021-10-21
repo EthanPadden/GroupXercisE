@@ -98,7 +98,7 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
                 TextView unitText = row.findViewById( R.id.goal_unit );
 
                 exerciseNameText.setText( progress.getmExerciseName() );
-                currentStatusText.setText( Float.toString( progress.getmCurrentStatus()) );
+//                currentStatusText.setText( Float.toString( progress.getmCurrentStatus()) );
                 dividerText.setVisibility( View.GONE );
                 targetText.setVisibility( View.GONE );
                 unitText.setVisibility( View.GONE );

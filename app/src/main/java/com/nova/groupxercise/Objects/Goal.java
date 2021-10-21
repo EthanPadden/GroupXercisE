@@ -12,16 +12,14 @@ import java.util.ArrayList;
 
 public class Goal {
     private String mExerciseName;
-    private float mCurrentStatus;
     private float mTarget;
 
     public Goal( String mExerciseName ) {
         setmExerciseName( mExerciseName );
     }
 
-    public Goal( String mExerciseName, float mCurrentStatus, float mTarget ) {
+    public Goal( String mExerciseName, float mTarget ) {
         this( mExerciseName );
-        setmCurrentStatus( mCurrentStatus );
         setmTarget( mTarget );
     }
 
@@ -56,7 +54,7 @@ public class Goal {
                     }
 
                     // Add the goal to the list
-                    goals.add( new Goal( exerciseName, currentStatus, target ) );
+                    goals.add( new Goal( exerciseName, target ) );
                 }
 
                 if ( listener != null && listener.isActive() ) listener.onRetrievalFinished();
@@ -101,7 +99,7 @@ public class Goal {
     }
     @Override
     public String toString() {
-        return String.format( "%s\nCurrent: %s\nTarget: %s", mExerciseName, mCurrentStatus, mTarget );
+        return String.format( "%s\nCurrent: %s\nTarget: %s", mExerciseName, mTarget );
     }
 
     public void setmExerciseName( String mExerciseName ) {
@@ -110,14 +108,6 @@ public class Goal {
 
     public String getmExerciseName() {
         return mExerciseName;
-    }
-
-    public float getmCurrentStatus() {
-        return mCurrentStatus;
-    }
-
-    public void setmCurrentStatus( float mCurrentStatus ) {
-        this.mCurrentStatus = mCurrentStatus;
     }
 
     public float getmTarget() {

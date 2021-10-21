@@ -21,7 +21,6 @@ import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
 import com.nova.groupxercise.Objects.Member;
-import com.nova.groupxercise.Objects.User;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
@@ -198,7 +197,7 @@ public class GoalsFragment extends Fragment {
                     }
                 };
                 mDBListeners.add( memberProgressListener );
-                group.retrieveMemberProgress( memberProgressListener, User.getInstance().getUsername() );
+//                group.retrieveMemberProgress( memberProgressListener, User.getInstance().getUsername() );
             }
         } else {
             // Display that the group has no goals

@@ -208,7 +208,7 @@ public class GroupFragment extends Fragment {
                         // We are not concerned with the target, it is stored in the group goal
                         float target = 0;
 
-                        Goal goal = new Goal( exerciseName, currentStatus, target );
+                        Goal goal = new Goal( exerciseName, target );
                         member.getmProgress().add( goal );
                     }
 

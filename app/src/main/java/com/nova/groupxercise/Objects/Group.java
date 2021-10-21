@@ -262,7 +262,7 @@ public class Group {
                         } else {
                             target = ( ( Float ) targetObj ).floatValue();
                         }
-                        mGoals.add( new Goal( exerciseName, 0, target ) );
+                        mGoals.add( new Goal( exerciseName, target ) );
                     }
                 }
 
@@ -338,79 +338,79 @@ public class Group {
         }
     }
 
-    public void retrieveMemberProgress( final DBListener listener, String username ) {
-        String path = "groups/" + mGroupId + "/members/" + username + "/progress";
-        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
-        final Member member = new Member( username );
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    for ( DataSnapshot progressDataSnapshot : dataSnapshot.getChildren() ) {
-                        // Get the exercise name
-                        String exerciseName = progressDataSnapshot.getKey();
+//    public void retrieveMemberProgress( final DBListener listener, String username ) {
+//        String path = "groups/" + mGroupId + "/members/" + username + "/progress";
+//        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+//        final Member member = new Member( username );
+//        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+//            @Override
+//            public void onDataChange( DataSnapshot dataSnapshot ) {
+//                if ( dataSnapshot.exists() ) {
+//                    for ( DataSnapshot progressDataSnapshot : dataSnapshot.getChildren() ) {
+//                        // Get the exercise name
+//                        String exerciseName = progressDataSnapshot.getKey();
+//
+//                        // Get the current status (member progress towards that goal
+//                        Object currentStatusObj = progressDataSnapshot.getValue();
+//                        float currentStatus;
+//                        if ( currentStatusObj instanceof Long ) {
+//                            currentStatus = ( ( Long ) currentStatusObj ).floatValue();
+//                        } else {
+//                            currentStatus = ( ( Float ) currentStatusObj ).floatValue();
+//                        }
+//
+//                        // We are not concerned with the target, it is stored in the group goal
+//                        float target = 0;
+//
+//                        Goal goal = new Goal( exerciseName, currentStatus, target );
+//                        member.getmProgress().add( goal );
+//                    }
+//
+//                    // Add to the object
+//                    mMembers.add( member );
+//                }
+//
+//                if ( listener != null && listener.isActive() )
+//                    listener.onRetrievalFinished( member );
+//            }
+//
+//            @Override
+//            public void onCancelled( DatabaseError databaseError ) {
+//            }
+//        } );
+//    }
 
-                        // Get the current status (member progress towards that goal
-                        Object currentStatusObj = progressDataSnapshot.getValue();
-                        float currentStatus;
-                        if ( currentStatusObj instanceof Long ) {
-                            currentStatus = ( ( Long ) currentStatusObj ).floatValue();
-                        } else {
-                            currentStatus = ( ( Float ) currentStatusObj ).floatValue();
-                        }
 
-                        // We are not concerned with the target, it is stored in the group goal
-                        float target = 0;
-
-                        Goal goal = new Goal( exerciseName, currentStatus, target );
-                        member.getmProgress().add( goal );
-                    }
-
-                    // Add to the object
-                    mMembers.add( member );
-                }
-
-                if ( listener != null && listener.isActive() )
-                    listener.onRetrievalFinished( member );
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
-
-
-    public void updateMyStatusFromPersonalGoals( final Goal goal, final DBListener listener ) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        String path = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
-
-        final DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
-
-        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    Object currentStatusObj = dataSnapshot.getValue();
-                    float currentStatus;
-                    if ( currentStatusObj instanceof Long ) {
-                        currentStatus = ( ( Long ) currentStatusObj ).floatValue();
-                    } else {
-                        currentStatus = ( ( Float ) currentStatusObj ).floatValue();
-                    }
-                    goal.setmCurrentStatus( currentStatus );
-
-                    if ( listener != null && listener.isActive() )
-                        listener.onRetrievalFinished( goal );
-                }
-            }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
+//    public void updateMyStatusFromPersonalGoals( final Goal goal, final DBListener listener ) {
+//        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//
+//        String path = "user_goals/" + userId + "/" + goal.getmExerciseName() + "/current_status";
+//
+//        final DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+//
+//        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+//            @Override
+//            public void onDataChange( DataSnapshot dataSnapshot ) {
+//                if ( dataSnapshot.exists() ) {
+//                    Object currentStatusObj = dataSnapshot.getValue();
+//                    float currentStatus;
+//                    if ( currentStatusObj instanceof Long ) {
+//                        currentStatus = ( ( Long ) currentStatusObj ).floatValue();
+//                    } else {
+//                        currentStatus = ( ( Float ) currentStatusObj ).floatValue();
+//                    }
+//                    goal.setmCurrentStatus( currentStatus );
+//
+//                    if ( listener != null && listener.isActive() )
+//                        listener.onRetrievalFinished( goal );
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled( DatabaseError databaseError ) {
+//            }
+//        } );
+//    }
 
     public String getmName() {
         return mName;

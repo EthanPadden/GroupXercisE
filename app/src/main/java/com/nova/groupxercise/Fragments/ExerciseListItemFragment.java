@@ -160,7 +160,7 @@ public class ExerciseListItemFragment extends Fragment {
                     if ( currentUser.isUserDetailsAreSet() ) {
                         // Automatic goal calculation option: use suggested goal
                         float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
-                        savePersonalGoal( new Goal( mExerciseName, 0, target ) );
+                        savePersonalGoal( new Goal( mExerciseName, target ) );
                     } else {
                         Toast.makeText( getActivity(), "Invalid details", Toast.LENGTH_SHORT ).show();
                     }
@@ -170,7 +170,7 @@ public class ExerciseListItemFragment extends Fragment {
 
                     if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
                         float target = Float.parseFloat( targetStr );
-                        savePersonalGoal( new Goal( mExerciseName, 0, target ) );
+                        savePersonalGoal( new Goal( mExerciseName, target ) );
                     } else {
                         Toast.makeText( getActivity(), R.string.error_no_target_entered, Toast.LENGTH_SHORT ).show();
                     }
@@ -292,7 +292,7 @@ public class ExerciseListItemFragment extends Fragment {
 
                     if ( targetStr != null && targetStr.compareTo( "" ) != 0 ) {
                         float target = Float.parseFloat( targetStr );
-                        final Goal goal = new Goal( mExerciseName, 0, target );
+                        final Goal goal = new Goal( mExerciseName, target );
                         DBListener goalSaveListener = new DBListener() {
                             public void onRetrievalFinished() {
                                 Toast.makeText( getActivity(), "Group goal set", Toast.LENGTH_SHORT ).show();
@@ -353,6 +353,7 @@ public class ExerciseListItemFragment extends Fragment {
                     // If no child exists, this will create a new one
                     // If one does, this will update it
                     // TODO: save goal
+//                    childRef.setValue( goal.getmTarget() );
                 }
 
                 @Override
