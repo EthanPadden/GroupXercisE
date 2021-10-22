@@ -326,7 +326,6 @@ public class ExerciseListItemFragment extends Fragment {
         if ( goal == null ) {
             Toast.makeText( getActivity(), R.string.error_goal_setting, Toast.LENGTH_SHORT ).show();
         } else {
-
             // Path to the users goals
             final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             String path = "personal_goals/" + userId + "/" + goal.getmExerciseName();
@@ -352,8 +351,7 @@ public class ExerciseListItemFragment extends Fragment {
 
                     // If no child exists, this will create a new one
                     // If one does, this will update it
-                    // TODO: save goal
-//                    childRef.setValue( goal.getmTarget() );
+                    childRef.setValue( goal.getmTarget() );
                 }
 
                 @Override
