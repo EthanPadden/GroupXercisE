@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:layout_toLeftOf="@+id/goal_divider"
-        android:text="5" />
+        android:text="Loading..." />
 
     <TextView
         android:id="@+id/goal_divider"

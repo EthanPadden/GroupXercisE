@@ -84,38 +84,46 @@ public class GoalsFragment extends Fragment {
         super.onViewCreated( view, savedInstanceState );
 
         // Initialise components
-        mListView = view.findViewById( R.id.goal_list );
+        mListView = view.findViewById( R.id.goals_fgt_list_personal_goals );
         mLoadingPersonalGoalsText = view.findViewById( R.id.goals_fgt_text_loading_personal_goals );
         mLoadingGroupGoalsText = view.findViewById( R.id.goals_fgt_text_loading_group_goals );
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
-
-        // Set the list as the list for the items adapter
-        mItemsAdapter = new GoalItemsAdapter( getActivity(), mPersonalGoalsList );
-
-        mGroups = new ArrayList<>();
 
         // Set loading texts
         mLoadingPersonalGoalsText.setText( "Loading personal goals..." );
         mLoadingGroupGoalsText.setText( "Loading group goals..." );
 
+        // Initialise personal goals list and set the list as the list for the items adapter
         mPersonalGoalsList = new ArrayList<>();
-
-        // Set the list as the list for the items adapter
         mItemsAdapter = new GoalItemsAdapter( getActivity(), mPersonalGoalsList );
+
+        // Retrieve personal goals
         DBListener pesonalGoalsListener = new DBListener() {
-            public void onRetrievalFinished() {
+            @Override
+            public void onRetrievalFinished( Object retrievedData ) {
+                mPersonalGoalsList = (ArrayList< Goal> ) retrievedData;
                 if (mPersonalGoalsList.size() == 0) {
                     mLoadingPersonalGoalsText.setText( "You have no personal goals" );
                 } else {
                     mLoadingPersonalGoalsText.setVisibility( View.GONE );
-                    mListView.setAdapter( mItemsAdapter );
+//                    mItemsAdapter.notifyDataSetChanged();
+                    mListView.setAdapter( new GoalItemsAdapter( getActivity(), mPersonalGoalsList ) );
                 }
                 mDBListeners.remove( this );
+
+                // TODO: user member progress subtree to get progresses FOR EACH
             }
+            //
+
+
         };
         mDBListeners.add( pesonalGoalsListener );
-        Goal.retrievePersonalGoals( mPersonalGoalsList, pesonalGoalsListener );
+        Goal.retrievePersonalGoals( pesonalGoalsListener );
 
+
+
+
+        mGroups = new ArrayList<>();
 
         DBListener groupIdsListener = new DBListener() {
             public void onRetrievalFinished( Object retrievedData ) {

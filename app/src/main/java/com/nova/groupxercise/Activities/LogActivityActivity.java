@@ -87,7 +87,7 @@ public class LogActivityActivity extends AppCompatActivity {
             }
         };
         mDBListeners.add( personalGoalsListener );
-        Goal.retrievePersonalGoals( mGoalsList, personalGoalsListener );
+        Goal.retrievePersonalGoals( personalGoalsListener );
         
         DBListener groupIdsListener = new DBListener() {
             public void onRetrievalFinished(Object retrievedData) {
