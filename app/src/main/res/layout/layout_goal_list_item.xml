@@ -12,7 +12,7 @@
         android:text="Exercise Name" />
 
     <TextView
-        android:id="@+id/goal_current_status"
+        android:id="@+id/goal_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"

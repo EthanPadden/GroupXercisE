@@ -34,8 +34,8 @@ public class GoalItemsAdapter extends ArrayAdapter {
 
         TextView exerciseNameText = listItemView.findViewById( R.id.goal_exercise_name );
         exerciseNameText.setText( currentGoal.getmExerciseName() );
-        TextView currentStatusText = listItemView.findViewById( R.id.goal_current_status );
-//        currentStatusText.setText( Float.toString( currentGoal.getmCurrentStatus() ) );
+        TextView progressText = listItemView.findViewById( R.id.goal_progress );
+        progressText.setText( Float.toString( currentGoal.getmProgress() ) );
         TextView targetText = listItemView.findViewById( R.id.goal_target );
         targetText.setText( Float.toString( currentGoal.getmTarget() ) );
 

@@ -12,14 +12,18 @@ import java.util.ArrayList;
 public class Goal {
     private String mExerciseName;
     private float mTarget;
+    // Used by GoalItemsAdapter
+    private float mProgress;
 
     public Goal( String mExerciseName ) {
         setmExerciseName( mExerciseName );
+        setmProgress( 0 );
     }
 
     public Goal( String mExerciseName, float mTarget ) {
         this( mExerciseName );
         setmTarget( mTarget );
+        setmProgress( 0 );
     }
 
     public static void retrievePersonalGoals( final DBListener listener ) {
@@ -47,6 +51,37 @@ public class Goal {
                 }
 
                 if ( listener != null && listener.isActive() ) listener.onRetrievalFinished( personalGoalsList );
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
+    public void retrieveUserProgress( final DBListener listener )
+    {
+        // Path to the user progress for this goal
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String path = "user_progress/" + userId + "/" + mExerciseName;
+
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                Float progress = null;
+                Object progressObj = dataSnapshot.getValue();
+
+                if (dataSnapshot.exists()){
+                    if ( progressObj instanceof Long ) {
+                        progress = ( ( Long ) progressObj ).floatValue();
+                    } else {
+                        progress = ( ( Float ) progressObj ).floatValue();
+                    }
+                }
+
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished( progress );
             }
 
             @Override
@@ -105,5 +140,13 @@ public class Goal {
 
     public void setmTarget( float mTarget ) {
         this.mTarget = mTarget;
+    }
+
+    public float getmProgress() {
+        return mProgress;
+    }
+
+    public void setmProgress( float mProgress ) {
+        this.mProgress = mProgress;
     }
 }

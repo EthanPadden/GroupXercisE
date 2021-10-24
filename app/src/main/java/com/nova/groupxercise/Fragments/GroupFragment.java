@@ -230,7 +230,7 @@ public class GroupFragment extends Fragment {
     private View createGroupGoalUIComponent( Goal goal ) {
         View goalView = getLayoutInflater().inflate( R.layout.layout_goal_list_item, null );
         TextView exerciseNameText = goalView.findViewById( R.id.goal_exercise_name );
-        TextView currentStatusText = goalView.findViewById( R.id.goal_current_status );
+        TextView currentStatusText = goalView.findViewById( R.id.goal_progress );
         TextView dividerText = goalView.findViewById( R.id.goal_divider );
         TextView targetText = goalView.findViewById( R.id.goal_target );
         exerciseNameText.setText( goal.getmExerciseName() );

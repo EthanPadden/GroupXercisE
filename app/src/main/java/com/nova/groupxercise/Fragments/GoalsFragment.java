@@ -111,7 +111,8 @@ public class GoalsFragment extends Fragment {
                 }
                 mDBListeners.remove( this );
 
-                // TODO: user member progress subtree to get progresses FOR EACH
+                // Use recursive algorithm where base case is when the number of items updated is the same as the goals list size?
+                updateUIWithPersonalGoalProgress( 0 );
             }
             //
 
@@ -168,6 +169,38 @@ public class GoalsFragment extends Fragment {
         }
     }
 
+    /**
+     * This is a recursive function - call to database for each goal is asynchronous
+     * Base case = on the last item in the goals list
+     * Updates the progress using the user_progress subtree
+     */
+    private void updateUIWithPersonalGoalProgress( int i ) {
+        if ( i == mPersonalGoalsList.size() ) {
+            Toast.makeText( getActivity(), "Personal goal progress updated!", Toast.LENGTH_SHORT ).show();
+        } else {
+            Goal goalToUpdate = mPersonalGoalsList.get( i );
+
+            DBListener progressListener = new DBListener() {
+                public void onRetrievalFinished( Object retrievedData ) {
+                    // If retrievedData == null,
+                    // there is no progress saved for this exercise yet
+                    // so 0 is the default value
+                    float progress = 0;
+
+                    if(retrievedData != null) {
+                        progress = ((Float) retrievedData).floatValue();
+                    }
+                    goalToUpdate.setmProgress( progress );
+                    mListView.setAdapter( new GoalItemsAdapter( getActivity(), mPersonalGoalsList ) );
+                    mDBListeners.remove( this );
+                }
+
+            };
+            mDBListeners.add( progressListener );
+            goalToUpdate.retrieveUserProgress( progressListener );
+            updateUIWithPersonalGoalProgress( ++i );
+        }
+    }
     /**
      * Builds a list for every group to display the group goals
      */
