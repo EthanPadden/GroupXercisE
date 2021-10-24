@@ -175,9 +175,7 @@ public class GoalsFragment extends Fragment {
      * Updates the progress using the user_progress subtree
      */
     private void updateUIWithPersonalGoalProgress( int i ) {
-        if ( i == mPersonalGoalsList.size() ) {
-            Toast.makeText( getActivity(), "Personal goal progress updated!", Toast.LENGTH_SHORT ).show();
-        } else {
+        if (i < mPersonalGoalsList.size() ) {
             Goal goalToUpdate = mPersonalGoalsList.get( i );
 
             DBListener progressListener = new DBListener() {
