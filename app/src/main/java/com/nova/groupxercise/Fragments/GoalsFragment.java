@@ -20,7 +20,6 @@ import com.nova.groupxercise.Adapters.GoalItemsAdapter;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
-import com.nova.groupxercise.Objects.Member;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
@@ -143,6 +142,7 @@ public class GoalsFragment extends Fragment {
                                     }
                                 };
                                 mDBListeners.add( groupGoalsListener );
+                                // This retrieves group goals and places on group object
                                 group.retrieveGroupGoals( groupGoalsListener );
                             }
                         }
@@ -198,46 +198,71 @@ public class GoalsFragment extends Fragment {
      * Builds a list for every group to display the group goals
      */
     private void addGroupGoalsToUI( final Group group ) {
-        // Group title
-        View groupTitleView = getLayoutInflater().inflate( R.layout.text_group_subtitle, null );
-        TextView groupTitleText = groupTitleView.findViewById( R.id.goal_group_name );
-        groupTitleText.setText( group.getmName() );
-        final LinearLayout groupLayout = new LinearLayout( getActivity() );
-        groupLayout.setOrientation( LinearLayout.VERTICAL );
-        groupLayout.setId( group.getmGroupId().hashCode() );
-        groupLayout.addView( groupTitleView );
-        mGroupGoalsLayout.addView( groupLayout );
+        // Inflate a group goals view
+        LinearLayout groupGoalsView = (LinearLayout) getLayoutInflater().inflate( R.layout.layout_group_goals, null );
+        mGroupGoalsLayout.addView( groupGoalsView );
 
+        // Set group title
+        LinearLayout groupTitleLayout = groupGoalsView.findViewById( R.id.text_group_goal_title );
+        TextView groupTitleText = groupTitleLayout.findViewById( R.id.group_title );
+        groupTitleText.setText( group.getmName() );
+
+        // Set adapter for listview
+        ListView groupGoalsList = groupGoalsView.findViewById( R.id.list_group_goals );
         if ( group.getmGoals() != null ) {
-            if (group.getmGoals().size() == 0) {
+            if ( group.getmGoals().size() == 0 ) {
                 // Display that the group has no goals
                 TextView noGoalsText = new TextView( getActivity() );
                 noGoalsText.setText( "No goals" );
-                mGroupGoalsLayout.addView( noGoalsText );
+                groupGoalsView.addView( noGoalsText );
+                groupGoalsView.setVisibility( View.GONE );
             } else {
-                final ListView groupListView = new ListView( getActivity() );
-                final ArrayList<Goal> goals = new ArrayList<>(  );
-                GoalItemsAdapter itemsAdapter = new GoalItemsAdapter( getActivity(), goals);
-                groupListView.setAdapter( itemsAdapter );
-
-                groupLayout.addView( groupListView );
-
-                final DBListener memberProgressListener = new DBListener() {
-                    public void onRetrievalFinished( Object retrievedData ) {
-                        Member member = ( Member ) retrievedData;
-
-                        for(Goal progress : member.getmProgress()) goals.add( progress );
-                        mDBListeners.remove( this );
-                    }
-                };
-                mDBListeners.add( memberProgressListener );
-//                group.retrieveMemberProgress( memberProgressListener, User.getInstance().getUsername() );
+                groupGoalsList.setAdapter( new GoalItemsAdapter( getActivity(), group.getmGoals() ) );
             }
-        } else {
-            // Display that the group has no goals
-            TextView noGoalsText = new TextView( getActivity() );
-            noGoalsText.setText( "No goals" );
-            mGroupGoalsLayout.addView( noGoalsText );
         }
+
+        //TODO:FROM HERE
+
+//        // Group title
+//        View groupTitleView = getLayoutInflater().inflate( R.layout.text_group_subtitle, null );
+//        TextView groupTitleText = groupTitleView.findViewById( R.id.goal_group_name );
+//        groupTitleText.setText( group.getmName() );
+//        final LinearLayout groupLayout = new LinearLayout( getActivity() );
+//        groupLayout.setOrientation( LinearLayout.VERTICAL );
+//        groupLayout.setId( group.getmGroupId().hashCode() );
+//        groupLayout.addView( groupTitleView );
+//        mGroupGoalsLayout.addView( groupLayout );
+//
+//        if ( group.getmGoals() != null ) {
+//            if (group.getmGoals().size() == 0) {
+//                // Display that the group has no goals
+//                TextView noGoalsText = new TextView( getActivity() );
+//                noGoalsText.setText( "No goals" );
+//                mGroupGoalsLayout.addView( noGoalsText );
+//            } else {
+//                final ListView groupListView = new ListView( getActivity() );
+//                final ArrayList<Goal> goals = new ArrayList<>(  );
+//                GoalItemsAdapter itemsAdapter = new GoalItemsAdapter( getActivity(), goals);
+//                groupListView.setAdapter( itemsAdapter );
+//
+//                groupLayout.addView( groupListView );
+//
+//                final DBListener memberProgressListener = new DBListener() {
+//                    public void onRetrievalFinished( Object retrievedData ) {
+//                        Member member = ( Member ) retrievedData;
+//
+//                        for(Goal progress : member.getmProgress()) goals.add( progress );
+//                        mDBListeners.remove( this );
+//                    }
+//                };
+//                mDBListeners.add( memberProgressListener );
+////                group.retrieveMemberProgress( memberProgressListener, User.getInstance().getUsername() );
+//            }
+//        } else {
+//            // Display that the group has no goals
+//            TextView noGoalsText = new TextView( getActivity() );
+//            noGoalsText.setText( "No goals" );
+//            mGroupGoalsLayout.addView( noGoalsText );
+//        }
     }
 }
