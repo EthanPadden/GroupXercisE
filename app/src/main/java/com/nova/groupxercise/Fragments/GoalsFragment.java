@@ -221,48 +221,32 @@ public class GoalsFragment extends Fragment {
             }
         }
 
-        //TODO:FROM HERE
+        updateUIWithGroupGoalProgress( group, groupGoalsList );
+    }
 
-//        // Group title
-//        View groupTitleView = getLayoutInflater().inflate( R.layout.text_group_subtitle, null );
-//        TextView groupTitleText = groupTitleView.findViewById( R.id.goal_group_name );
-//        groupTitleText.setText( group.getmName() );
-//        final LinearLayout groupLayout = new LinearLayout( getActivity() );
-//        groupLayout.setOrientation( LinearLayout.VERTICAL );
-//        groupLayout.setId( group.getmGroupId().hashCode() );
-//        groupLayout.addView( groupTitleView );
-//        mGroupGoalsLayout.addView( groupLayout );
-//
-//        if ( group.getmGoals() != null ) {
-//            if (group.getmGoals().size() == 0) {
-//                // Display that the group has no goals
-//                TextView noGoalsText = new TextView( getActivity() );
-//                noGoalsText.setText( "No goals" );
-//                mGroupGoalsLayout.addView( noGoalsText );
-//            } else {
-//                final ListView groupListView = new ListView( getActivity() );
-//                final ArrayList<Goal> goals = new ArrayList<>(  );
-//                GoalItemsAdapter itemsAdapter = new GoalItemsAdapter( getActivity(), goals);
-//                groupListView.setAdapter( itemsAdapter );
-//
-//                groupLayout.addView( groupListView );
-//
-//                final DBListener memberProgressListener = new DBListener() {
-//                    public void onRetrievalFinished( Object retrievedData ) {
-//                        Member member = ( Member ) retrievedData;
-//
-//                        for(Goal progress : member.getmProgress()) goals.add( progress );
-//                        mDBListeners.remove( this );
-//                    }
-//                };
-//                mDBListeners.add( memberProgressListener );
-////                group.retrieveMemberProgress( memberProgressListener, User.getInstance().getUsername() );
-//            }
-//        } else {
-//            // Display that the group has no goals
-//            TextView noGoalsText = new TextView( getActivity() );
-//            noGoalsText.setText( "No goals" );
-//            mGroupGoalsLayout.addView( noGoalsText );
-//        }
+    /**
+     * Updates the progress using the user_progress subtree
+     */
+    private void updateUIWithGroupGoalProgress( Group group, ListView groupGoalsList ) {
+        for (Goal goalToUpdate : group.getmGoals() ) {
+            DBListener progressListener = new DBListener() {
+                public void onRetrievalFinished( Object retrievedData ) {
+                    // If retrievedData == null,
+                    // there is no progress saved for this exercise yet
+                    // so 0 is the default value
+                    float progress = 0;
+
+                    if ( retrievedData != null ) {
+                        progress = ( ( Float ) retrievedData ).floatValue();
+                    }
+                    goalToUpdate.setmProgress( progress );
+                    groupGoalsList.setAdapter( new GoalItemsAdapter( getActivity(), group.getmGoals() ) );
+                    mDBListeners.remove( this );
+                }
+
+            };
+            mDBListeners.add( progressListener );
+            goalToUpdate.retrieveUserProgress( progressListener );
+        }
     }
 }
