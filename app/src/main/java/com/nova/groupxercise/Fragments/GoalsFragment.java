@@ -112,7 +112,7 @@ public class GoalsFragment extends Fragment {
                 mDBListeners.remove( this );
 
                 // Use recursive algorithm where base case is when the number of items updated is the same as the goals list size?
-                updateUIWithPersonalGoalProgress( 0 );
+                updateUIWithPersonalGoalProgress();
             }
             //
 
@@ -170,14 +170,10 @@ public class GoalsFragment extends Fragment {
     }
 
     /**
-     * This is a recursive function - call to database for each goal is asynchronous
-     * Base case = on the last item in the goals list
      * Updates the progress using the user_progress subtree
      */
-    private void updateUIWithPersonalGoalProgress( int i ) {
-        if (i < mPersonalGoalsList.size() ) {
-            Goal goalToUpdate = mPersonalGoalsList.get( i );
-
+    private void updateUIWithPersonalGoalProgress() {
+        for (Goal goalToUpdate : mPersonalGoalsList ) {
             DBListener progressListener = new DBListener() {
                 public void onRetrievalFinished( Object retrievedData ) {
                     // If retrievedData == null,
@@ -185,8 +181,8 @@ public class GoalsFragment extends Fragment {
                     // so 0 is the default value
                     float progress = 0;
 
-                    if(retrievedData != null) {
-                        progress = ((Float) retrievedData).floatValue();
+                    if ( retrievedData != null ) {
+                        progress = ( ( Float ) retrievedData ).floatValue();
                     }
                     goalToUpdate.setmProgress( progress );
                     mListView.setAdapter( new GoalItemsAdapter( getActivity(), mPersonalGoalsList ) );
@@ -196,7 +192,6 @@ public class GoalsFragment extends Fragment {
             };
             mDBListeners.add( progressListener );
             goalToUpdate.retrieveUserProgress( progressListener );
-            updateUIWithPersonalGoalProgress( ++i );
         }
     }
     /**
