@@ -215,7 +215,7 @@ public class GoalsFragment extends Fragment {
                 TextView noGoalsText = new TextView( getActivity() );
                 noGoalsText.setText( "No goals" );
                 groupGoalsView.addView( noGoalsText );
-                groupGoalsView.setVisibility( View.GONE );
+                groupGoalsList.setVisibility( View.GONE );
             } else {
                 groupGoalsList.setAdapter( new GoalItemsAdapter( getActivity(), group.getmGoals() ) );
             }
