@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.nova.groupxercise.Adapters.GoalItemsAdapter;
 import com.nova.groupxercise.Objects.DBListener;
@@ -105,13 +107,13 @@ public class GoalsFragment extends Fragment {
                     mLoadingPersonalGoalsText.setText( "You have no personal goals" );
                 } else {
                     mLoadingPersonalGoalsText.setVisibility( View.GONE );
-//                    mItemsAdapter.notifyDataSetChanged();
                     mListView.setAdapter( new GoalItemsAdapter( getActivity(), mPersonalGoalsList ) );
                 }
                 mDBListeners.remove( this );
 
                 // Use recursive algorithm where base case is when the number of items updated is the same as the goals list size?
                 updateUIWithPersonalGoalProgress();
+                addPersonalGoalsClickListeners();
             }
             //
 
@@ -248,5 +250,25 @@ public class GoalsFragment extends Fragment {
             mDBListeners.add( progressListener );
             goalToUpdate.retrieveUserProgress( progressListener );
         }
+    }
+
+    private void addPersonalGoalsClickListeners() {
+        // Set event listeners
+        mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
+                // Get the exercise name
+                Goal selectedGoal = (Goal) mListView.getItemAtPosition( i );
+                String exerciseName = selectedGoal.getmExerciseName();
+
+                // Create a fragment and pass in the exercise name
+                LogActivityFragment exerciseListItemFragment = LogActivityFragment.newInstance( exerciseName );
+
+                // Set the fragment to be displayed in the frame view
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, exerciseListItemFragment );
+                ft.commit();
+            }
+        } );
     }
 }

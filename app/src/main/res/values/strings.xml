@@ -20,20 +20,30 @@
     // User details
     <string name="sex_male">Male</string>
     <string name="sex_female">Female</string>
-    <string-array name="sex_array">
-        <item>@string/sex_male</item>
-        <item>@string/sex_female</item>
-    </string-array>
     <string name="info_updating_details">Updating your details...</string>
     <string name="info_setting_details">Setting your details...</string>
+    <string name="set_goal_title">Set Goal: </string>
 
     // Goal setting
-    <string name="set_goal_title">Set Goal: </string>
     <string name="level_beginner">Beginner</string>
     <string name="level_novice">Novice</string>
     <string name="level_intermediate">Intermediate</string>
     <string name="level_advanced">Advanced</string>
     <string name="level_elite">Elite</string>
+    <string name="info_updating_goal">Updating your goal...</string>
+    <string name="info_creating_goal">Creating your goal...</string>
+    <string name="sample_goal_name">Sample Goal</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_home_screen">HomeScreenActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="title_home">Home</string>
+    <string name="title_discoveries">Discoveries</string>
+    <string name="title_goals">Goals</string>
+    <string-array name="sex_array">
+        <item>@string/sex_male</item>
+        <item>@string/sex_female</item>
+    </string-array>
     <string-array name="level_array">
         <item>@string/level_beginner</item>
         <item>@string/level_novice</item>
@@ -41,14 +51,4 @@
         <item>@string/level_advanced</item>
         <item>@string/level_elite</item>
     </string-array>
-    <string name="info_updating_goal">Updating your goal...</string>
-    <string name="info_creating_goal">Creating your goal...</string>
-    <string name="sample_goal_name">Sample Goal</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_home_screen">HomeScreenActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_discoveries">Discoveries</string>
-    <string name="title_goals">Goals</string>
 </resources>
