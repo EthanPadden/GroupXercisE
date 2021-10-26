@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
-        android:text="Log Activity" />
+        android:text="Log activity" />
 
 
     <EditText

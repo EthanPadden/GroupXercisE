@@ -4,8 +4,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.nova.groupxercise.R;
 
@@ -15,13 +20,14 @@ import com.nova.groupxercise.R;
  * create an instance of this fragment.
  */
 public class LogActivityFragment extends Fragment {
+    private TextView mTitleText;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String EXERCISE_NAME = "Exercise name";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private String mExerciseName;
     private String mParam2;
 
     public LogActivityFragment() {
@@ -49,8 +55,31 @@ public class LogActivityFragment extends Fragment {
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         if ( getArguments() != null ) {
-            mParam1 = getArguments().getString( EXERCISE_NAME );
+            mExerciseName = getArguments().getString( EXERCISE_NAME );
         }
+
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                GoalsFragment goalsFragment = new GoalsFragment();
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, goalsFragment );
+                ft.commit();
+
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
+    }
+
+    @Override
+    public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
+        super.onViewCreated( view, savedInstanceState );
+        mTitleText = getActivity().findViewById( R.id.text_title );
+        mTitleText.setText( "Log activity for " + mExerciseName );
     }
 
     @Override
