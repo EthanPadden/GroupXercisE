@@ -92,13 +92,13 @@ public class GroupMemberRecyclerAdapter extends RecyclerView.Adapter<GroupMember
             for(Goal progress : progresses) {
                 View row = mInflater.inflate(R.layout.layout_goal_list_item , null);
                 TextView exerciseNameText = row.findViewById( R.id.goal_exercise_name );
-                TextView currentStatusText = row.findViewById( R.id.goal_current_status );
+                TextView currentStatusText = row.findViewById( R.id.goal_progress );
                 TextView dividerText = row.findViewById( R.id.goal_divider );
                 TextView targetText = row.findViewById( R.id.goal_target );
                 TextView unitText = row.findViewById( R.id.goal_unit );
 
                 exerciseNameText.setText( progress.getmExerciseName() );
-                currentStatusText.setText( Float.toString( progress.getmCurrentStatus()) );
+//                currentStatusText.setText( Float.toString( progress.getmCurrentStatus()) );
                 dividerText.setVisibility( View.GONE );
                 targetText.setVisibility( View.GONE );
                 unitText.setVisibility( View.GONE );

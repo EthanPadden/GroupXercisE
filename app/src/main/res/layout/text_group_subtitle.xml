@@ -18,7 +18,7 @@
         android:layout_gravity="center_vertical"
         android:text="Group name"
         android:layout_margin="5dp"
-        android:id="@+id/goal_group_name"
+        android:id="@+id/group_title"
         android:textColor="#3500D3"></TextView>
 
 

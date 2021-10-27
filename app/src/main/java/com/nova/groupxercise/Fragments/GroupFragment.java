@@ -79,9 +79,6 @@ public class GroupFragment extends Fragment {
         // Create arraylist for DB single-value events
         mDBListeners = new ArrayList<>();
 
-        // Create group object in memory
-
-
         // Set event listeners
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -165,7 +162,6 @@ public class GroupFragment extends Fragment {
                     }
                 }
                 mDBListeners.remove( this );
-
             }
         };
         mDBListeners.add( groupGoalListener );
@@ -212,7 +208,7 @@ public class GroupFragment extends Fragment {
                         // We are not concerned with the target, it is stored in the group goal
                         float target = 0;
 
-                        Goal goal = new Goal( exerciseName, currentStatus, target );
+                        Goal goal = new Goal( exerciseName, target );
                         member.getmProgress().add( goal );
                     }
 
@@ -234,7 +230,7 @@ public class GroupFragment extends Fragment {
     private View createGroupGoalUIComponent( Goal goal ) {
         View goalView = getLayoutInflater().inflate( R.layout.layout_goal_list_item, null );
         TextView exerciseNameText = goalView.findViewById( R.id.goal_exercise_name );
-        TextView currentStatusText = goalView.findViewById( R.id.goal_current_status );
+        TextView currentStatusText = goalView.findViewById( R.id.goal_progress );
         TextView dividerText = goalView.findViewById( R.id.goal_divider );
         TextView targetText = goalView.findViewById( R.id.goal_target );
         exerciseNameText.setText( goal.getmExerciseName() );
