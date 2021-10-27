@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class GoalsFragment extends Fragment {
     private ArrayList< Goal > mPersonalGoalsList;
     private GoalItemsAdapter mItemsAdapter;
-    private ListView mListView;
+    private ListView mPersonalGoalsLListView;
     private TextView mLoadingPersonalGoalsText;
     private TextView mLoadingGroupGoalsText;
     private ArrayList< Group > mGroups;
@@ -85,7 +85,7 @@ public class GoalsFragment extends Fragment {
         super.onViewCreated( view, savedInstanceState );
 
         // Initialise components
-        mListView = view.findViewById( R.id.goals_fgt_list_personal_goals );
+        mPersonalGoalsLListView = view.findViewById( R.id.goals_fgt_list_personal_goals );
         mLoadingPersonalGoalsText = view.findViewById( R.id.goals_fgt_text_loading_personal_goals );
         mLoadingGroupGoalsText = view.findViewById( R.id.goals_fgt_text_loading_group_goals );
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
@@ -107,13 +107,13 @@ public class GoalsFragment extends Fragment {
                     mLoadingPersonalGoalsText.setText( "You have no personal goals" );
                 } else {
                     mLoadingPersonalGoalsText.setVisibility( View.GONE );
-                    mListView.setAdapter( new GoalItemsAdapter( getActivity(), mPersonalGoalsList ) );
+                    mPersonalGoalsLListView.setAdapter( new GoalItemsAdapter( getActivity(), mPersonalGoalsList ) );
                 }
                 mDBListeners.remove( this );
 
                 // Use recursive algorithm where base case is when the number of items updated is the same as the goals list size?
                 updateUIWithPersonalGoalProgress();
-                addPersonalGoalsClickListeners();
+                addGoalClickListeners( mPersonalGoalsLListView );
             }
             //
 
@@ -187,7 +187,7 @@ public class GoalsFragment extends Fragment {
                         progress = ( ( Float ) retrievedData ).floatValue();
                     }
                     goalToUpdate.setmProgress( progress );
-                    mListView.setAdapter( new GoalItemsAdapter( getActivity(), mPersonalGoalsList ) );
+                    mPersonalGoalsLListView.setAdapter( new GoalItemsAdapter( getActivity(), mPersonalGoalsList ) );
                     mDBListeners.remove( this );
                 }
 
@@ -220,6 +220,7 @@ public class GoalsFragment extends Fragment {
                 groupGoalsList.setVisibility( View.GONE );
             } else {
                 groupGoalsList.setAdapter( new GoalItemsAdapter( getActivity(), group.getmGoals() ) );
+                addGoalClickListeners( groupGoalsList );
             }
         }
 
@@ -252,13 +253,12 @@ public class GoalsFragment extends Fragment {
         }
     }
 
-    private void addPersonalGoalsClickListeners() {
-        // Set event listeners
-        mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+    private void addGoalClickListeners( ListView listView ) {
+        listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
                 // Get the exercise name
-                Goal selectedGoal = (Goal) mListView.getItemAtPosition( i );
+                Goal selectedGoal = (Goal) listView.getItemAtPosition( i );
                 String exerciseName = selectedGoal.getmExerciseName();
 
                 // Create a fragment and pass in the exercise name
