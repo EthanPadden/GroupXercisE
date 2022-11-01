@@ -20,16 +20,21 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.ExerciseActivity;
+import com.nova.groupxercise.Objects.WalkingPlan;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
 
 
 public class DiscoveriesFragment extends Fragment {
+    private ArrayList< String > mWalkingPlanNameList;
     private ArrayList< String > mExerciseNameList;
-    private ListView mListView;
-    private TextView mLoadingText;
-    private ArrayAdapter< String > mItemsAdapter;
+    private ListView mWalkingPlanListView;
+    private ListView mExerciseListView;
+    private TextView mWalkingPlanLoadingText;
+    private TextView mExerciseLoadingText;
+    private ArrayAdapter< String > mWalkingPlansItemsAdapter;
+    private ArrayAdapter< String > mStrengthExercisesItemsAdapter;
     private ArrayAdapter< CharSequence > mLevelSpinnerAdapter;
     protected ArrayList< DBListener > mDBListeners;
 
@@ -81,39 +86,54 @@ public class DiscoveriesFragment extends Fragment {
         super.onViewCreated( view, savedInstanceState );
 
         // Initialise components
-        mListView = view.findViewById( R.id.exercise_list );
-        mLoadingText = view.findViewById( R.id.text_loading_exercise_list );
+        mExerciseListView = view.findViewById( R.id.exercise_list );
+        mWalkingPlanListView = view.findViewById( R.id.walking_plan_list );
+        mExerciseLoadingText = view.findViewById( R.id.text_loading_exercise_list );
+        mWalkingPlanLoadingText = view.findViewById( R.id.text_loading_walking_plan_list );
         mLevelSpinnerAdapter = ArrayAdapter.createFromResource( getActivity(),
                 R.array.level_array, android.R.layout.simple_spinner_item );
 
         // Specify the layout to use when the list of choices appears
         mLevelSpinnerAdapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
 
-        // Create an empty list for the exercise names
+        // Create an empty list for the walking plans and the strength exercise names
+        mWalkingPlanNameList = new ArrayList<>();
         mExerciseNameList = new ArrayList<>();
 
         // Set the list as the list for the items adapter
-        mItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mExerciseNameList );
+        mWalkingPlansItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mWalkingPlanNameList );
+        mStrengthExercisesItemsAdapter = new ArrayAdapter< String >( getActivity(), android.R.layout.simple_list_item_1, mExerciseNameList );
 
+        // Get the list of walking plans from the database
+        DBListener walkingPlanListener = new DBListener() {
+            public void onRetrievalFinished() {
+                // Display exercise list on UI
+                mWalkingPlanLoadingText.setVisibility( View.GONE );
+                mWalkingPlanListView.setAdapter( mWalkingPlansItemsAdapter );
+                mDBListeners.remove( this );
+            }
+        };
+        mDBListeners.add( walkingPlanListener );
+        WalkingPlan.retrieveWalkingPlanList( mWalkingPlanNameList,  walkingPlanListener);
+
+        // Get the list of strength exercises from the database
         DBListener exerciseListener = new DBListener() {
             public void onRetrievalFinished() {
                 // Display exercise list on UI
-                mLoadingText.setVisibility( View.GONE );
-                mListView.setAdapter( mItemsAdapter );
+                mExerciseLoadingText.setVisibility( View.GONE );
+                mExerciseListView.setAdapter( mStrengthExercisesItemsAdapter );
                 mDBListeners.remove( this );
             }
         };
         mDBListeners.add( exerciseListener );
-
-        // Get the list of exercises from the database
         ExerciseActivity.retrieveExerciseList( mExerciseNameList,  exerciseListener);
 
         // Set event listeners
-        mListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+        mExerciseListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
                 // Get the exercise name
-                String exerciseName = mListView.getItemAtPosition( i ).toString();
+                String exerciseName = mExerciseListView.getItemAtPosition( i ).toString();
 
                 // Create a fragment and set the spinner adapter on the fragment
                 ExerciseListItemFragment exerciseListItemFragment = ExerciseListItemFragment.newInstance( exerciseName );
