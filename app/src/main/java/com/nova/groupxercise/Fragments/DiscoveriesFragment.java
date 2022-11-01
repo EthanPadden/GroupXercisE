@@ -98,7 +98,7 @@ public class DiscoveriesFragment extends Fragment {
         DBListener exerciseListener = new DBListener() {
             public void onRetrievalFinished() {
                 // Display exercise list on UI
-                mLoadingText.setVisibility( View.INVISIBLE );
+                mLoadingText.setVisibility( View.GONE );
                 mListView.setAdapter( mItemsAdapter );
                 mDBListeners.remove( this );
             }
