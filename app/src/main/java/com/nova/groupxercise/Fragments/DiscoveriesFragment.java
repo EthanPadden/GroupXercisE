@@ -136,16 +136,13 @@ public class DiscoveriesFragment extends Fragment {
                 String walkingPlanName = mWalkingPlanListView.getItemAtPosition( i ).toString();
 
                 /** CHANGE FOR WALKING PLAN FRAGMENT */
-                // Temporary:
-                Toast.makeText( getActivity(), walkingPlanName, Toast.LENGTH_SHORT  ).show();
-//                // Create a fragment and set the spinner adapter on the fragment
-//                ExerciseListItemFragment exerciseListItemFragment = ExerciseListItemFragment.newInstance( walkingPlanName );
-//                exerciseListItemFragment.setmLevelSpinnerAdapter( mLevelSpinnerAdapter );
+                // Create a fragment and set the spinner adapter on the fragment
+                WalkingPlanListItemFragment walkingPlanListItemFragment = WalkingPlanListItemFragment.newInstance( walkingPlanName );
 
-//                // Set the fragment to be displayed in the frame view
-//                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-//                ft.replace( R.id.frame_home_screen_fragment_placeholder, exerciseListItemFragment );
-//                ft.commit();
+                // Set the fragment to be displayed in the frame view
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, walkingPlanListItemFragment );
+                ft.commit();
             }
         } );
 
