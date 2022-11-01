@@ -128,7 +128,28 @@ public class DiscoveriesFragment extends Fragment {
         mDBListeners.add( exerciseListener );
         ExerciseActivity.retrieveExerciseList( mExerciseNameList,  exerciseListener);
 
-        // Set event listeners
+        // Set event listeners for walking plans
+        mWalkingPlanListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
+                // Get the walking plan name
+                String walkingPlanName = mWalkingPlanListView.getItemAtPosition( i ).toString();
+
+                /** CHANGE FOR WALKING PLAN FRAGMENT */
+                // Temporary:
+                Toast.makeText( getActivity(), walkingPlanName, Toast.LENGTH_SHORT  ).show();
+//                // Create a fragment and set the spinner adapter on the fragment
+//                ExerciseListItemFragment exerciseListItemFragment = ExerciseListItemFragment.newInstance( walkingPlanName );
+//                exerciseListItemFragment.setmLevelSpinnerAdapter( mLevelSpinnerAdapter );
+
+//                // Set the fragment to be displayed in the frame view
+//                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+//                ft.replace( R.id.frame_home_screen_fragment_placeholder, exerciseListItemFragment );
+//                ft.commit();
+            }
+        } );
+
+        // Set event listeners for strength exercises
         mExerciseListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick( AdapterView< ? > adapterView, View view, int i, long l ) {
