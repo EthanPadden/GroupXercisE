@@ -14,6 +14,7 @@
         android:textStyle="bold" />
 
     <ImageView
+        android:id="@+id/img_walking_plan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/text_set_goal_title"/>
@@ -25,6 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
+        android:layout_below="@id/img_walking_plan"
         android:text="Set Personal Goal" />
 
 </RelativeLayout>
