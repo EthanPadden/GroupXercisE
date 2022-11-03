@@ -120,7 +120,7 @@ public class GoalsFragment extends Fragment {
 
         };
         mDBListeners.add( pesonalGoalsListener );
-        Goal.retrievePersonalGoals( pesonalGoalsListener );
+        Goal.retrievePersonalStrengthGoals( pesonalGoalsListener );
 
 
 
