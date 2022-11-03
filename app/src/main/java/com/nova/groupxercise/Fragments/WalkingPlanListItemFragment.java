@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,8 +18,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.nova.groupxercise.Objects.DBListener;
+import com.nova.groupxercise.Objects.WalkingPlan;
 import com.nova.groupxercise.R;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +38,8 @@ public class WalkingPlanListItemFragment extends Fragment {
 
     private TextView mSetGoalTitleText;
     ImageView mImage;
+    private Button mSetWalkingPlanBtn;
+    private ArrayList< DBListener > mDBListeners;
 
     public WalkingPlanListItemFragment() {
         // Required empty public constructor
@@ -72,8 +79,10 @@ public class WalkingPlanListItemFragment extends Fragment {
     @Override
     public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
         super.onViewCreated( view, savedInstanceState );
+        mDBListeners = new ArrayList<>();
 
         mSetGoalTitleText = view.findViewById( R.id.text_set_goal_title );
+        mSetWalkingPlanBtn = view.findViewById( R.id.btn_set_walking_plan );
 
         // Set the fragment title
         mSetGoalTitleText.setText( getResources().getString( R.string.set_goal_title ) + " " + mWalkingPlanName );
@@ -133,5 +142,30 @@ public class WalkingPlanListItemFragment extends Fragment {
                                 .show();
                     }
                 });
+
+        mSetWalkingPlanBtn.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                WalkingPlan walkingPlan = new WalkingPlan( mWalkingPlanName );
+
+                DBListener walkingPlanDetailsListener = new DBListener() {
+                    public void onRetrievalFinished() {
+                        String msg = mWalkingPlanName + " walking plan set!";
+                        Toast.makeText( getActivity(), msg, Toast.LENGTH_SHORT ).show();
+                        mDBListeners.remove( this );
+                    }
+                };
+                mDBListeners.add( walkingPlanDetailsListener );
+
+                walkingPlan.retrieveWalkingPlanDetails( walkingPlanDetailsListener );
+            }
+        } );
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for ( DBListener dbListener : mDBListeners ) {
+            dbListener.setActive( false );
+        }
     }
 }
