@@ -186,13 +186,25 @@ public class GoalsFragment extends Fragment {
 
         String walkingPlanText = walkingPlan.getmWalkingPlanName() + " walking plan";
         exerciseNameText.setText( walkingPlanText );
-        // TODO: try toString()
         progressText.setText( Integer.toString( walkingPlan.getmProgress() ) );
         targetText.setText( Integer.toString( walkingPlan.getmTodaysStepGoal() ) );
         unitText.setText( "steps" );
 
         mWalkingPlanPlaceholder.addView( walkingPlanView );
         mLoadingWalkingPlanText.setVisibility( View.GONE );
+
+        // Set on click listener for walking plan
+        walkingPlanView.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                // Create a fragment and pass in the exercise name
+                LogWalkFragment logWalkFragment = LogWalkFragment.newInstance();
+
+                // Set the fragment to be displayed in the frame view
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, logWalkFragment );
+                ft.commit();
+            }
+        } );
     }
 
     @Override
