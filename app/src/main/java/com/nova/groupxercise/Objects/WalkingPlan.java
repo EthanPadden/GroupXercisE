@@ -17,6 +17,9 @@ public class WalkingPlan {
     private int mIncrement;
     private int mGoal;
     private String mWalkingPlanName;
+    private long mStartTime;
+    private int mProgress;
+    private int mTodaysStepGoal;
 
     public WalkingPlan( String mWalkingPlanName ) {
         setmWalkingPlanName( mWalkingPlanName );
@@ -95,10 +98,59 @@ public class WalkingPlan {
         } );
     }
 
-    public void setWalkingPlan() {
+    public static void retrievePersonalWalkingPlanGoal( final DBListener listener ) {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final String path = "personal_goals/" + userId + "/Walking";
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
 
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
+                // Get plan name
+                String planName = dataSnapshot.child( "plan" ).getValue().toString();
+
+                // Get progress
+                Integer progress = null;
+                Object progressObj = dataSnapshot.child( "progress" ).getValue();
+
+                if (dataSnapshot.exists()){
+                    if ( progressObj instanceof Long ) {
+                        progress = ( ( Long ) progressObj ).intValue();
+                    } else {
+                        progress = ( ( Integer ) progressObj ).intValue();
+                    }
+                }
+
+                // Get start time
+                Object startTimeObj = dataSnapshot.child( "start_time" ).getValue();
+                Long startTime = ( ( Long ) startTimeObj ).longValue();
+
+                // Get todays step goal
+                Integer todaysStepGoal = null;
+                Object todaysStepGoalObj = dataSnapshot.child( "todays_step_goal" ).getValue();
+
+                if (dataSnapshot.exists()){
+                    if ( todaysStepGoalObj instanceof Long ) {
+                        todaysStepGoal = ( ( Long ) todaysStepGoalObj ).intValue();
+                    } else {
+                        todaysStepGoal = ( ( Integer ) todaysStepGoalObj ).intValue();
+                    }
+                }
+
+                WalkingPlan walkingPlan = new WalkingPlan( planName );
+                walkingPlan.setmProgress( progress );
+                walkingPlan.setmStartTime( startTime );
+                walkingPlan.setmTodaysStepGoal( todaysStepGoal );
+
+                listener.onRetrievalFinished( walkingPlan );
+            }
+
+            @Override
+            public void onCancelled( @NonNull DatabaseError databaseError ) {
+
+            }
+        } );
     }
-
     public static void retrieveWalkingPlanList( final ArrayList<String> walkingPlanNames, final DBListener listener){
         String path = "exercise_list/Cardio/Walking";
         DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
@@ -150,5 +202,29 @@ public class WalkingPlan {
 
     public void setmWalkingPlanName( String mWalkingPlanName ) {
         this.mWalkingPlanName = mWalkingPlanName;
+    }
+
+    public long getmStartTime() {
+        return mStartTime;
+    }
+
+    public void setmStartTime( long mStartTime ) {
+        this.mStartTime = mStartTime;
+    }
+
+    public int getmProgress() {
+        return mProgress;
+    }
+
+    public void setmProgress( int mProgress ) {
+        this.mProgress = mProgress;
+    }
+
+    public int getmTodaysStepGoal() {
+        return mTodaysStepGoal;
+    }
+
+    public void setmTodaysStepGoal( int mTodaysStepGoal ) {
+        this.mTodaysStepGoal = mTodaysStepGoal;
     }
 }

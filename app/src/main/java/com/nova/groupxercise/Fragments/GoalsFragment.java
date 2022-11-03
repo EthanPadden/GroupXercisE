@@ -22,6 +22,7 @@ import com.nova.groupxercise.Adapters.GoalItemsAdapter;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
+import com.nova.groupxercise.Objects.WalkingPlan;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
@@ -122,9 +123,6 @@ public class GoalsFragment extends Fragment {
         mDBListeners.add( pesonalGoalsListener );
         Goal.retrievePersonalStrengthGoals( pesonalGoalsListener );
 
-
-
-
         mGroups = new ArrayList<>();
 
         DBListener groupIdsListener = new DBListener() {
@@ -161,6 +159,16 @@ public class GoalsFragment extends Fragment {
         };
         mDBListeners.add( groupIdsListener );
         Group.retrieveGroupIds( groupIdsListener );
+
+        DBListener walkingPlanPersonalGoalListener = new DBListener() {
+            public void onRetrievalFinished( Object retrievedData ) {
+                WalkingPlan walkingPlan = ( WalkingPlan ) retrievedData;
+
+                mDBListeners.remove( this );
+            }
+        };
+        mDBListeners.add( walkingPlanPersonalGoalListener );
+        WalkingPlan.retrievePersonalWalkingPlanGoal( walkingPlanPersonalGoalListener );
     }
 
     @Override
