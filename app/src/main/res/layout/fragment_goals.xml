@@ -9,7 +9,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-    <TextView
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/walking_plan_goal_placeholder"
+            android:layout_margin="10dp">
+            <TextView
+                android:id="@+id/goals_fgt_text_loading_walking_plan_goal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Loading walking plan..." />
+        </RelativeLayout>
+
+        <TextView
         android:id="@+id/goals_fgt_text_loading_personal_goals"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

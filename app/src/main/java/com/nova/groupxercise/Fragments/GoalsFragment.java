@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,8 @@ public class GoalsFragment extends Fragment {
     private ArrayList< Group > mGroups;
     private LinearLayout mGroupGoalsLayout;
     protected ArrayList< DBListener > mDBListeners;
+    private RelativeLayout mWalkingPlanPlaceholder;
+    private TextView mLoadingWalkingPlanText;
 
     private boolean backButtonPressed;
 
@@ -90,6 +93,8 @@ public class GoalsFragment extends Fragment {
         mLoadingPersonalGoalsText = view.findViewById( R.id.goals_fgt_text_loading_personal_goals );
         mLoadingGroupGoalsText = view.findViewById( R.id.goals_fgt_text_loading_group_goals );
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
+        mWalkingPlanPlaceholder = view.findViewById( R.id.walking_plan_goal_placeholder );
+        mLoadingWalkingPlanText = view.findViewById( R.id.goals_fgt_text_loading_walking_plan_goal );
 
         // Set loading texts
         mLoadingPersonalGoalsText.setText( "Loading personal goals..." );
@@ -163,12 +168,31 @@ public class GoalsFragment extends Fragment {
         DBListener walkingPlanPersonalGoalListener = new DBListener() {
             public void onRetrievalFinished( Object retrievedData ) {
                 WalkingPlan walkingPlan = ( WalkingPlan ) retrievedData;
-
+                updateUIWithWalkingPlan( walkingPlan );
                 mDBListeners.remove( this );
             }
         };
         mDBListeners.add( walkingPlanPersonalGoalListener );
         WalkingPlan.retrievePersonalWalkingPlanGoal( walkingPlanPersonalGoalListener );
+    }
+
+    private void updateUIWithWalkingPlan( WalkingPlan walkingPlan ){
+        View walkingPlanView = (View) getLayoutInflater().inflate( R.layout.layout_goal_list_item, null );
+
+        TextView exerciseNameText = walkingPlanView.findViewById( R.id.goal_exercise_name );
+        TextView progressText = walkingPlanView.findViewById( R.id.goal_progress );
+        TextView targetText = walkingPlanView.findViewById( R.id.goal_target );
+        TextView unitText = walkingPlanView.findViewById( R.id.goal_unit );
+
+        String walkingPlanText = walkingPlan.getmWalkingPlanName() + " walking plan";
+        exerciseNameText.setText( walkingPlanText );
+        // TODO: try toString()
+        progressText.setText( Integer.toString( walkingPlan.getmProgress() ) );
+        targetText.setText( Integer.toString( walkingPlan.getmTodaysStepGoal() ) );
+        unitText.setText( "steps" );
+
+        mWalkingPlanPlaceholder.addView( walkingPlanView );
+        mLoadingWalkingPlanText.setVisibility( View.GONE );
     }
 
     @Override
