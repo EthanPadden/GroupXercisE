@@ -149,8 +149,16 @@ public class WalkingPlanListItemFragment extends Fragment {
 
                 DBListener walkingPlanDetailsListener = new DBListener() {
                     public void onRetrievalFinished() {
-                        String msg = mWalkingPlanName + " walking plan set!";
-                        Toast.makeText( getActivity(), msg, Toast.LENGTH_SHORT ).show();
+                        DBListener walkingPlanSaveListener = new DBListener() {
+                            @Override
+                            public void onRetrievalFinished() {
+                                String msg = mWalkingPlanName + " walking plan set!";
+                                Toast.makeText( getActivity(), msg, Toast.LENGTH_SHORT ).show();
+                                mDBListeners.remove( this );
+                            }
+                        };
+                        mDBListeners.add( walkingPlanSaveListener );
+                        walkingPlan.saveWalkingPlanAsPersonalGoal( walkingPlanSaveListener );
                         mDBListeners.remove( this );
                     }
                 };

@@ -2,11 +2,13 @@ package com.nova.groupxercise.Objects;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.nova.groupxercise.DBObjects.WalkingPlanGoalDBObject;
 
 import java.util.ArrayList;
 
@@ -67,6 +69,28 @@ public class WalkingPlan {
             @Override
             public void onCancelled( @NonNull DatabaseError databaseError ) {
 
+            }
+        } );
+    }
+
+
+    public void saveWalkingPlanAsPersonalGoal( final DBListener listener ){
+        // Hitting the save button WILL RESET THE USER'S PROGRESS towards it
+        // Need to disregard any activities before the walking plan was set
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final String path = "personal_goals/" + userId;
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                WalkingPlanGoalDBObject walkingPlanGoalDBObject = new WalkingPlanGoalDBObject( mWalkingPlanName, mStartingPoint );
+                childRef.child( "Walking" ).setValue( walkingPlanGoalDBObject );
+                listener.onRetrievalFinished();
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
             }
         } );
     }
