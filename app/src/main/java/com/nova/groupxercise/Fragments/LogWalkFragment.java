@@ -14,10 +14,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.nova.groupxercise.Activities.HomeScreenActivity;
 import com.nova.groupxercise.Objects.ExerciseActivity;
 import com.nova.groupxercise.R;
 
 import org.joda.time.DateTime;
+import org.joda.time.Instant;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -88,6 +93,7 @@ public class LogWalkFragment extends Fragment {
                         ExerciseActivity exerciseActivity = new ExerciseActivity( "Walking", DateTime.now(), steps );
                         String msg = "Logging " + steps + " steps";
                         Toast.makeText( getActivity(), msg, Toast.LENGTH_SHORT ).show();
+                        logWalk( exerciseActivity );
                     } catch ( NumberFormatException e ) {
                         Toast.makeText( getActivity(), "Steps must be a number", Toast.LENGTH_SHORT ).show();
                     }
@@ -96,5 +102,53 @@ public class LogWalkFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void logWalk( ExerciseActivity exerciseActivity ) {
+        // Add activity to activities subtree
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String currentUserId = currentUser.getUid();
+
+        String activitiesPath = "activities/" + currentUserId + "/" + exerciseActivity.getmExerciseName();
+        final HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
+        DatabaseReference activitiesRef = homeScreenActivity.getmRootRef().child( activitiesPath );
+
+        Instant activityInstant = exerciseActivity.getmTime().toInstant();
+        long activityTimeStamp = activityInstant.getMillis();
+        String activityTimeStampStr = Long.toString( activityTimeStamp );
+
+        activitiesRef.child( activityTimeStampStr ).setValue( exerciseActivity.getmLevel() );
+
+//        // Get the current user progress towards the exercise and see if this beats the record
+//        Goal goal = new Goal( exerciseActivity.getmExerciseName() );
+//        DBListener progressListener = new DBListener() {
+//            public void onRetrievalFinished( Object retrievedData ) {
+//                // If retrievedData == null,
+//                // there is no progress saved for this exercise yet
+//                // so 0 is the default value
+//                float progress = 0;
+//
+//                if ( retrievedData != null ) {
+//                    progress = ( ( Float ) retrievedData ).floatValue();
+//                }
+//
+//                if ( exerciseActivity.getmLevel() > progress) {
+//                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//                    String userProgressPath = "user_progress/" + userId + "/" + exerciseActivity.getmExerciseName();
+//                    DatabaseReference userProgressRef = homeScreenActivity.getmRootRef().child( userProgressPath );
+//                    userProgressRef.setValue( exerciseActivity.getmLevel() );
+//                }
+//                Toast.makeText( getActivity(), "Activity logged", Toast.LENGTH_SHORT ).show();
+//
+//                Intent intent = new Intent( getActivity(), HomeScreenActivity.class );
+//                intent.putExtra( "FRAGMENT_ID", R.id.navigation_activities );
+//                startActivity( intent );
+//
+//                mDBListeners.remove( this );
+//            }
+//
+//        };
+//        mDBListeners.add( progressListener );
+//        goal.retrieveUserProgress( progressListener );
     }
 }
