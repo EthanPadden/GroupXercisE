@@ -4,12 +4,20 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.nova.groupxercise.Objects.ExerciseActivity;
 import com.nova.groupxercise.R;
+
+import org.joda.time.DateTime;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,6 +25,9 @@ import com.nova.groupxercise.R;
  * create an instance of this fragment.
  */
 public class LogWalkFragment extends Fragment {
+    private Button mLogWalkBtn;
+    private EditText mStepsEt;
+
     public LogWalkFragment() {
         // Required empty public constructor
     }
@@ -59,5 +70,31 @@ public class LogWalkFragment extends Fragment {
                               Bundle savedInstanceState ) {
         // Inflate the layout for this fragment
         return inflater.inflate( R.layout.fragment_log_walk, container, false );
+    }
+
+    @Override
+    public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
+        super.onViewCreated( view, savedInstanceState );
+        mLogWalkBtn = getActivity().findViewById( R.id.btn_log_walk );
+        mStepsEt = getActivity().findViewById( R.id.et_steps );
+
+        mLogWalkBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick( View view ) {
+                String stepsStr = mStepsEt.getText().toString();
+                if ( stepsStr != null && stepsStr.compareTo( "" ) != 0 ) {
+                    try {
+                        int steps = Integer.parseInt( stepsStr );
+                        ExerciseActivity exerciseActivity = new ExerciseActivity( "Walking", DateTime.now(), steps );
+                        String msg = "Logging " + steps + " steps";
+                        Toast.makeText( getActivity(), msg, Toast.LENGTH_SHORT ).show();
+                    } catch ( NumberFormatException e ) {
+                        Toast.makeText( getActivity(), "Steps must be a number", Toast.LENGTH_SHORT ).show();
+                    }
+                }  else {
+                    Toast.makeText( getActivity(), "Enter steps", Toast.LENGTH_SHORT ).show();
+                }
+            }
+        });
     }
 }
