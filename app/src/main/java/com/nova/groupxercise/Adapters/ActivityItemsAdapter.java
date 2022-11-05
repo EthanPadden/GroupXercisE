@@ -37,6 +37,10 @@ public class ActivityItemsAdapter extends ArrayAdapter {
         exerciseNameText.setText( currentActivity.getmExerciseName() );
         TextView levelText = listItemView.findViewById( R.id.activity_level );
         levelText.setText( Float.toString( currentActivity.getmLevel() ));
+        TextView unitText = listItemView.findViewById( R.id.activity_unit );
+        if (currentActivity.getmExerciseName().compareTo( "Walking" ) == 0) {
+            unitText.setText( "steps" );
+        }
         TextView timeText = listItemView.findViewById( R.id.activity_time );
         // Format for output
         DateTimeFormatter dtfOut = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm");
