@@ -16,7 +16,10 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
 import com.nova.groupxercise.Objects.ExerciseActivity;
 import com.nova.groupxercise.R;
@@ -119,36 +122,56 @@ public class LogWalkFragment extends Fragment {
 
         activitiesRef.child( activityTimeStampStr ).setValue( exerciseActivity.getmLevel() );
 
-//        // Get the current user progress towards the exercise and see if this beats the record
-//        Goal goal = new Goal( exerciseActivity.getmExerciseName() );
-//        DBListener progressListener = new DBListener() {
-//            public void onRetrievalFinished( Object retrievedData ) {
-//                // If retrievedData == null,
-//                // there is no progress saved for this exercise yet
-//                // so 0 is the default value
-//                float progress = 0;
-//
-//                if ( retrievedData != null ) {
-//                    progress = ( ( Float ) retrievedData ).floatValue();
-//                }
-//
-//                if ( exerciseActivity.getmLevel() > progress) {
-//                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//                    String userProgressPath = "user_progress/" + userId + "/" + exerciseActivity.getmExerciseName();
-//                    DatabaseReference userProgressRef = homeScreenActivity.getmRootRef().child( userProgressPath );
-//                    userProgressRef.setValue( exerciseActivity.getmLevel() );
-//                }
-//                Toast.makeText( getActivity(), "Activity logged", Toast.LENGTH_SHORT ).show();
-//
-//                Intent intent = new Intent( getActivity(), HomeScreenActivity.class );
-//                intent.putExtra( "FRAGMENT_ID", R.id.navigation_activities );
-//                startActivity( intent );
-//
-//                mDBListeners.remove( this );
-//            }
-//
-//        };
-//        mDBListeners.add( progressListener );
-//        goal.retrieveUserProgress( progressListener );
+        // Update progress towards daily goal in goals subtree
+        String goalsPath = "personal_goals/" + currentUserId + "/Walking";
+        DatabaseReference goalsRef = homeScreenActivity.getmRootRef().child( goalsPath );
+
+        goalsRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
+                // Get the value for the last walk time
+                // TODO: test!!!
+                // https://www.baeldung.com/joda-time
+                long lastWalkTimeTS = (Long) dataSnapshot.child( "last_walk_time" ).getValue();
+                Instant lastWalkTimeInstant = new Instant(lastWalkTimeTS);
+                DateTime lastWalkTimeDateTime = lastWalkTimeInstant.toDateTime();
+                int lastWalkDateTimeDay = lastWalkTimeDateTime.getDayOfMonth();
+                int today = DateTime.now().getDayOfMonth();
+
+                // Get steps as an int rather than a float
+                int steps = Math.round( exerciseActivity.getmLevel() );
+
+                if(lastWalkDateTimeDay != today) {
+                    // It is a new day, so set todays progress as the steps for this walk
+                    goalsRef.child( "progress" ).setValue( exerciseActivity.getmLevel() );
+                } else {
+                    // It is the same day, so append the steps
+                    Object currentStepsObj = dataSnapshot.child( "progress" ).getValue();
+                    int currentSteps, newSteps;
+                    if (dataSnapshot.exists()) {
+                        if (currentStepsObj instanceof Long ){
+                            currentSteps = ( ( Long ) currentStepsObj ).intValue();
+                        } else {
+                            currentSteps = ( ( Integer ) currentStepsObj ).intValue();
+                        }
+                        newSteps = currentSteps + steps;
+                    } else {
+                        newSteps = steps;
+                    }
+
+
+                    goalsRef.child( "progress" ).setValue( newSteps );
+                }
+
+                // Set the new last walk time TS as now TS
+                long nowTS = DateTime.now().getMillis();
+                goalsRef.child( "last_walk_time" ).setValue( nowTS );
+            }
+
+            @Override
+            public void onCancelled( @NonNull DatabaseError databaseError ) {
+
+            }
+        } );
     }
 }
