@@ -171,6 +171,13 @@ public class GoalsFragment extends Fragment {
                 updateUIWithWalkingPlan( walkingPlan );
                 mDBListeners.remove( this );
             }
+
+            @Override
+            public void onRetrievalFinished() {
+                // In this case, there is no walking goal set
+                mLoadingWalkingPlanText.setText( "No walking plan set" );
+                mDBListeners.remove( this );
+            }
         };
         mDBListeners.add( walkingPlanPersonalGoalListener );
         WalkingPlan.retrievePersonalWalkingPlanGoal( walkingPlanPersonalGoalListener );

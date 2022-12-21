@@ -26,6 +26,7 @@ import com.nova.groupxercise.R;
 
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
+import org.joda.time.LocalDate;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -132,16 +133,19 @@ public class LogWalkFragment extends Fragment {
                 // Get the value for the last walk time
                 // TODO: test!!!
                 // https://www.baeldung.com/joda-time
+
+                // LocalDate represents a date without time
                 long lastWalkTimeTS = (Long) dataSnapshot.child( "last_walk_time" ).getValue();
-                Instant lastWalkTimeInstant = new Instant(lastWalkTimeTS);
-                DateTime lastWalkTimeDateTime = lastWalkTimeInstant.toDateTime();
-                int lastWalkDateTimeDay = lastWalkTimeDateTime.getDayOfMonth();
-                int today = DateTime.now().getDayOfMonth();
+                DateTime lastWalkTimeDT = new DateTime( lastWalkTimeTS );
+                LocalDate lastWalkDate = lastWalkTimeDT.toLocalDate();
+
+                DateTime todayDT = DateTime.now();
+                LocalDate todayDate = todayDT.toLocalDate();
 
                 // Get steps as an int rather than a float
                 int steps = Math.round( exerciseActivity.getmLevel() );
 
-                if(lastWalkDateTimeDay != today) {
+                if(lastWalkDate.equals( todayDate )) {
                     // It is a new day, so set todays progress as the steps for this walk
                     goalsRef.child( "progress" ).setValue( exerciseActivity.getmLevel() );
                 } else {
@@ -158,7 +162,6 @@ public class LogWalkFragment extends Fragment {
                     } else {
                         newSteps = steps;
                     }
-
 
                     goalsRef.child( "progress" ).setValue( newSteps );
                 }

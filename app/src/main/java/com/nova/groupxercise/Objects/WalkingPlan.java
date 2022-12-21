@@ -10,6 +10,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.DBObjects.WalkingPlanGoalDBObject;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+
 import java.util.ArrayList;
 
 public class WalkingPlan {
@@ -20,6 +23,8 @@ public class WalkingPlan {
     private long mStartTime;
     private int mProgress;
     private int mTodaysStepGoal;
+    private long mLastTimeStepGoalWasReset;
+    private long mLastWalkTime;
 
     public WalkingPlan( String mWalkingPlanName ) {
         setmWalkingPlanName( mWalkingPlanName );
@@ -87,7 +92,7 @@ public class WalkingPlan {
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
-                WalkingPlanGoalDBObject walkingPlanGoalDBObject = new WalkingPlanGoalDBObject( mWalkingPlanName, mStartingPoint );
+                WalkingPlanGoalDBObject walkingPlanGoalDBObject = new WalkingPlanGoalDBObject( mWalkingPlanName, mStartingPoint, mIncrement );
                 childRef.child( "Walking" ).setValue( walkingPlanGoalDBObject );
                 listener.onRetrievalFinished();
             }
@@ -103,46 +108,128 @@ public class WalkingPlan {
         final String path = "personal_goals/" + userId + "/Walking";
         DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
 
+        /**
+         * Prob = last walk time went to 0 - FIXED??, last time step goal reset updated for no reason?, progress went to 0
+         * With act logged ^^
+         * */
+
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
-                // Get plan name
-                String planName = dataSnapshot.child( "plan" ).getValue().toString();
+                if (dataSnapshot.exists()) {
+                    // Get plan name
+                    String planName = dataSnapshot.child( "plan" ).getValue().toString();
 
-                // Get progress
-                Integer progress = null;
-                Object progressObj = dataSnapshot.child( "progress" ).getValue();
+                    // Get progress
+                    Integer progress = null;
+                    Object progressObj = dataSnapshot.child( "progress" ).getValue();
 
-                if (dataSnapshot.exists()){
-                    if ( progressObj instanceof Long ) {
-                        progress = ( ( Long ) progressObj ).intValue();
-                    } else {
-                        progress = ( ( Integer ) progressObj ).intValue();
+                    if ( dataSnapshot.exists() ) {
+                        if ( progressObj instanceof Long ) {
+                            progress = ( ( Long ) progressObj ).intValue();
+                        } else {
+                            progress = ( ( Integer ) progressObj ).intValue();
+                        }
                     }
-                }
 
-                // Get start time
-                Object startTimeObj = dataSnapshot.child( "start_time" ).getValue();
-                Long startTime = ( ( Long ) startTimeObj ).longValue();
+                    // Get start time
+                    Object startTimeObj = dataSnapshot.child( "start_time" ).getValue();
+                    Long startTime = ( ( Long ) startTimeObj ).longValue();
 
-                // Get todays step goal
-                Integer todaysStepGoal = null;
-                Object todaysStepGoalObj = dataSnapshot.child( "todays_step_goal" ).getValue();
+                    // Get todays step goal
+                    Integer todaysStepGoal = null;
+                    Object todaysStepGoalObj = dataSnapshot.child( "todays_step_goal" ).getValue();
 
-                if (dataSnapshot.exists()){
-                    if ( todaysStepGoalObj instanceof Long ) {
-                        todaysStepGoal = ( ( Long ) todaysStepGoalObj ).intValue();
-                    } else {
-                        todaysStepGoal = ( ( Integer ) todaysStepGoalObj ).intValue();
+                    if ( dataSnapshot.exists() ) {
+                        if ( todaysStepGoalObj instanceof Long ) {
+                            todaysStepGoal = ( ( Long ) todaysStepGoalObj ).intValue();
+                        } else {
+                            todaysStepGoal = ( ( Integer ) todaysStepGoalObj ).intValue();
+                        }
                     }
+
+                    // Get last time step goal was reset
+                    Object lastTimeGoalWasResetObj = dataSnapshot.child( "last_time_step_goal_reset" ).getValue();
+                    long lastTimeGoalWasReset = ( ( Long ) lastTimeGoalWasResetObj ).longValue();
+
+                    // Get last walk time so that it is not overwritten
+                    Object lastWalkTimeObj = dataSnapshot.child( "last_walk_time" ).getValue();
+                    long lastWalkTime = ( ( Long ) lastWalkTimeObj ).longValue();
+
+                    // Get increment
+                    Integer increment = null;
+                    Object incrementObj = dataSnapshot.child( "increment" ).getValue();
+
+                    if ( dataSnapshot.exists() ) {
+                        if ( incrementObj instanceof Long ) {
+                            increment = ( ( Long ) incrementObj ).intValue();
+                        } else {
+                            increment = ( ( Integer ) incrementObj ).intValue();
+                        }
+                    }
+
+                    // Create an object to be stored locally
+                    WalkingPlan walkingPlan = new WalkingPlan( planName );
+                    walkingPlan.setmProgress( progress );
+                    walkingPlan.setmStartTime( startTime );
+                    walkingPlan.setmTodaysStepGoal( todaysStepGoal );
+                    walkingPlan.setmLastTimeStepGoalWasReset( lastTimeGoalWasReset );
+                    walkingPlan.setmLastWalkTime( lastWalkTime );
+                    walkingPlan.setmIncrement( increment );
+
+                    // Create a DB object to replace the one in the database
+                    WalkingPlanGoalDBObject walkingPlanGoalDBObject = new WalkingPlanGoalDBObject(
+                            walkingPlan.mWalkingPlanName,
+                            walkingPlan.getmTodaysStepGoal(),
+                            walkingPlan.getmIncrement()
+                    );
+                    // These will not be changed here
+                    walkingPlanGoalDBObject.last_walk_time = lastWalkTime;
+                    walkingPlanGoalDBObject.start_time = startTime;
+                    walkingPlanGoalDBObject.last_time_step_goal_reset = lastTimeGoalWasReset;
+                    walkingPlanGoalDBObject.progress = progress;
+
+                    /** RESET WALKING PLAN */
+                    long todayTS = DateTime.now().getMillis();
+                    if ( walkingPlan.getmLastTimeStepGoalWasReset() == 0) {
+                        // Set it as today - basically the first day of the plan
+                        walkingPlan.setmLastTimeStepGoalWasReset( todayTS );
+                        walkingPlanGoalDBObject.last_time_step_goal_reset = todayTS;
+                    } else {
+                        // LocalDate represents a date without time
+                        DateTime dayLastStepGoalResetDT = new DateTime(lastTimeGoalWasReset);
+                        LocalDate dayLastStepGoalResetDate = dayLastStepGoalResetDT.toLocalDate();
+                        DateTime todayDT = DateTime.now();
+                        LocalDate todayDate = todayDT.toLocalDate();
+
+                        if (!dayLastStepGoalResetDate.equals( todayDate )) {
+                            /**    NEED TO GET INCREMENT FROM DB    */
+                            // Reset the progress for a new day
+                            walkingPlan.setmProgress( 0 );
+                            walkingPlanGoalDBObject.progress = 0;
+
+                            // Did we meet our step goal yesterday?
+                            if ( walkingPlan.getmProgress() >= walkingPlan.getmTodaysStepGoal() ) {
+                                // Increase todays step goal by the increment
+                                int yesterdaysStepGoal = walkingPlan.getmTodaysStepGoal();
+                                int newTodayStepGoal = yesterdaysStepGoal + walkingPlan.getmIncrement();
+                                walkingPlan.setmTodaysStepGoal( newTodayStepGoal );
+                                walkingPlanGoalDBObject.todays_step_goal = newTodayStepGoal;
+                            }
+
+                            // Update the last time the step goal was reset
+                            walkingPlan.setmLastTimeStepGoalWasReset( todayTS );
+                            walkingPlanGoalDBObject.last_time_step_goal_reset = todayTS;
+                        }
+                        // Otherwise - do nothing
+                    }
+
+                    // Update database
+                    childRef.setValue( walkingPlanGoalDBObject );
+                    listener.onRetrievalFinished( walkingPlan );
+                } else {
+                    listener.onRetrievalFinished();
                 }
-
-                WalkingPlan walkingPlan = new WalkingPlan( planName );
-                walkingPlan.setmProgress( progress );
-                walkingPlan.setmStartTime( startTime );
-                walkingPlan.setmTodaysStepGoal( todaysStepGoal );
-
-                listener.onRetrievalFinished( walkingPlan );
             }
 
             @Override
@@ -226,5 +313,21 @@ public class WalkingPlan {
 
     public void setmTodaysStepGoal( int mTodaysStepGoal ) {
         this.mTodaysStepGoal = mTodaysStepGoal;
+    }
+
+    public long getmLastTimeStepGoalWasReset() {
+        return mLastTimeStepGoalWasReset;
+    }
+
+    public void setmLastTimeStepGoalWasReset( long mLastTimeStepGoalWasReset ) {
+        this.mLastTimeStepGoalWasReset = mLastTimeStepGoalWasReset;
+    }
+
+    public long getmLastWalkTime() {
+        return mLastWalkTime;
+    }
+
+    public void setmLastWalkTime( long mLastWalkTime ) {
+        this.mLastWalkTime = mLastWalkTime;
     }
 }
