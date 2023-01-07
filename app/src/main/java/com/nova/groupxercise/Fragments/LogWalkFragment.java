@@ -145,7 +145,7 @@ public class LogWalkFragment extends Fragment {
                 // Get steps as an int rather than a float
                 int steps = Math.round( exerciseActivity.getmLevel() );
 
-                if(lastWalkDate.equals( todayDate )) {
+                if(!lastWalkDate.equals( todayDate )) {
                     // It is a new day, so set todays progress as the steps for this walk
                     goalsRef.child( "progress" ).setValue( exerciseActivity.getmLevel() );
                 } else {
