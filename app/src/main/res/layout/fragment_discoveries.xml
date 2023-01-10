@@ -4,7 +4,19 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/text_loading_exercise_list"
+        android:id="@+id/text_walking_plans_heading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="Walking Plans"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/text_loading_walking_plan_list"
+        android:layout_below="@id/text_walking_plans_heading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -13,9 +25,10 @@
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/exercise_list"
+        android:id="@+id/walking_plan_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text_loading_walking_plan_list"
         android:orientation="vertical"
         android:paddingLeft="10dp"
         android:paddingTop="10dp"
@@ -23,5 +36,38 @@
         android:paddingBottom="10dp"
         tools:context="com.nova.groupxercise.Activities.HomeScreenActivity" />
 
+    <TextView
+        android:id="@+id/text_strength_heading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:padding="10dp"
+        android:layout_below="@id/walking_plan_list"
+        android:text="Strength"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/text_loading_exercise_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/text_strength_heading"
+        android:layout_margin="20dp"
+        android:text="Loading..." />
+
+    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/exercise_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:layout_below="@id/text_loading_exercise_list"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        tools:context="com.nova.groupxercise.Activities.HomeScreenActivity" />
 
 </RelativeLayout>

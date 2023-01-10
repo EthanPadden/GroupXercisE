@@ -328,7 +328,7 @@ public class ExerciseListItemFragment extends Fragment {
         } else {
             // Path to the users goals
             final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            String path = "personal_goals/" + userId + "/" + goal.getmExerciseName();
+            String path = "personal_goals/" + userId + "/Strength/" + goal.getmExerciseName();
 
             // Get the DB reference
             HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();

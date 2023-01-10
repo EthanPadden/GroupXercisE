@@ -26,10 +26,10 @@ public class Goal {
         setmProgress( 0 );
     }
 
-    public static void retrievePersonalGoals( final DBListener listener ) {
+    public static void retrievePersonalStrengthGoals( final DBListener listener ) {
         // Path to the users goals
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String path = "personal_goals/" + userId;
+        String path = "personal_goals/" + userId + "/Strength";
 
         DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
 

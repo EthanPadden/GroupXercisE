@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ import com.nova.groupxercise.Adapters.GoalItemsAdapter;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
+import com.nova.groupxercise.Objects.WalkingPlan;
 import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ public class GoalsFragment extends Fragment {
     private ArrayList< Group > mGroups;
     private LinearLayout mGroupGoalsLayout;
     protected ArrayList< DBListener > mDBListeners;
+    private RelativeLayout mWalkingPlanPlaceholder;
+    private TextView mLoadingWalkingPlanText;
 
     private boolean backButtonPressed;
 
@@ -89,6 +93,8 @@ public class GoalsFragment extends Fragment {
         mLoadingPersonalGoalsText = view.findViewById( R.id.goals_fgt_text_loading_personal_goals );
         mLoadingGroupGoalsText = view.findViewById( R.id.goals_fgt_text_loading_group_goals );
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
+        mWalkingPlanPlaceholder = view.findViewById( R.id.walking_plan_goal_placeholder );
+        mLoadingWalkingPlanText = view.findViewById( R.id.goals_fgt_text_loading_walking_plan_goal );
 
         // Set loading texts
         mLoadingPersonalGoalsText.setText( "Loading personal goals..." );
@@ -120,10 +126,7 @@ public class GoalsFragment extends Fragment {
 
         };
         mDBListeners.add( pesonalGoalsListener );
-        Goal.retrievePersonalGoals( pesonalGoalsListener );
-
-
-
+        Goal.retrievePersonalStrengthGoals( pesonalGoalsListener );
 
         mGroups = new ArrayList<>();
 
@@ -161,6 +164,54 @@ public class GoalsFragment extends Fragment {
         };
         mDBListeners.add( groupIdsListener );
         Group.retrieveGroupIds( groupIdsListener );
+
+        DBListener walkingPlanPersonalGoalListener = new DBListener() {
+            public void onRetrievalFinished( Object retrievedData ) {
+                WalkingPlan walkingPlan = ( WalkingPlan ) retrievedData;
+                updateUIWithWalkingPlan( walkingPlan );
+                mDBListeners.remove( this );
+            }
+
+            @Override
+            public void onRetrievalFinished() {
+                // In this case, there is no walking goal set
+                mLoadingWalkingPlanText.setText( "No walking plan set" );
+                mDBListeners.remove( this );
+            }
+        };
+        mDBListeners.add( walkingPlanPersonalGoalListener );
+        WalkingPlan.retrievePersonalWalkingPlanGoal( walkingPlanPersonalGoalListener );
+    }
+
+    private void updateUIWithWalkingPlan( WalkingPlan walkingPlan ){
+        View walkingPlanView = (View) getLayoutInflater().inflate( R.layout.layout_goal_list_item, null );
+
+        TextView exerciseNameText = walkingPlanView.findViewById( R.id.goal_exercise_name );
+        TextView progressText = walkingPlanView.findViewById( R.id.goal_progress );
+        TextView targetText = walkingPlanView.findViewById( R.id.goal_target );
+        TextView unitText = walkingPlanView.findViewById( R.id.goal_unit );
+
+        String walkingPlanText = walkingPlan.getmWalkingPlanName() + " walking plan";
+        exerciseNameText.setText( walkingPlanText );
+        progressText.setText( Integer.toString( walkingPlan.getmProgress() ) );
+        targetText.setText( Integer.toString( walkingPlan.getmTodaysStepGoal() ) );
+        unitText.setText( "steps" );
+
+        mWalkingPlanPlaceholder.addView( walkingPlanView );
+        mLoadingWalkingPlanText.setVisibility( View.GONE );
+
+        // Set on click listener for walking plan
+        walkingPlanView.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                // Create a fragment and pass in the exercise name
+                LogWalkFragment logWalkFragment = LogWalkFragment.newInstance();
+
+                // Set the fragment to be displayed in the frame view
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, logWalkFragment );
+                ft.commit();
+            }
+        } );
     }
 
     @Override
