@@ -243,6 +243,9 @@ public class GoalsFragment extends Fragment {
      * Updates the progress using the user_progress subtree
      */
     private void updateUIWithPersonalGoalProgress() {
+        GoalItemsAdapter goalItemsAdapter = new GoalItemsAdapter( getActivity(), mPersonalGoalsList );
+        mPersonalGoalsLListView.setAdapter( goalItemsAdapter );
+
         for (Goal goalToUpdate : mPersonalGoalsList ) {
             DBListener progressListener = new DBListener() {
                 public void onRetrievalFinished( Object retrievedData ) {
@@ -255,7 +258,9 @@ public class GoalsFragment extends Fragment {
                         progress = ( ( Float ) retrievedData ).floatValue();
                     }
                     goalToUpdate.setmProgress( progress );
-                    mPersonalGoalsLListView.setAdapter( new GoalItemsAdapter( getActivity(), mPersonalGoalsList ) );
+
+                    // Is it the case that setadapter is called again and again? - trying something different
+                    goalItemsAdapter.notifyDataSetChanged();
                     mDBListeners.remove( this );
                 }
 
