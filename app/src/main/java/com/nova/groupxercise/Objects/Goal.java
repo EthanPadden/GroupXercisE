@@ -123,7 +123,7 @@ public class Goal {
     }
     @Override
     public String toString() {
-        return String.format( "%s\nCurrent: %s\nTarget: %s", mExerciseName, mTarget );
+        return String.format( "%s\nCurrent: %s\nTarget: %s", mExerciseName, Float.toString( mProgress ), Float.toString( mTarget ) );
     }
 
     public void setmExerciseName( String mExerciseName ) {

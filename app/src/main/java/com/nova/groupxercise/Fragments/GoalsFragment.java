@@ -2,6 +2,7 @@ package com.nova.groupxercise.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -167,6 +168,7 @@ public class GoalsFragment extends Fragment {
 
         DBListener walkingPlanPersonalGoalListener = new DBListener() {
             public void onRetrievalFinished( Object retrievedData ) {
+                // In this case, there is a walking plan set
                 WalkingPlan walkingPlan = ( WalkingPlan ) retrievedData;
                 updateUIWithWalkingPlan( walkingPlan );
                 mDBListeners.remove( this );
@@ -183,11 +185,17 @@ public class GoalsFragment extends Fragment {
         WalkingPlan.retrievePersonalWalkingPlanGoal( walkingPlanPersonalGoalListener );
     }
 
+    /**
+     * This method is only called if there is a walking plan set
+     * i.e. if there was a walking plan retrieved from the database
+     * @param walkingPlan
+     */
     private void updateUIWithWalkingPlan( WalkingPlan walkingPlan ){
         View walkingPlanView = (View) getLayoutInflater().inflate( R.layout.layout_goal_list_item, null );
 
         TextView exerciseNameText = walkingPlanView.findViewById( R.id.goal_exercise_name );
         TextView progressText = walkingPlanView.findViewById( R.id.goal_progress );
+        TextView dividerText = walkingPlanView.findViewById( R.id.goal_divider );
         TextView targetText = walkingPlanView.findViewById( R.id.goal_target );
         TextView unitText = walkingPlanView.findViewById( R.id.goal_unit );
 
@@ -199,6 +207,15 @@ public class GoalsFragment extends Fragment {
 
         mWalkingPlanPlaceholder.addView( walkingPlanView );
         mLoadingWalkingPlanText.setVisibility( View.GONE );
+
+        // Set text to green if the daily goal is complete
+        if ( walkingPlan.getmProgress() >= walkingPlan.getmTodaysStepGoal() ) {
+            exerciseNameText.setTextColor( Color.GREEN );
+            progressText.setTextColor( Color.GREEN );
+            dividerText.setTextColor( Color.GREEN );
+            targetText.setTextColor( Color.GREEN );
+            unitText.setTextColor( Color.GREEN );
+        }
 
         // Set on click listener for walking plan
         walkingPlanView.setOnClickListener( new View.OnClickListener() {
@@ -226,6 +243,9 @@ public class GoalsFragment extends Fragment {
      * Updates the progress using the user_progress subtree
      */
     private void updateUIWithPersonalGoalProgress() {
+        GoalItemsAdapter goalItemsAdapter = new GoalItemsAdapter( getActivity(), mPersonalGoalsList );
+        mPersonalGoalsLListView.setAdapter( goalItemsAdapter );
+
         for (Goal goalToUpdate : mPersonalGoalsList ) {
             DBListener progressListener = new DBListener() {
                 public void onRetrievalFinished( Object retrievedData ) {
@@ -238,7 +258,8 @@ public class GoalsFragment extends Fragment {
                         progress = ( ( Float ) retrievedData ).floatValue();
                     }
                     goalToUpdate.setmProgress( progress );
-                    mPersonalGoalsLListView.setAdapter( new GoalItemsAdapter( getActivity(), mPersonalGoalsList ) );
+
+                    goalItemsAdapter.notifyDataSetChanged();
                     mDBListeners.remove( this );
                 }
 
