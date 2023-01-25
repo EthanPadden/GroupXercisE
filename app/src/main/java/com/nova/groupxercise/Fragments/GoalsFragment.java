@@ -259,7 +259,6 @@ public class GoalsFragment extends Fragment {
                     }
                     goalToUpdate.setmProgress( progress );
 
-                    // Is it the case that setadapter is called again and again? - trying something different
                     goalItemsAdapter.notifyDataSetChanged();
                     mDBListeners.remove( this );
                 }

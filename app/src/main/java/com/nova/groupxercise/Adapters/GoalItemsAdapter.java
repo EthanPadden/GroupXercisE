@@ -1,6 +1,7 @@
 package com.nova.groupxercise.Adapters;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,10 @@ public class GoalItemsAdapter extends ArrayAdapter {
         TextView targetText = listItemView.findViewById( R.id.goal_target );
         targetText.setText( Float.toString( currentGoal.getmTarget() ) );
 
+        if (currentGoal.getmProgress() >= currentGoal.getmTarget()) {
+            exerciseNameText.setTextColor( Color.GREEN );
+        }
+
         return listItemView;
     }
-
 }
