@@ -66,6 +66,21 @@
         android:gravity="center" />
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Setting a goal based on your details is unavailable. Please set these details in the Profile section."
+        android:visibility="gone"
+        android:id="@+id/text_no_details_set_error"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/layout_user_details_options">
+
+
+
     <LinearLayout
         android:layout_marginBottom="0dp"
         android:layout_width="match_parent"
@@ -133,7 +148,7 @@
         android:gravity="center"
         android:text="kg" />
     </LinearLayout>
-
+    </LinearLayout>
 
     <LinearLayout
         android:layout_marginTop="20dp"
