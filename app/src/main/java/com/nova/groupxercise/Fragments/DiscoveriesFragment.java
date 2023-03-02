@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ public class DiscoveriesFragment extends Fragment {
     private ArrayAdapter< String > mStrengthExercisesItemsAdapter;
     private ArrayAdapter< CharSequence > mLevelSpinnerAdapter;
     protected ArrayList< DBListener > mDBListeners;
+    private Button mCustomWalkingPlanBtn;
 
     private boolean backButtonPressed;
 
@@ -92,6 +94,7 @@ public class DiscoveriesFragment extends Fragment {
         mWalkingPlanLoadingText = view.findViewById( R.id.text_loading_walking_plan_list );
         mLevelSpinnerAdapter = ArrayAdapter.createFromResource( getActivity(),
                 R.array.level_array, android.R.layout.simple_spinner_item );
+        mCustomWalkingPlanBtn = view.findViewById( R.id.btn_custom_walking_plan );
 
         // Specify the layout to use when the list of choices appears
         mLevelSpinnerAdapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
@@ -160,6 +163,18 @@ public class DiscoveriesFragment extends Fragment {
                 // Set the fragment to be displayed in the frame view
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 ft.replace( R.id.frame_home_screen_fragment_placeholder, exerciseListItemFragment );
+                ft.commit();
+            }
+        } );
+
+        // Set on click listeners
+        mCustomWalkingPlanBtn.setOnClickListener( new View.OnClickListener() {
+            public void onClick( View v ) {
+                CustomWalkingPlanListItemFragment customWalkingPlanListItemFragment = CustomWalkingPlanListItemFragment.newInstance( "Custom" );
+
+                // Set the fragment to be displayed in the frame view
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, customWalkingPlanListItemFragment );
                 ft.commit();
             }
         } );
