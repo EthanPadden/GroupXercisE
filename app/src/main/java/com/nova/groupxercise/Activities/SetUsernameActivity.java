@@ -49,8 +49,8 @@ public class SetUsernameActivity extends AppCompatActivity {
                                 Toast.makeText( SetUsernameActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT ).show();
                             } else {
                                 Toast.makeText( SetUsernameActivity.this, "Username set!", Toast.LENGTH_SHORT ).show();
-                                // Go to the home screen
-                                Intent intent = new Intent( SetUsernameActivity.this, HomeScreenActivity.class );
+                                // Go to the tutorial screen
+                                Intent intent = new Intent( SetUsernameActivity.this, TutorialActivity.class );
                                 startActivity( intent );
                             }
                         }

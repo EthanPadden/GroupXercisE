@@ -51,4 +51,10 @@
         <item>@string/level_advanced</item>
         <item>@string/level_elite</item>
     </string-array>
+
+    // Tutorial
+    <string name="tutorial_discoveries">When you open the app, you will be taken to the Discoveries screen. Here, you can select various strength exercises and a walking plan to add to your goals. You can choose from the preset walking plans or set a custom daily step goal.</string>
+    <string-array name="tutorial">
+        <item>@string/tutorial_discoveries</item>
+    </string-array>
 </resources>
