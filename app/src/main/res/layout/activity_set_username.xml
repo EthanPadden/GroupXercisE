@@ -9,7 +9,9 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
-        android:text="Choose Username" />
+        android:text="Choose Username"
+        style="@style/listItemTitle"
+        />
 
     <EditText
         android:id="@+id/et_username"
@@ -31,6 +33,9 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="20dp"
-        android:text="Select" />
+        android:text="Select"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="#FFFFFF"/>
 
 </RelativeLayout>

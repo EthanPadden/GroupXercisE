@@ -10,7 +10,7 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
         android:text="Register"
-        android:textSize="25dp"/>
+        style="@style/listItemTitle" />
 
     <EditText
         android:id="@+id/et_email"
