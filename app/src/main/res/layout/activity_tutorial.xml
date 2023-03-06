@@ -25,9 +25,10 @@
         android:layout_below="@id/text_tutorial_title"/>
 
     <ImageView
+        android:id="@+id/img_tutorial"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/discoveries"
+        android:src="@drawable/tutorial_step_0"
         android:layout_below="@id/text_tutorial"
         android:layout_above="@id/next_button"/>
     <Button
