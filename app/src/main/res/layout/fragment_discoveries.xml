@@ -35,6 +35,12 @@
         android:paddingRight="10dp"
         android:paddingBottom="10dp"
         tools:context="com.nova.groupxercise.Activities.HomeScreenActivity" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_custom_walking_plan"
+        android:layout_below="@+id/walking_plan_list"
+        android:text="Custom Walking Plan"/>
 
     <TextView
         android:id="@+id/text_strength_heading"
@@ -43,7 +49,7 @@
         android:layout_weight="1"
         android:gravity="center"
         android:padding="10dp"
-        android:layout_below="@id/walking_plan_list"
+        android:layout_below="@id/btn_custom_walking_plan"
         android:text="Strength"
         android:textSize="20sp"
         android:textStyle="bold" />

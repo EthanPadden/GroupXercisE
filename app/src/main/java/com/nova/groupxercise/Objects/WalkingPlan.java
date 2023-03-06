@@ -208,13 +208,15 @@ public class WalkingPlan {
                             walkingPlan.setmProgress( 0 );
                             walkingPlanGoalDBObject.progress = 0;
 
-                            // Did we meet our step goal yesterday?
-                            if ( walkingPlan.getmProgress() >= walkingPlan.getmTodaysStepGoal() ) {
-                                // Increase todays step goal by the increment
-                                int yesterdaysStepGoal = walkingPlan.getmTodaysStepGoal();
-                                int newTodayStepGoal = yesterdaysStepGoal + walkingPlan.getmIncrement();
-                                walkingPlan.setmTodaysStepGoal( newTodayStepGoal );
-                                walkingPlanGoalDBObject.todays_step_goal = newTodayStepGoal;
+                            // Did we meet our step goal yesterday? - IGNORE IF THE WALKING PLAN IS CUSTOM STEPS
+                            if (walkingPlan.getmWalkingPlanName().compareTo( "Custom" ) != 0) {
+                                if ( walkingPlan.getmProgress() >= walkingPlan.getmTodaysStepGoal() ) {
+                                    // Increase todays step goal by the increment
+                                    int yesterdaysStepGoal = walkingPlan.getmTodaysStepGoal();
+                                    int newTodayStepGoal = yesterdaysStepGoal + walkingPlan.getmIncrement();
+                                    walkingPlan.setmTodaysStepGoal( newTodayStepGoal );
+                                    walkingPlanGoalDBObject.todays_step_goal = newTodayStepGoal;
+                                }
                             }
 
                             // Update the last time the step goal was reset

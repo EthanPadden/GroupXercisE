@@ -36,7 +36,13 @@ public class ActivityItemsAdapter extends ArrayAdapter {
         TextView exerciseNameText = listItemView.findViewById( R.id.activity_exercise_name );
         exerciseNameText.setText( currentActivity.getmExerciseName() );
         TextView levelText = listItemView.findViewById( R.id.activity_level );
-        levelText.setText( Float.toString( currentActivity.getmLevel() ));
+        // If the activity is a walking activity, we dont want the decimal point
+        if(currentActivity.getmExerciseName().compareTo( "Walking" ) == 0) {
+            int steps = Math.round( currentActivity.getmLevel() );
+            levelText.setText( Integer.toString( steps ) );
+        } else {
+            levelText.setText( Float.toString( currentActivity.getmLevel() ));
+        }
         TextView unitText = listItemView.findViewById( R.id.activity_unit );
         if (currentActivity.getmExerciseName().compareTo( "Walking" ) == 0) {
             unitText.setText( "steps" );

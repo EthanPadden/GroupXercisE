@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
@@ -56,6 +57,7 @@ public class ExerciseListItemFragment extends Fragment {
     private TextView mSuggestedGoalText;
     private TextView mSetsText;
     private TextView mRepsText;
+    private TextView mNoDetailsSetErrorText;
     private Spinner mLevelSpinner;
     private String mSelectedLevel;
     private ArrayAdapter< CharSequence > mLevelSpinnerAdapter;
@@ -74,6 +76,7 @@ public class ExerciseListItemFragment extends Fragment {
     private ArrayList< DBListener > mDBListeners;
     // DB root reference
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private LinearLayout mUserDetailsOptionsLayout;
 
     // Goal option selection
     public enum GoalOption {
@@ -127,6 +130,8 @@ public class ExerciseListItemFragment extends Fragment {
         mManualGoalET = view.findViewById( R.id.et_exercise_weight );
         mListView = view.findViewById( R.id.goal_groups_list );
         mLoadingText = view.findViewById( R.id.text_loading_group_list );
+        mNoDetailsSetErrorText = view.findViewById( R.id.text_no_details_set_error );
+        mUserDetailsOptionsLayout = view.findViewById( R.id.layout_user_details_options );
 
 
         // Set spinner adapter
@@ -162,7 +167,9 @@ public class ExerciseListItemFragment extends Fragment {
                         float target = Float.parseFloat( mSuggestedGoalText.getText().toString() );
                         savePersonalGoal( new Goal( mExerciseName, target ) );
                     } else {
-                        Toast.makeText( getActivity(), "Invalid details", Toast.LENGTH_SHORT ).show();
+                        Toast.makeText( getActivity(),
+                                "Setting a goal based on your details is unavailable. Please set these details in the Profile section.",
+                                Toast.LENGTH_SHORT ).show();
                     }
                 } else if ( mSelectedGoalOption == GoalOption.MANUAL ) {
                     // Manual goal calculation option: use user-set goal
@@ -227,7 +234,8 @@ public class ExerciseListItemFragment extends Fragment {
         if ( currentUser.isUserDetailsAreSet() && currentUser.detailsAreValid() ) {
             Goal.retrieveStrengthStandards( mExerciseName, strengthStandardsListener );
         } else {
-            mSuggestedGoalText.setText( "Invalid details" );
+            mUserDetailsOptionsLayout.setVisibility( View.GONE );
+            mNoDetailsSetErrorText.setVisibility( View.VISIBLE );
         }
 
 //        retrieveGroupIds();
