@@ -53,8 +53,47 @@
     </string-array>
 
     // Tutorial
+    <string name="tutorial_title_discoveries">Discoveries</string>
     <string name="tutorial_discoveries">When you open the app, you will be taken to the Discoveries screen. Here, you can select various strength exercises and a walking plan to add to your goals. You can choose from the preset walking plans or set a custom daily step goal.</string>
+
+    <string name="tutorial_title_set_strength_exercise_goals">Set strength exercise goals</string>
+    <string name="tutorial_set_strength_exercise_goals">If you select a strength exercise, the app will show you options to either manually set your goal or have the app automatically set your goal based on the details you entered.</string>
+
+    <string name="tutorial_title_set_group_goals">Set group goals</string>
+    <string name="tutorial_set_group_goals">You can also set a goal for any of the groups that you have created and are an admin of.</string>
+
+    <string name="tutorial_title_use_preset_walking_plans">Use preset walking plans</string>
+    <string name="tutorial_use_preset_walking_plans">If you select one of the preset walking plans, the daily step goal will start out at day one, then increase to the next day if you meet that goal.</string>
+
+    <string name="tutorial_title_set_custom_walking_plan">Set a custom walking plan</string>
+    <string name="tutorial_set_custom_walking_plan">If you select your custom walking plan, you can select your daily step goal that will not change.</string>
+
+    <string name="tutorial_title_goals">Goals</string>
+    <string name="tutorial_goals">To view all the goals you have set, go to the Goals screen. This screen displays all the goals you have set, including your walking plan. It also shows any goals of groups that you are a member of.</string>
+
+    <string name="tutorial_title_log_activity_for_an_exercise">Log activity for an exercise</string>
+    <string name="tutorial_log_activity_for_an_exercise">To log activity for one of the exercises, click on it on the Goals screen.</string>
+
+    <string name="tutorial_title_groups">Groups</string>
+    <string name="tutorial_groups">The Groups screen displays all the groups you are a member of.</string>
+
+    <string name="tutorial_title_enter_group_page">Enter group page</string>
+    <string name="tutorial_enter_group_page">To enter a group page, click on the group you want to view. Each group\'s page displays the goals and members of the group.</string>
+
+    <string name="tutorial_title_activities">Activities</string>
+    <string name="tutorial_activities">To view all the activities you have done in the past, go to the Activities screen.</string>
+
     <string-array name="tutorial">
         <item>@string/tutorial_discoveries</item>
+        <item>@string/tutorial_set_strength_exercise_goals</item>
+        <item>@string/tutorial_set_group_goals</item>
+        <item>@string/tutorial_use_preset_walking_plans</item>
+        <item>@string/tutorial_set_custom_walking_plan</item>
+        <item>@string/tutorial_goals</item>
+        <item>@string/tutorial_log_activity_for_an_exercise</item>
+        <item>@string/tutorial_groups</item>
+        <item>@string/tutorial_enter_group_page</item>
+        <item>@string/tutorial_activities</item>
     </string-array>
+
 </resources>
