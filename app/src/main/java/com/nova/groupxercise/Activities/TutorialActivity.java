@@ -12,27 +12,32 @@ import com.nova.groupxercise.R;
 
 public class TutorialActivity extends AppCompatActivity {
     private TextView mTutorialText;
+    private TextView mTutorialTitleText;
     private Button mNextButton;
     private int mCurrentStep = 0;
-    String[] mDiscoveriesStepStrings;
+    String[] mTutorialStrings;
+    String[] mTutorialTitleStrings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tutorial);
 
-        mTutorialText = findViewById(R.id.tutorial_text);
+        mTutorialText = findViewById(R.id.text_tutorial );
+        mTutorialTitleText = findViewById(R.id.text_tutorial_title );
         mNextButton = findViewById(R.id.next_button);
-        mDiscoveriesStepStrings = getResources().getStringArray(R.array.tutorial );
+        mTutorialStrings = getResources().getStringArray(R.array.tutorial );
+        mTutorialTitleStrings = getResources().getStringArray(R.array.tutorial_titles );
 
         mNextButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mCurrentStep++;
-                if ( mCurrentStep < mDiscoveriesStepStrings.length) {
-                    mTutorialText.setText(mDiscoveriesStepStrings[mCurrentStep]);
+                if ( mCurrentStep < mTutorialStrings.length) {
+                    mTutorialText.setText( mTutorialStrings[mCurrentStep]);
+                    mTutorialTitleText.setText( mTutorialTitleStrings[mCurrentStep] );
                     // Need to program in images too
-                    if ( mCurrentStep == mDiscoveriesStepStrings.length - 1) {
+                    if ( mCurrentStep == mTutorialStrings.length - 1) {
                         mNextButton.setText("Finish");
                     }
                 } else {

@@ -95,5 +95,16 @@
         <item>@string/tutorial_enter_group_page</item>
         <item>@string/tutorial_activities</item>
     </string-array>
-
+    <string-array name="tutorial_titles">
+        <item>@string/tutorial_title_discoveries</item>
+        <item>@string/tutorial_title_set_strength_exercise_goals</item>
+        <item>@string/tutorial_title_set_group_goals</item>
+        <item>@string/tutorial_title_use_preset_walking_plans</item>
+        <item>@string/tutorial_title_set_custom_walking_plan</item>
+        <item>@string/tutorial_title_goals</item>
+        <item>@string/tutorial_title_log_activity_for_an_exercise</item>
+        <item>@string/tutorial_title_groups</item>
+        <item>@string/tutorial_title_enter_group_page</item>
+        <item>@string/tutorial_title_activities</item>
+    </string-array>
 </resources>

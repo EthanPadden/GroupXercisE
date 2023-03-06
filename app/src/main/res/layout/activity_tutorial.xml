@@ -5,19 +5,30 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/tutorial_text"
+        android:id="@+id/text_tutorial_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:text="@string/tutorial_title_discoveries"
+        android:textAlignment="viewStart"
+        android:layout_margin="5dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/text_tutorial"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:text="@string/tutorial_discoveries"
         android:textAlignment="viewStart"
-        android:layout_margin="5dp"/>
+        android:layout_margin="5dp"
+        android:layout_below="@id/text_tutorial_title"/>
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:src="@drawable/discoveries"
-        android:layout_below="@id/tutorial_text"
+        android:layout_below="@id/text_tutorial"
         android:layout_above="@id/next_button"/>
     <Button
         android:id="@+id/next_button"
