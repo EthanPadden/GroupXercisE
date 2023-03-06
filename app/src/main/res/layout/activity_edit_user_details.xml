@@ -41,6 +41,7 @@
                 android:id="@+id/layout_user_details"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_margin="10dp"
                 android:orientation="vertical">
 
 
@@ -63,6 +64,12 @@
                         android:layout_weight="1"  />
 
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#c0c0c0"/>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -91,6 +98,12 @@
 
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#c0c0c0"/>
+
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -109,7 +122,7 @@
                         android:id="@+id/spinner_sex"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1" />
+                        android:layout_weight="1"/>
                 </LinearLayout>
 
                 <LinearLayout
