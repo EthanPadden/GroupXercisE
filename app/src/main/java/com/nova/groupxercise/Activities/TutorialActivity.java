@@ -1,5 +1,6 @@
 package com.nova.groupxercise.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -35,7 +36,8 @@ public class TutorialActivity extends AppCompatActivity {
                         mNextButton.setText("Finish");
                     }
                 } else {
-                    finish();
+                    Intent intent = new Intent( TutorialActivity.this, MainActivity.class );
+                    startActivity( intent );
                 }
             }
         });
