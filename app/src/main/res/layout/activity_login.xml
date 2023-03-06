@@ -8,9 +8,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_margin="20dp"
-        android:textSize="30dp"
-        android:text="GroupXercisE" />
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="GroupXercisE"
+        android:textSize="30dp" />
 
     <EditText
         android:id="@+id/et_email"
