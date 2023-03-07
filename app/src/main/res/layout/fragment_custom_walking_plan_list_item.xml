@@ -15,23 +15,33 @@
 
     <EditText
         android:id="@+id/et_step_goal"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:hint="Daily step goal"
         android:textAlignment="center"
         android:ems="10"
         android:layout_below="@id/text_set_goal_title"
-        android:inputType="number" />
+        android:inputType="number"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"/>
 
     <Button
-        android:layout_margin="10dp"
         android:id="@+id/btn_set_walking_plan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/et_step_goal"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
-        android:layout_below="@id/et_step_goal"
-        android:text="Set Personal Goal" />
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/colorPrimary"
+        android:padding="10dp"
+        android:text="Set Personal Goal"
+        android:textColor="#FFFFFF" />
 
 </RelativeLayout>
