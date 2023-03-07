@@ -3,6 +3,7 @@ package com.nova.groupxercise.Activities;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -75,6 +76,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
 
         // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
         // Make sure the toolbar exists in the activity and is not null
+        toolbar.setTitleTextColor( Color.WHITE );
         setSupportActionBar( toolbar );
 
         // Initialise and set up navigation drawer

@@ -1,6 +1,7 @@
 package com.nova.groupxercise.Activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -70,6 +71,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
         // Make sure the toolbar exists in the activity and is not null
+        mToolbar.setTitleTextColor( Color.WHITE );
         setSupportActionBar( mToolbar );
 
         // Initialise and set up navigation drawer
