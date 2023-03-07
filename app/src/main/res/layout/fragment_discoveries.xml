@@ -40,7 +40,12 @@
         android:layout_height="wrap_content"
         android:id="@+id/btn_custom_walking_plan"
         android:layout_below="@+id/walking_plan_list"
-        android:text="Custom Walking Plan"/>
+        android:text="Custom Walking Plan"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="#FFFFFF"
+        android:layout_margin="10dp"
+        android:layout_marginTop="0dp"/>
 
     <TextView
         android:id="@+id/text_strength_heading"
