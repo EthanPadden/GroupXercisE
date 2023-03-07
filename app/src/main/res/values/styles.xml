@@ -22,10 +22,4 @@
         <item name="android:textSize">15dp</item>
     </style>
 
-    <style name="ToolbarTheme" parent="Widget.AppCompat.Toolbar">
-        <item name="android:titleTextColor">@android:color/white</item>
-    </style>
-
-
-
 </resources>
