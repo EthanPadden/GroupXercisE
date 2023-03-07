@@ -17,7 +17,9 @@
         android:id="@+id/img_walking_plan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/text_set_goal_title"/>
+        android:layout_below="@id/text_set_goal_title"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"/>
 
     <Button
         android:layout_margin="10dp"
@@ -27,6 +29,10 @@
         android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:layout_below="@id/img_walking_plan"
-        android:text="Set Personal Goal" />
+        android:text="Set Personal Goal"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"/>
 
 </RelativeLayout>
