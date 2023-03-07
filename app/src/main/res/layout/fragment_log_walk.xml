@@ -20,7 +20,9 @@
         android:layout_centerHorizontal="true"
         android:inputType="number"
         android:hint="steps"
-        android:layout_above="@+id/btn_log_walk"/>
+        android:layout_above="@+id/btn_log_walk"
+        android:gravity="center"
+        />
 
     <Button
         android:id="@+id/btn_log_walk"
@@ -31,6 +33,11 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="20dp"
-        android:text="Log Walk" />
+        android:text="Log Walk"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"
+        android:layout_margin="30dp"/>
 
 </RelativeLayout>
