@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorAccent">
 
 
     <TextView
@@ -15,7 +16,17 @@
         android:padding="10dp"
         android:text="Set Goal: "
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/round_slate"
+        android:backgroundTint="#FFFFFF"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp">
 
     <TextView
         android:layout_margin="10dp"
@@ -98,59 +109,67 @@
             android:text="Based on your details:" />
     </LinearLayout>
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:layout_weight="1"
-            android:layout_width="0dp"
+        <TableLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Level" />
+            android:padding="5dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp">
+
+            <TableRow
+                android:layout_marginBottom="5dp">
+                <TextView
+                    android:text="Level:"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    />
+
+                <Spinner
+                    android:id="@+id/spinner_level"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+            </TableRow>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#c0c0c0"/>
+
+            <TableRow
+                android:layout_marginTop="10dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Suggested Weight:" />
 
 
-        <Spinner
-            android:id="@+id/spinner_level"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/text_suggested_goal"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:ems="10" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    <TextView
-        android:layout_width="0dp"
-        android:layout_weight="2"
-
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Suggested Weight:" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
 
 
-    <TextView
-        android:id="@+id/text_suggested_goal"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="kg" />
+            </TableRow>
 
-        android:layout_height="wrap_content"
-        android:ems="10" />
-
-    <TextView
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        </TableLayout>
 
 
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="kg" />
-    </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
+        <LinearLayout
         android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -169,11 +188,11 @@
 
 
     <LinearLayout
-
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginRight="15dp"
+        android:layout_marginLeft="15dp">
 
         <TextView
             android:layout_width="0dp"
@@ -207,12 +226,28 @@
     <Button
         android:layout_margin="10dp"
         android:id="@+id/btn_set_goal"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
-        android:text="Set Personal Goal" />
+        android:text="Set Personal Goal"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"
+        />
+    </LinearLayout>
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/round_slate"
+        android:backgroundTint="#FFFFFF"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="5dp"
+        >
     <TextView
         android:layout_margin="10dp"
         android:id="@+id/text_group_goal_title"
@@ -236,4 +271,5 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         tools:context="com.nova.groupxercise.Activities.HomeScreenActivity"></ListView>
+    </LinearLayout>
 </LinearLayout>
