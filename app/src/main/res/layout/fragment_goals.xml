@@ -9,6 +9,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="Personal Goals"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -22,6 +31,13 @@
                 android:layout_margin="10dp"
                 android:text="Loading walking plan..." />
         </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#c0c0c0"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"/>
 
         <TextView
         android:id="@+id/goals_fgt_text_loading_personal_goals"
@@ -43,6 +59,15 @@
         android:paddingBottom="10dp"
         tools:context="com.nova.groupxercise.Activities.HomeScreenActivity" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="Group Goals"
+            android:textSize="20sp"
+            android:textStyle="bold" />
     <TextView
         android:id="@+id/goals_fgt_text_loading_group_goals"
         android:layout_width="wrap_content"
