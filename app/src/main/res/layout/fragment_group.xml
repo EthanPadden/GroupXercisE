@@ -54,6 +54,7 @@
             android:backgroundTint="@color/colorPrimary"
             android:textColor="#FFFFFF"
             android:padding="10dp"/>
+
         <LinearLayout
             android:id="@+id/layout_group_members"
             android:layout_width="match_parent"
@@ -62,50 +63,47 @@
             android:background="@drawable/round_slate"
             android:backgroundTint="#FFFFFF"
             android:layout_margin="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp"
             android:layout_below="@id/btn_delete_group">
 
 
-        <TextView
-            android:id="@+id/text_members_heading"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/btn_delete_group"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="Members"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            <FrameLayout
+                android:id="@+id/frame_group_members"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_slate"
+                android:backgroundTint="#FFFFFF"
+                >
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_members"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/text_members_heading" />
+            </FrameLayout>
 
-        <EditText
-            android:id="@+id/et_member_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/recycler_members"
-            android:layout_margin="10dp"
-            android:hint="Add member..."
-            android:visibility="gone" />
+            <EditText
+                android:id="@+id/et_member_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/layout_group_members"
+                android:layout_margin="10dp"
+                android:hint="Add member..."
+                android:visibility="gone" />
 
-        <Button
-            android:id="@+id/btn_add_member"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/et_member_name"
-            android:layout_gravity="center"
-            android:text="Add Member"
-            android:visibility="gone"
-            android:background="@drawable/round_button"
-            android:backgroundTint="@color/colorPrimary"
-            android:textColor="#FFFFFF"
-            android:padding="10dp"
-            android:layout_marginBottom="10dp"/>
+            <Button
+                android:id="@+id/btn_add_member"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/et_member_name"
+                android:layout_gravity="center"
+                android:text="Add Member"
+                android:visibility="gone"
+                android:background="@drawable/round_button"
+                android:backgroundTint="@color/colorPrimary"
+                android:textColor="#FFFFFF"
+                android:padding="10dp"
+                android:layout_marginBottom="10dp"/>
         </LinearLayout>
+
+
     </RelativeLayout>
 
 </ScrollView>

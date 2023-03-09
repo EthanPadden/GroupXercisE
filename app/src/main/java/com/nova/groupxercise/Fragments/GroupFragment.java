@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,15 +15,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.Adapters.GroupMemberRecyclerAdapter;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
@@ -39,15 +38,13 @@ public class GroupFragment extends Fragment {
     private Button mDeleteGroupBtn;
     private EditText mMemberNameEt;
     private TextView mGroupGoalsLoadingText;
-    //    private LinearLayout mGroupMembersLayout;
+    private LinearLayout mGroupMembersLayout;
     private LinearLayout mGroupGoalsLayout;
     private ArrayList< DBListener > mDBListeners;
     private boolean adminGroup;
-    private RecyclerView mGroupMembersRecycler;
-    private GroupMemberRecyclerAdapter mGroupMemberRecyclerAdapter;
     private DatabaseReference mGroupMembersRef;
     private ValueEventListener mGroupMembersListener;
-
+    private FrameLayout mGroupMembersFrameLayout;
 
     public GroupFragment( String mGroupId ) {
         this.mGroupId = mGroupId;
@@ -74,7 +71,8 @@ public class GroupFragment extends Fragment {
         mDeleteGroupBtn = view.findViewById( R.id.btn_delete_group );
         mGroupGoalsLoadingText = view.findViewById( R.id.text_group_goals_loading );
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
-        mGroupMembersRecycler = view.findViewById( R.id.recycler_members );
+        mGroupMembersLayout = view.findViewById( R.id.layout_group_members );
+        mGroupMembersFrameLayout = view.findViewById( R.id.frame_group_members );
 
         // Create arraylist for DB single-value events
         mDBListeners = new ArrayList<>();
@@ -174,17 +172,16 @@ public class GroupFragment extends Fragment {
      */
     private void setupGroupMemberListeners() {
         final String path = "groups/" + mGroupId + "/members";
-        mGroupMembersRecycler.setLayoutManager( new LinearLayoutManager( getContext() ) );
-        mGroupMemberRecyclerAdapter = new GroupMemberRecyclerAdapter( getContext(), mGroup, adminGroup);
-        mGroupMembersRecycler.setAdapter( mGroupMemberRecyclerAdapter );
 
         // Get the DB reference
         mGroupMembersRef = FirebaseDatabase.getInstance().getReference().child( path );
-
         mGroupMembersListener = new ValueEventListener() {
             @Override
             public void onDataChange( @NonNull DataSnapshot membersDataSnapshot ) {
-//                 Parse the snapshot, updating the group in memory
+                // Clear the current group members list
+                ArrayList<Member> updatedMembers = new ArrayList<Member>();
+
+                // Parse the snapshot, updating the group in memory
                 for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
                     // Retrieve member username and create member object
                     final String username = memberDataSnapshot.getKey();
@@ -197,25 +194,39 @@ public class GroupFragment extends Fragment {
                         String exerciseName = progressDataSnapshot.getKey();
 
                         // Get the current status (member progress towards that goal
-                        Object currentStatusObj = progressDataSnapshot.getValue();
-                        float currentStatus;
-                        if ( currentStatusObj instanceof Long ) {
-                            currentStatus = ( ( Long ) currentStatusObj ).floatValue();
+                        Object progressObj = progressDataSnapshot.getValue();
+                        float progress;
+                        if ( progressObj instanceof Long ) {
+                            progress = ( ( Long ) progressObj ).floatValue();
                         } else {
-                            currentStatus = ( ( Float ) currentStatusObj ).floatValue();
+                            progress = ( ( Float ) progressObj ).floatValue();
                         }
 
                         // We are not concerned with the target, it is stored in the group goal
                         float target = 0;
 
                         Goal goal = new Goal( exerciseName, target );
+                        goal.setmProgress( progress );
                         member.getmProgress().add( goal );
                     }
 
-                    mGroup.getmMembers().add( member );
+                    updatedMembers.add( member );
                 }
 
-                mGroupMemberRecyclerAdapter.notifyDataSetChanged();
+                mGroup.setmMembers( updatedMembers );
+
+                // Refresh the group members fragment
+                GroupMembersFragment oldGroupMembersFragment = (GroupMembersFragment) getFragmentManager().findFragmentById( R.id.frame_group_members );
+
+                GroupMembersFragment newGroupMembersFragment = new GroupMembersFragment( mGroup );
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+
+//                if(oldGroupMembersFragment != null) {
+//                    ft.detach( oldGroupMembersFragment );
+//                }
+
+                ft.replace( R.id.frame_group_members, newGroupMembersFragment );
+                ft.commit();
             }
 
             @Override
@@ -226,6 +237,7 @@ public class GroupFragment extends Fragment {
 
         mGroupMembersRef.addValueEventListener( mGroupMembersListener );
     }
+
 
     private View createGroupGoalUIComponent( Goal goal ) {
         View goalView = getLayoutInflater().inflate( R.layout.layout_goal_list_item, null );

@@ -40,22 +40,10 @@
     <string name="title_home">Home</string>
     <string name="title_discoveries">Discoveries</string>
     <string name="title_goals">Goals</string>
-    <string-array name="sex_array">
-        <item>@string/sex_male</item>
-        <item>@string/sex_female</item>
-    </string-array>
-    <string-array name="level_array">
-        <item>@string/level_beginner</item>
-        <item>@string/level_novice</item>
-        <item>@string/level_intermediate</item>
-        <item>@string/level_advanced</item>
-        <item>@string/level_elite</item>
-    </string-array>
-
-    // Tutorial
     <string name="tutorial_title_discoveries">Discoveries</string>
     <string name="tutorial_discoveries">When you open the app, you will be taken to the Discoveries screen. Here, you can select various strength exercises and a walking plan to add to your goals. You can choose from the preset walking plans or set a custom daily step goal.</string>
 
+    // Tutorial
     <string name="tutorial_title_set_strength_exercise_goals">Set strength exercise goals</string>
     <string name="tutorial_set_strength_exercise_goals">If you select a strength exercise, the app will show you options to either manually set your goal or have the app automatically set your goal based on the details you entered.</string>
 
@@ -82,6 +70,18 @@
 
     <string name="tutorial_title_activities">Activities</string>
     <string name="tutorial_activities">To view all the activities you have done in the past, go to the Activities screen.</string>
+
+    <string-array name="sex_array">
+        <item>@string/sex_male</item>
+        <item>@string/sex_female</item>
+    </string-array>
+    <string-array name="level_array">
+        <item>@string/level_beginner</item>
+        <item>@string/level_novice</item>
+        <item>@string/level_intermediate</item>
+        <item>@string/level_advanced</item>
+        <item>@string/level_elite</item>
+    </string-array>
 
     <string-array name="tutorial">
         <item>@string/tutorial_discoveries</item>
