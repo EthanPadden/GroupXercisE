@@ -172,7 +172,6 @@ public class GroupFragment extends Fragment {
      */
     private void setupGroupMemberListeners() {
         final String path = "groups/" + mGroupId + "/members";
-
         // Get the DB reference
         mGroupMembersRef = FirebaseDatabase.getInstance().getReference().child( path );
         mGroupMembersListener = new ValueEventListener() {
@@ -215,15 +214,8 @@ public class GroupFragment extends Fragment {
 
                 mGroup.setmMembers( updatedMembers );
 
-                // Refresh the group members fragment
-                GroupMembersFragment oldGroupMembersFragment = (GroupMembersFragment) getFragmentManager().findFragmentById( R.id.frame_group_members );
-
-                GroupMembersFragment newGroupMembersFragment = new GroupMembersFragment( mGroup );
+                GroupMembersFragment newGroupMembersFragment = new GroupMembersFragment( mGroup, adminGroup );
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-
-//                if(oldGroupMembersFragment != null) {
-//                    ft.detach( oldGroupMembersFragment );
-//                }
 
                 ft.replace( R.id.frame_group_members, newGroupMembersFragment );
                 ft.commit();
