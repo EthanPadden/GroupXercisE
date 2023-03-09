@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -46,7 +45,7 @@ public class GroupMembersFragment extends Fragment {
         // Add group members to UI
         for( Member member : mGroup.getmMembers() ) {
             View memberLayout = LayoutInflater.from( getContext() ).inflate(
-                    R.layout.layout_group_member, mGroupMembersLayout, false );
+                    R.layout.layout_group_member, null );
 
             TextView memberNameText = memberLayout.findViewById( R.id.text_member_name );
             memberNameText.setText( member.getmUsername() );
@@ -56,10 +55,6 @@ public class GroupMembersFragment extends Fragment {
                 adminStatusText.setVisibility( View.VISIBLE );
             }
 
-            if(mAdminGroup) {
-                Button deleteMemberBtn = memberLayout.findViewById( R.id.btn_delete_member );
-                deleteMemberBtn.setVisibility( View.VISIBLE );
-            }
             mGroupMembersLayout.addView( memberLayout );
         }
 
