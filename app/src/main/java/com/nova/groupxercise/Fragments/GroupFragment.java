@@ -25,7 +25,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
-import com.nova.groupxercise.Objects.Member;
 import com.nova.groupxercise.Objects.User;
 import com.nova.groupxercise.R;
 
@@ -178,40 +177,15 @@ public class GroupFragment extends Fragment {
             @Override
             public void onDataChange( @NonNull DataSnapshot membersDataSnapshot ) {
                 // Clear the current group members list
-                ArrayList<Member> updatedMembers = new ArrayList<Member>();
+                ArrayList<User> updatedMembers = new ArrayList<User>();
 
                 // Parse the snapshot, updating the group in memory
                 for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
                     // Retrieve member username and create member object
                     final String username = memberDataSnapshot.getKey();
-                    Member member = new Member( username );
-
-                    // For every progress in the progress subtree, create a goal object
-                    // and add to the member object
-                    for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
-                        // Get the exercise name
-                        String exerciseName = progressDataSnapshot.getKey();
-
-                        // Get the current status (member progress towards that goal
-                        Object progressObj = progressDataSnapshot.getValue();
-                        float progress;
-                        if ( progressObj instanceof Long ) {
-                            progress = ( ( Long ) progressObj ).floatValue();
-                        } else {
-                            progress = ( ( Float ) progressObj ).floatValue();
-                        }
-
-                        // We are not concerned with the target, it is stored in the group goal
-                        float target = 0;
-
-                        Goal goal = new Goal( exerciseName, target );
-                        goal.setmProgress( progress );
-                        member.getmProgress().add( goal );
-                    }
-
+                    User member = new User( username );
                     updatedMembers.add( member );
                 }
-
                 mGroup.setmMembers( updatedMembers );
 
                 GroupMembersFragment newGroupMembersFragment = new GroupMembersFragment( mGroup );

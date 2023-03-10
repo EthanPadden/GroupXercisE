@@ -40,6 +40,11 @@ public class User {
         return user;
     }
 
+    public User( String username ) {
+        this();
+        this.username = username;
+    }
+
     // Override methods
     @Override
     public String toString() {
@@ -101,6 +106,28 @@ public class User {
 
                 // If no username is found, this will do nothing
                 // Checking if getUsername() is null is the check whether the username was found for the user
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+
+    }
+
+    public void retrieveUserID(DBListener listener) {
+        // Path to the username child
+        String path = "usernames/" + username;
+
+        final DatabaseReference childRef = mRootRef.child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                if(dataSnapshot.exists()) {
+                    String userID = dataSnapshot.getValue().toString();
+                    if ( listener != null && listener.isActive() ) listener.onRetrievalFinished(userID);
+                }
             }
 
             @Override
