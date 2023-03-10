@@ -214,7 +214,7 @@ public class GroupFragment extends Fragment {
 
                 mGroup.setmMembers( updatedMembers );
 
-                GroupMembersFragment newGroupMembersFragment = new GroupMembersFragment( mGroup, adminGroup );
+                GroupMembersFragment newGroupMembersFragment = new GroupMembersFragment( mGroup );
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
 
                 ft.replace( R.id.frame_group_members, newGroupMembersFragment );

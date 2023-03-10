@@ -12,20 +12,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.nova.groupxercise.Adapters.GroupMembersItemsAdapter;
 import com.nova.groupxercise.Objects.Group;
+import com.nova.groupxercise.Objects.Member;
 import com.nova.groupxercise.R;
+
+import java.util.ArrayList;
 
 public class GroupMembersFragment extends Fragment {
     private Group mGroup;
     private ListView mGroupMembersListView;
-    private boolean mAdminGroup;
     private TextView mGroupMembersLoadingText;
     private ArrayAdapter mGroupMembersAdapter;
 
-    public GroupMembersFragment( Group mGroup, boolean mAdminGroup ) {
+    public GroupMembersFragment( Group mGroup ) {
         this.mGroup = mGroup;
-        this.mAdminGroup = mAdminGroup;
     }
 
     @Override
@@ -42,32 +42,14 @@ public class GroupMembersFragment extends Fragment {
         mGroupMembersListView = view.findViewById( R.id.list_group_members );
         mGroupMembersLoadingText = view.findViewById( R.id.text_group_members_loading );
 
-        mGroupMembersAdapter = new GroupMembersItemsAdapter( getActivity(), mGroup );
+        ArrayList< Member > members = mGroup.getmMembers();
+        ArrayList< String> memberNames = new ArrayList<>();
 
+        for (Member member : members) {
+            memberNames.add( member.getmUsername() );
+        }
 
-        // Initially assume the user is not an admin, and add the delete buttons as necessary
-
-//        // Add group members to UI
-//        for( Member member : mGroup.getmMembers() ) {
-//            View memberLayout = LayoutInflater.from( getContext() ).inflate(
-//                    R.layout.layout_group_member, null );
-//
-//            TextView memberNameText = memberLayout.findViewById( R.id.text_member_name );
-//            memberNameText.setText( member.getmUsername() );
-//
-//            if(mGroup.getmCreator().compareTo( member.getmUsername() ) == 0) {
-//                TextView adminStatusText = memberLayout.findViewById( R.id.text_member_admin_status );
-//                adminStatusText.setVisibility( View.VISIBLE );
-//            }
-//
-//            // Set on click method to open member details fragment
-//            memberLayout.setOnClickListener( new View.OnClickListener() {
-//                public void onClick( View v ) {
-//                    // TODO: show member progress
-//                    Toast.makeText( getActivity(), member.getmUsername(), Toast.LENGTH_SHORT );
-//                }
-//            } );
-//        }
+        mGroupMembersAdapter = new ArrayAdapter( getActivity(),android.R.layout.simple_list_item_1,  memberNames );
 
         if(mGroup.getmMembers().size() > 0) {
             mGroupMembersLoadingText.setVisibility( View.GONE );
