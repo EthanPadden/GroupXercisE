@@ -90,8 +90,6 @@
         android:orientation="vertical"
         android:id="@+id/layout_user_details_options">
 
-
-
     <LinearLayout
         android:layout_marginBottom="0dp"
         android:layout_width="match_parent"
@@ -168,7 +166,11 @@
 
         </TableLayout>
 
-
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
         <LinearLayout
         android:layout_marginTop="20dp"
         android:layout_width="match_parent"
