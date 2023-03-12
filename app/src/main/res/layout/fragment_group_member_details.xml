@@ -22,6 +22,7 @@
         android:text="Admin"
         android:gravity="center"
         android:layout_below="@id/text_member_details_title"
+        android:visibility="gone"
         android:id="@+id/text_member_admin_status"/>
 
     <TextView
@@ -41,5 +42,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="Remove Member"/>
+        android:id="@+id/btn_remove_member"
+        android:text="Remove Member"
+        android:visibility="gone"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"
+        android:layout_margin="10dp"/>
 </RelativeLayout>

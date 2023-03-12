@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -30,6 +31,8 @@ public class GroupMemberDetailsFragment extends Fragment {
     private ListView mMemberProgressesListView;
     private GoalItemsAdapter mItemsAdapter;
     private TextView loadingText;
+    private TextView adminStatusText;
+    private Button removeMemberBtn;
 
     public GroupMemberDetailsFragment( String memberName, Group group) {
         this.mMemberName = memberName;
@@ -53,10 +56,11 @@ public class GroupMemberDetailsFragment extends Fragment {
         super.onViewCreated( view, savedInstanceState );
 
         memberDetailsTitleText = view.findViewById( R.id.text_member_details_title );
-        //TODO: loading text
         memberDetailsTitleText.setText( mMemberName );
         mMemberProgressesListView = view.findViewById( R.id.list_member_progress );
         loadingText = view.findViewById( R.id.text_member_progress_loading );
+        adminStatusText = view.findViewById( R.id.text_member_admin_status );
+        removeMemberBtn = view.findViewById( R.id.btn_remove_member );
 
         DBListener userIDListener = new DBListener() {
             public void onRetrievalFinished(Object retrievedData) {
@@ -104,6 +108,17 @@ public class GroupMemberDetailsFragment extends Fragment {
         };
         mDBListeners.add( userIDListener );
         mMember.retrieveUserID(userIDListener);
+
+        // Show admin status if the member is an admin
+        if(mMemberName.compareTo( mGroup.getmCreator() ) == 0) {
+            adminStatusText.setVisibility( View.VISIBLE );
+        }
+
+        // If the logged in user is the admin of the group, make the remove button visible
+        User loggedInUser = User.getInstance();
+        if(loggedInUser.getUsername().compareTo( mGroup.getmCreator() ) == 0) {
+            removeMemberBtn.setVisibility( View.VISIBLE );
+        }
     }
 
     private void displayMemberProgress( ArrayList<Goal> memberProgresses) {
