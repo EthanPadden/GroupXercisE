@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -120,6 +121,21 @@ public class EditUserDetailsActivity extends AppCompatActivity {
                 newFragment.show( getSupportFragmentManager(), "datePicker" );
             }
         } );
+
+        Toast detailsNotSavedToast = Toast.makeText( this, "Details not saved - press save button to save details!" , Toast.LENGTH_SHORT);
+
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent( EditUserDetailsActivity.this, ProfileActivity.class );
+                detailsNotSavedToast.show();
+                startActivity( intent );
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     /**
