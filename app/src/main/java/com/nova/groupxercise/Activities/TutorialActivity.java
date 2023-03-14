@@ -6,7 +6,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.nova.groupxercise.R;
@@ -19,6 +21,7 @@ public class TutorialActivity extends AppCompatActivity {
     private int mCurrentStep = 0;
     String[] mTutorialStrings;
     String[] mTutorialTitleStrings;
+    private boolean backButtonPressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,5 +68,27 @@ public class TutorialActivity extends AppCompatActivity {
                 }
             }
         });
+
+        backButtonPressed = false;
+
+        Toast backBtnToast = Toast.makeText( this, "Press back button again to skip tutorial", Toast.LENGTH_SHORT );
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                if(!backButtonPressed) {
+                    backBtnToast.show();
+                    backButtonPressed = true;
+                } else {
+                    // Back button pressed twice - exit appp
+                    Intent intent = new Intent(TutorialActivity.this, HomeScreenActivity.class);
+                    startActivity(intent);
+                    backButtonPressed = false;
+                }
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 }

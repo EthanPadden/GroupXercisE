@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,6 +24,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mEmailEt;
     private EditText mPasswordEt;
     private FirebaseAuth mAuth;
+    private boolean backButtonPressed;
 
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
@@ -55,6 +57,29 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity( intent );
             }
         } );
+
+        backButtonPressed = false;
+
+        Toast backBtnToast = Toast.makeText( this, "Press back button again to exit", Toast.LENGTH_SHORT );
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                if(!backButtonPressed) {
+                    backBtnToast.show();
+                    backButtonPressed = true;
+                } else {
+                    // Back button pressed twice - exit appp
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    startActivity(intent);
+                    backButtonPressed = false;
+                }
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     /**
