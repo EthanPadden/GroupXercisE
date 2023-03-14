@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -54,6 +55,25 @@ public class GroupFragment extends Fragment {
                               Bundle savedInstanceState ) {
         // Inflate the layout for this fragment
         return inflater.inflate( R.layout.fragment_group, container, false );
+    }
+
+    @Override
+    public void onCreate( @Nullable Bundle savedInstanceState ) {
+        super.onCreate( savedInstanceState );
+
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
+                ft.commit();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override

@@ -9,9 +9,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.nova.groupxercise.Adapters.GoalItemsAdapter;
 import com.nova.groupxercise.Objects.DBListener;
@@ -42,6 +44,24 @@ public class GroupMemberDetailsFragment extends Fragment {
 
         // Create arraylist for DB single-value events
         mDBListeners = new ArrayList<>();
+    }
+
+    @Override
+    public void onCreate( @Nullable Bundle savedInstanceState ) {
+        super.onCreate( savedInstanceState );
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                GroupFragment groupFragment = new GroupFragment( mGroup.getmGroupId() );
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, groupFragment );
+                ft.commit();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override

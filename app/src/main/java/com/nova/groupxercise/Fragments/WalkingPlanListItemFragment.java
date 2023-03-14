@@ -9,9 +9,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -67,6 +69,20 @@ public class WalkingPlanListItemFragment extends Fragment {
         if ( getArguments() != null ) {
             mWalkingPlanName = getArguments().getString( WALKING_PLAN_NAME );
         }
+
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                DiscoveriesFragment discoveriesFragment = new DiscoveriesFragment();
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, discoveriesFragment );
+                ft.commit();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override

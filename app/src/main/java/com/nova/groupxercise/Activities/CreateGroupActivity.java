@@ -96,6 +96,8 @@ public class CreateGroupActivity extends AppCompatActivity {
         Toast.makeText( CreateGroupActivity.this, "Group " + groupName + " created", Toast.LENGTH_SHORT ).show();
 
         Intent intent = new Intent( CreateGroupActivity.this, HomeScreenActivity.class );
+        intent.putExtra( "FRAGMENT_ID", R.id.navigation_groups );
         startActivity( intent );
+        // TODO: fix top bar text behaviour
     }
 }
