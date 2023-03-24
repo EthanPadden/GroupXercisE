@@ -54,7 +54,6 @@ public class CustomWalkingPlanListItemFragment extends Fragment {
      * @param mWalkingPlanName Parameter 1.
      * @return A new instance of fragment WalkingPlanListItemFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static CustomWalkingPlanListItemFragment newInstance( String mWalkingPlanName ) {
         CustomWalkingPlanListItemFragment fragment = new CustomWalkingPlanListItemFragment();
         Bundle args = new Bundle();

@@ -65,8 +65,6 @@ public class ExerciseActivity implements Comparable<ExerciseActivity>{
     }
 
     public static void retrieveExerciseList(final ArrayList<String> exerciseNames, final DBListener listener){
-
-        // TODO: change to differentiate between strength and cardio
         String category = "Strength";
         String path = "exercise_list/" + category;
         DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );

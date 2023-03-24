@@ -43,11 +43,9 @@ public class LogActivityFragment extends Fragment {
     protected ArrayList< DBListener > mDBListeners;
 
 
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String EXERCISE_NAME = "Exercise name";
 
-    // TODO: Rename and change types of parameters
     private String mExerciseName;
 
     public LogActivityFragment() {
@@ -75,7 +73,6 @@ public class LogActivityFragment extends Fragment {
      * @param mExerciseName Parameter 1.
      * @return A new instance of fragment ExerciseListItemFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static LogActivityFragment newInstance( String mExerciseName ) {
         LogActivityFragment fragment = new LogActivityFragment();
         Bundle args = new Bundle();

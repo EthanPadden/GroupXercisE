@@ -99,7 +99,6 @@ public class ExerciseListItemFragment extends Fragment {
      * @param mExerciseName Parameter 1.
      * @return A new instance of fragment ExerciseListItemFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static ExerciseListItemFragment newInstance( String mExerciseName ) {
         ExerciseListItemFragment fragment = new ExerciseListItemFragment();
         Bundle args = new Bundle();
@@ -404,7 +403,7 @@ public class ExerciseListItemFragment extends Fragment {
      */
     private void calculateSuggestedWeight() {
         if ( mStrengthStandards == null ) {
-            // TODO: Error
+            Toast.makeText( getActivity(), "Error in retrieving strength standards for calculating suggested intensity", Toast.LENGTH_SHORT);
         } else {
             Long suggestedWeightLong = ( Long ) mStrengthStandards.child( mSelectedLevel ).getValue();
             double suggestedWeight = suggestedWeightLong.doubleValue();
@@ -444,7 +443,6 @@ public class ExerciseListItemFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction( Uri uri );
     }
 

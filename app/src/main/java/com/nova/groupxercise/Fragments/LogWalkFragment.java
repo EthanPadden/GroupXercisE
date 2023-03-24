@@ -47,7 +47,6 @@ public class LogWalkFragment extends Fragment {
      *
      * @return A new instance of fragment LogWalkFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static LogWalkFragment newInstance() {
         LogWalkFragment fragment = new LogWalkFragment();
         Bundle args = new Bundle();
