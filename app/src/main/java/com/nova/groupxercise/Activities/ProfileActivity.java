@@ -59,6 +59,13 @@ public class ProfileActivity extends AppCompatActivity {
         mSexText = findViewById( R.id.text_sex );
         mUserDetailsTable = findViewById( R.id.layout_user_details );
         mUsernameText = findViewById( R.id.text_username );
+        Toolbar toolbar = findViewById( R.id.toolbar );
+
+        // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
+        // Make sure the toolbar exists in the activity and is not null
+        toolbar.setTitleTextColor( Color.WHITE );
+        setSupportActionBar( toolbar );
+        getSupportActionBar().setTitle( "Profile" );
 
         // Set event listeners
         mEditBtn.setOnClickListener( new View.OnClickListener() {
