@@ -98,8 +98,5 @@ public class CreateGroupActivity extends AppCompatActivity {
         Intent intent = new Intent( CreateGroupActivity.this, HomeScreenActivity.class );
         intent.putExtra( "FRAGMENT_ID", R.id.navigation_groups );
         startActivity( intent );
-        // TODO: fix top bar text behaviour:
-        // Group member screen
-        // Back button behaviour
     }
 }
