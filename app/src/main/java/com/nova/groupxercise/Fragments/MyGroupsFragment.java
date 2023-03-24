@@ -2,6 +2,7 @@ package com.nova.groupxercise.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,8 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -74,6 +77,15 @@ public class MyGroupsFragment extends Fragment {
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
+        Toolbar toolbar = getActivity().findViewById( R.id.toolbar );
+
+        // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
+        // Make sure the toolbar exists in the activity and is not null
+        toolbar.setTitleTextColor( Color.WHITE );
+        toolbar.setTitle( "Groups" );
+
+        (( AppCompatActivity) getActivity()).setSupportActionBar( toolbar );
+
         // Inflate the layout for this fragment
         return inflater.inflate( R.layout.fragment_my_groups, container, false );
     }
@@ -163,7 +175,6 @@ public class MyGroupsFragment extends Fragment {
                     Group selectedGroup = ( Group ) mListView.getItemAtPosition( i );
 
                     HomeScreenActivity homeScreenActivity = ( HomeScreenActivity ) getActivity();
-                    homeScreenActivity.getSupportActionBar().setTitle( selectedGroup.getmName() );
 
                     FragmentTransaction ft = homeScreenActivity.getSupportFragmentManager().beginTransaction();
                     GroupFragment groupFragment = new GroupFragment( selectedGroup.getmGroupId() );

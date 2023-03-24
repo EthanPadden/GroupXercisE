@@ -1,6 +1,7 @@
 package com.nova.groupxercise.Fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -53,6 +56,14 @@ public class GroupFragment extends Fragment {
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
+        Toolbar toolbar = getActivity().findViewById( R.id.toolbar );
+
+        // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
+        // Make sure the toolbar exists in the activity and is not null
+        toolbar.setTitleTextColor( Color.WHITE );
+        toolbar.setTitle( "Group details" );
+        // TODO: use simplified code and in profile etc
+        (( AppCompatActivity ) getActivity()).setSupportActionBar( toolbar );
         // Inflate the layout for this fragment
         return inflater.inflate( R.layout.fragment_group, container, false );
     }
@@ -156,6 +167,8 @@ public class GroupFragment extends Fragment {
                     mDeleteGroupBtn.setVisibility( View.VISIBLE );
                     adminGroup = true;
                 }
+
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle( mGroup.getmName() );
 
                 // Set up listener for changes to the members subtree
                 setupGroupMemberListeners();
