@@ -117,6 +117,7 @@ public class Goal {
                         }
 
                         Goal goal = new Goal( exerciseName );
+                        goal.setmProgress( progress );
 
                         userProgresses.add( goal );
                     }

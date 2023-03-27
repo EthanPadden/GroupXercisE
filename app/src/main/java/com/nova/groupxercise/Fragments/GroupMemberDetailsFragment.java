@@ -86,7 +86,6 @@ public class GroupMemberDetailsFragment extends Fragment {
             public void onRetrievalFinished(Object retrievedData) {
                 if(retrievedData != null) {
                     String userID = (String) retrievedData;
-                    // TODO: get member details method
                     DBListener progressListener = new DBListener() {
                         @Override
                         public void onRetrievalFinished( Object retrievedData ) {
@@ -99,6 +98,8 @@ public class GroupMemberDetailsFragment extends Fragment {
                                     for(Goal groupGoal : mGroup.getmGoals()) {
                                         if(userProgress.getmExerciseName().compareTo( groupGoal.getmExerciseName() ) == 0) {
                                             isInGroupGoals = true;
+                                            // Update the member progress with the target from the group goals
+                                            userProgress.setmTarget( groupGoal.getmTarget() );
                                             break;
                                         }
                                     }
@@ -142,12 +143,12 @@ public class GroupMemberDetailsFragment extends Fragment {
     }
 
     private void displayMemberProgress( ArrayList<Goal> memberProgresses) {
+        // Use the group object to display the goals first
         mItemsAdapter = new GoalItemsAdapter( getActivity(), memberProgresses );
         mMemberProgressesListView.setAdapter( mItemsAdapter );
         loadingText.setVisibility( View.GONE );
         // TODO: test out properly and display other parts of goal eg target
     }
-
 
     @Override
     public void onAttach( @NonNull Context context ) {
