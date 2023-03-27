@@ -129,10 +129,6 @@ public class LogWalkFragment extends Fragment {
         goalsRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
-                // Get the value for the last walk time
-                // TODO: test!!!
-                // https://www.baeldung.com/joda-time
-
                 // LocalDate represents a date without time
                 long lastWalkTimeTS = (Long) dataSnapshot.child( "last_walk_time" ).getValue();
                 DateTime lastWalkTimeDT = new DateTime( lastWalkTimeTS );

@@ -37,7 +37,6 @@ public class WalkingPlan {
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
-                // TODO: Check theres no mix up between starting point, goal and increment - check does the debugger match the DB
                 Object startingPointObj = dataSnapshot.child( "starting_point" ).getValue();
                 int startingPoint;
                 if (dataSnapshot.exists()) {

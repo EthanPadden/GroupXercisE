@@ -147,7 +147,6 @@ public class GroupMemberDetailsFragment extends Fragment {
         mItemsAdapter = new GoalItemsAdapter( getActivity(), memberProgresses );
         mMemberProgressesListView.setAdapter( mItemsAdapter );
         loadingText.setVisibility( View.GONE );
-        // TODO: test out properly and display other parts of goal eg target
     }
 
     @Override

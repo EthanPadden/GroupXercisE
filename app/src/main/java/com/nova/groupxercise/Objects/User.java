@@ -66,12 +66,6 @@ public class User {
      * @return true if details are valid
      */
     public boolean detailsAreValid() {
-        // Validate DOB
-        // TODO: Age not used yet
-//        Period period = new Period( dob, DateTime.now() );
-//        int age = period.getYears();
-//        if ( age < 14 || age > 89 ) validDetails = false;
-
         if ( sex == null ) return false;
         // If male, weight should be in range 50-140
         if ( sex == Sex.MALE && ( weight < 50 || weight > 140 ) )

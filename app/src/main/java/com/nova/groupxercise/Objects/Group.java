@@ -172,8 +172,6 @@ public class Group {
 
         groupsChildRef.child( username ).setValue( false );
 
-        // TODO: check if the user is already a member - error?
-
         /** Updating user_groups subtree */
         String userGroupsPath = "user_groups/" + userId;
         DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
@@ -193,42 +191,6 @@ public class Group {
                 childRef.setValue( goal.getmTarget() );
                 listener.onRetrievalFinished();
             }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
-
-    public void removeMember( final User member ) {
-        /** Updating groups subtree */
-        // Path to this groups members child
-        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
-
-        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference groupsChildRef = rootRef.child( thisGroupMembersPath );
-
-        // TODO: check if the user is already a member - error?
-        // TODO: what if that user is not a member? = error?
-        groupsChildRef.child( member.getUsername() ).removeValue();
-
-
-        /** Updating user_groups subtree */
-        String usernamePath = "usernames/" + member.getUsername();
-        DatabaseReference usernameChildRef = rootRef.child( usernamePath );
-        usernameChildRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                String userId = dataSnapshot.getValue().toString();
-
-                String userGroupsPath = "user_groups/" + userId;
-                DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
-                userGroupsChildRef.child( mGroupId ).removeValue();
-
-                /** Updating group in memory and UI */
-                mMembers.remove( member );
-            }
-
 
             @Override
             public void onCancelled( DatabaseError databaseError ) {
