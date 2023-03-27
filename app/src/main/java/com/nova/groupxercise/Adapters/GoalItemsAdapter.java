@@ -16,11 +16,9 @@ import java.util.ArrayList;
 public class GoalItemsAdapter extends ArrayAdapter {
     private static final String LOG_TAG = GoalItemsAdapter.class.getSimpleName();
 
-
     public GoalItemsAdapter( Activity context, ArrayList< Goal > goals ) {
         super( context, 0, goals );
     }
-
 
     @Override
     public View getView( int position, View convertView, ViewGroup parent ) {
