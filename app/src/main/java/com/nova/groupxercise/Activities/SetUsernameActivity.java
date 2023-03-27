@@ -62,7 +62,7 @@ public class SetUsernameActivity extends AppCompatActivity {
             }
         } );
 
-        // This callback will only be called when MyFragment is at least Started.
+        // Set back button behaviour
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -71,8 +71,6 @@ public class SetUsernameActivity extends AppCompatActivity {
             }
         };
         this.getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
 

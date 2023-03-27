@@ -56,6 +56,8 @@ public class EditUserDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
+        setContentView( R.layout.activity_edit_user_details );
+
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
@@ -65,8 +67,6 @@ public class EditUserDetailsActivity extends AppCompatActivity {
             Intent intent = new Intent( EditUserDetailsActivity.this, RegistrationActivity.class );
             startActivity( intent );
         }
-        // Set content view
-        setContentView( R.layout.activity_edit_user_details );
 
         // Initialise components
         mDobText = findViewById( R.id.text_dob );
@@ -76,7 +76,6 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById( R.id.toolbar );
 
         // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
-        // Make sure the toolbar exists in the activity and is not null
         toolbar.setTitleTextColor( Color.WHITE );
         setSupportActionBar( toolbar );
 
@@ -89,16 +88,13 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         mSelectedSex = User.Sex.MALE;
         mSelectedDob = Calendar.getInstance();
 
-        /** Set adapters */
-        // Create an ArrayAdapter using the string array and a default spinner layout
+        // Create an array adapter for the spinner component and apply
         ArrayAdapter< CharSequence > adapter = ArrayAdapter.createFromResource( this,
                 R.array.sex_array, android.R.layout.simple_spinner_item );
-        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-        // Apply the adapter to the spinner
         mSexSpinner.setAdapter( adapter );
 
-        /** Set event listeners */
+        // Set event listeners
         mUpdateBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 validateEnteredDetails();
@@ -116,26 +112,23 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         } );
         mDobText.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
-                // Create new dialog fragment, passing the date and textview objects to update them
                 DialogFragment newFragment = new DatePickerFragment( mSelectedDob, mDobText );
                 newFragment.show( getSupportFragmentManager(), "datePicker" );
             }
         } );
 
+        // Set back button behaviour
         Toast detailsNotSavedToast = Toast.makeText( this, "Details not saved - press save button to save details!" , Toast.LENGTH_SHORT);
-
-        // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
+                // Navigate to Profile activity and show toast
                 Intent intent = new Intent( EditUserDetailsActivity.this, ProfileActivity.class );
                 detailsNotSavedToast.show();
                 startActivity( intent );
             }
         };
         this.getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     /**
@@ -150,6 +143,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
                     Intent intent = new Intent( EditUserDetailsActivity.this, HomeScreenActivity.class );
                     startActivity( intent );
                 } else if ( item.getItemId() == R.id.drawer_logout ) {
+                    // Sign out the user and navigate to hte Login activity
                     User.getInstance().signOutUser();
                     Intent intent = new Intent( EditUserDetailsActivity.this, LoginActivity.class );
                     startActivity( intent );

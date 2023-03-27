@@ -109,14 +109,12 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
 
         // Set the fragment to be displayed in the frame view
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
         if ( getIntent().getExtras() != null ) {
             int fragmentNumber = getIntent().getExtras().getInt( "FRAGMENT_ID" );
             navView.setSelectedItemId(fragmentNumber);
         } else {
             navView.setSelectedItemId(R.id.navigation_discoveries);
         }
-
 
         // If the user details are not set locally, retrieve them from the database
         User currentUser = User.getInstance();
@@ -147,11 +145,6 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
             mDrawerContainer.openDrawer( GravityCompat.START );
         }
         return super.onOptionsItemSelected( item );
-    }
-
-
-    public FirebaseAuth getmAuth() {
-        return mAuth;
     }
 
     public DatabaseReference getmRootRef() {

@@ -47,6 +47,7 @@ public class ProfileActivity extends AppCompatActivity {
             Intent intent = new Intent( ProfileActivity.this, RegistrationActivity.class );
             startActivity( intent );
         }
+
         // Set content view
         setContentView( R.layout.activity_profile );
 
@@ -87,10 +88,11 @@ public class ProfileActivity extends AppCompatActivity {
         mDrawer = findViewById( R.id.drawer );
         setupDrawerContent();
 
+        // Call methods to update UI
         displayUserDetails();
         displayUsername();
 
-        // This callback will only be called when MyFragment is at least Started.
+        // Set back button behaviour
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -99,8 +101,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         };
         this.getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     /**
@@ -165,9 +165,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected( MenuItem item ) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if ( id == R.id.toolbar_btn_open_drawer ) {
             mDrawerContainer.openDrawer( GravityCompat.START );

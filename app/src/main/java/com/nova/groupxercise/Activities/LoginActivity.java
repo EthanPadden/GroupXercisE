@@ -58,11 +58,10 @@ public class LoginActivity extends AppCompatActivity {
             }
         } );
 
+        // Set back button behaviour
         backButtonPressed = false;
-
         Toast backBtnToast = Toast.makeText( this, "Press back button again to exit", Toast.LENGTH_SHORT );
-        // This callback will only be called when MyFragment is at least Started.
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if(!backButtonPressed) {
@@ -78,8 +77,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
         this.getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     /**
@@ -113,10 +110,8 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText( LoginActivity.this, errorMsg,
                                         Toast.LENGTH_SHORT ).show();
                             }
-
-                            // ...
                         }
-                    } );
+            } );
         }
     }
 }

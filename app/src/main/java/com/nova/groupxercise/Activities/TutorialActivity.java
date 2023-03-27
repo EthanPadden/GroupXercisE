@@ -69,10 +69,9 @@ public class TutorialActivity extends AppCompatActivity {
             }
         });
 
+        // Set back button behaviour
         backButtonPressed = false;
-
         Toast backBtnToast = Toast.makeText( this, "Press back button again to skip tutorial", Toast.LENGTH_SHORT );
-        // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -88,7 +87,5 @@ public class TutorialActivity extends AppCompatActivity {
             }
         };
         this.getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 }
