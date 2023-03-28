@@ -38,14 +38,12 @@ public class MyGroupsFragment extends Fragment {
     private ArrayList< DBListener > mDBListeners;
     private boolean backButtonPressed;
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Set back button behaviour
         backButtonPressed = false;
-
-        // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -62,8 +60,6 @@ public class MyGroupsFragment extends Fragment {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override
@@ -76,8 +72,6 @@ public class MyGroupsFragment extends Fragment {
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle( "Groups" );
-
-
         // Inflate the layout for this fragment
         return inflater.inflate( R.layout.fragment_my_groups, container, false );
     }
@@ -131,8 +125,6 @@ public class MyGroupsFragment extends Fragment {
                 mDBListeners.add( groupNameListener );
                 Group.retrieveGroupNames( retrievedGroupIds, mGroups, groupNameListener );
 
-
-
                 mDBListeners.remove( this );
             }
         };
@@ -140,11 +132,11 @@ public class MyGroupsFragment extends Fragment {
         Group.retrieveGroupIds( groupIdListener );
     }
 
-
-
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Deactivate any active listeners
         for ( DBListener dbListener : mDBListeners ) {
             dbListener.setActive( false );
         }
@@ -154,9 +146,9 @@ public class MyGroupsFragment extends Fragment {
      * Updates the UI with the group names and sets event listeners for the list items
      */
     private void setupGroupsList() {
-        if(mGroups.size() == 0) {
+        if ( mGroups.size() == 0 ) {
             mLoadingText.setText( "You have no groups" );
-        }else {
+        } else {
             mLoadingText.setVisibility( View.GONE );
             mListView.setAdapter( mItemsAdapter );
 
@@ -176,5 +168,4 @@ public class MyGroupsFragment extends Fragment {
             } );
         }
     }
-
 }

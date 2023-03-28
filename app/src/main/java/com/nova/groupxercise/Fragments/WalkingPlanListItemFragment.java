@@ -27,13 +27,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link WalkingPlanListItemFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class WalkingPlanListItemFragment extends Fragment {
-
     // Parameters
     private static final String WALKING_PLAN_NAME = "Walking Plan Name";
     private String mWalkingPlanName;
@@ -47,13 +41,6 @@ public class WalkingPlanListItemFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param mWalkingPlanName Parameter 1.
-     * @return A new instance of fragment WalkingPlanListItemFragment.
-     */
     public static WalkingPlanListItemFragment newInstance( String mWalkingPlanName ) {
         WalkingPlanListItemFragment fragment = new WalkingPlanListItemFragment();
         Bundle args = new Bundle();
@@ -69,7 +56,7 @@ public class WalkingPlanListItemFragment extends Fragment {
             mWalkingPlanName = getArguments().getString( WALKING_PLAN_NAME );
         }
 
-        // This callback will only be called when MyFragment is at least Started.
+        // Set back button behaviour
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -80,8 +67,6 @@ public class WalkingPlanListItemFragment extends Fragment {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override
@@ -96,6 +81,7 @@ public class WalkingPlanListItemFragment extends Fragment {
         super.onViewCreated( view, savedInstanceState );
         mDBListeners = new ArrayList<>();
 
+        // Initialise components
         mSetGoalTitleText = view.findViewById( R.id.text_set_goal_title );
         mSetWalkingPlanBtn = view.findViewById( R.id.btn_set_walking_plan );
 
@@ -187,6 +173,8 @@ public class WalkingPlanListItemFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Deactivate any active listeners
         for ( DBListener dbListener : mDBListeners ) {
             dbListener.setActive( false );
         }

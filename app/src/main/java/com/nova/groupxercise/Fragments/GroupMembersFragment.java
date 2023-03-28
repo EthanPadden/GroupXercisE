@@ -28,7 +28,6 @@ public class GroupMembersFragment extends Fragment {
     private ArrayAdapter mGroupMembersAdapter;
     private boolean isAdmin;
 
-
     public GroupMembersFragment( Group mGroup ) {
         this.mGroup = mGroup;
     }
@@ -54,20 +53,20 @@ public class GroupMembersFragment extends Fragment {
         mGroupMembersLoadingText = view.findViewById( R.id.text_group_members_loading );
 
         ArrayList< User > members = mGroup.getmMembers();
-        ArrayList< String> memberNames = new ArrayList<>();
+        ArrayList< String > memberNames = new ArrayList<>();
 
         for (User member : members) {
             memberNames.add( member.getUsername() );
         }
 
+        // Set up group members list
         mGroupMembersAdapter = new ArrayAdapter( getActivity(),android.R.layout.simple_list_item_1,  memberNames );
-
         if(mGroup.getmMembers().size() > 0) {
             mGroupMembersLoadingText.setVisibility( View.GONE );
         }
-
         mGroupMembersListView.setAdapter( mGroupMembersAdapter );
 
+        // Set onclick listeners for group members list
         mGroupMembersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -82,5 +81,4 @@ public class GroupMembersFragment extends Fragment {
             }
         });
     }
-
 }

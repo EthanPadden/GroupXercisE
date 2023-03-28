@@ -41,17 +41,14 @@ public class GoalsFragment extends Fragment {
     protected ArrayList< DBListener > mDBListeners;
     private RelativeLayout mWalkingPlanPlaceholder;
     private TextView mLoadingWalkingPlanText;
-
     private boolean backButtonPressed;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Set back button behaviour
         backButtonPressed = false;
-
-        // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -59,7 +56,7 @@ public class GoalsFragment extends Fragment {
                     Toast.makeText( getActivity(), "Press back button again to exit", Toast.LENGTH_SHORT ).show();
                     backButtonPressed = true;
                 } else {
-                    // Back button pressed twice - exit appp
+                    // Back button pressed twice - exit app
                     Intent intent = new Intent(Intent.ACTION_MAIN);
                     intent.addCategory(Intent.CATEGORY_HOME);
                     startActivity(intent);
@@ -68,8 +65,6 @@ public class GoalsFragment extends Fragment {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override
@@ -129,8 +124,8 @@ public class GoalsFragment extends Fragment {
         mDBListeners.add( pesonalGoalsListener );
         Goal.retrievePersonalStrengthGoals( pesonalGoalsListener );
 
+        // Retrieve groups
         mGroups = new ArrayList<>();
-
         DBListener groupIdsListener = new DBListener() {
             public void onRetrievalFinished( Object retrievedData ) {
                 ArrayList< String > retrievedGroupIds = ( ArrayList< String > ) retrievedData;
@@ -153,7 +148,6 @@ public class GoalsFragment extends Fragment {
                             }
                         }
                         mDBListeners.remove( this );
-
                     }
 
                 };

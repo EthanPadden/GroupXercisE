@@ -39,17 +39,14 @@ public class GroupMemberDetailsFragment extends Fragment {
     public GroupMemberDetailsFragment( String memberName, Group group) {
         this.mMemberName = memberName;
         this.mGroup = group;
-
         mMember = new User(memberName);
-
-        // Create arraylist for DB single-value events
-        mDBListeners = new ArrayList<>();
     }
 
     @Override
     public void onCreate( @Nullable Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-        // This callback will only be called when MyFragment is at least Started.
+
+        // Set back button behaviour
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -60,8 +57,6 @@ public class GroupMemberDetailsFragment extends Fragment {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override
@@ -75,6 +70,7 @@ public class GroupMemberDetailsFragment extends Fragment {
     public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
         super.onViewCreated( view, savedInstanceState );
 
+        // Initialise components
         memberDetailsTitleText = view.findViewById( R.id.text_member_details_title );
         memberDetailsTitleText.setText( mMemberName );
         mMemberProgressesListView = view.findViewById( R.id.list_member_progress );
@@ -110,7 +106,6 @@ public class GroupMemberDetailsFragment extends Fragment {
                                 }
 
                                 displayMemberProgress( userProgresses );
-
                             } else {
                                 loadingText.setText( "No progress has been made by this member" );
                             }
@@ -158,8 +153,9 @@ public class GroupMemberDetailsFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Deactivate any active listeners
         for ( DBListener dbListener : mDBListeners ) {
-            // Deactivate any active listeners
             dbListener.setActive( false );
         }
     }

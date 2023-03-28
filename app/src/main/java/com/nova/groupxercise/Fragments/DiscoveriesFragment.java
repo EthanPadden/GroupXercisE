@@ -39,7 +39,6 @@ public class DiscoveriesFragment extends Fragment {
     private ArrayAdapter< CharSequence > mLevelSpinnerAdapter;
     protected ArrayList< DBListener > mDBListeners;
     private Button mCustomWalkingPlanBtn;
-
     private boolean backButtonPressed;
 
 
@@ -47,9 +46,8 @@ public class DiscoveriesFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Set back button behaviour
         backButtonPressed = false;
-
-        // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -66,8 +64,6 @@ public class DiscoveriesFragment extends Fragment {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override
@@ -138,7 +134,6 @@ public class DiscoveriesFragment extends Fragment {
                 // Get the walking plan name
                 String walkingPlanName = mWalkingPlanListView.getItemAtPosition( i ).toString();
 
-                /** CHANGE FOR WALKING PLAN FRAGMENT */
                 // Create a fragment and set the spinner adapter on the fragment
                 WalkingPlanListItemFragment walkingPlanListItemFragment = WalkingPlanListItemFragment.newInstance( walkingPlanName );
 
@@ -182,6 +177,8 @@ public class DiscoveriesFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Set all DB listeners to inactive
         for(DBListener dbListener : mDBListeners) {
             dbListener.setActive( false );
         }

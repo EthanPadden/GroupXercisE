@@ -25,7 +25,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nova.groupxercise.Activities.HomeScreenActivity;
 import com.nova.groupxercise.Adapters.SimpleGroupItemsAdapter;
@@ -37,15 +36,6 @@ import com.nova.groupxercise.R;
 
 import java.util.ArrayList;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ExerciseListItemFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ExerciseListItemFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ExerciseListItemFragment extends Fragment {
     // Parameters
     private static final String EXERCISE_NAME = "Exercise Name";
@@ -73,12 +63,11 @@ public class ExerciseListItemFragment extends Fragment {
     private TextView mLoadingText;
     private ArrayList< String > mGroupIds;
     private ArrayList< String > mAdminGroupIds;
+    private LinearLayout mUserDetailsOptionsLayout;
+
     // For storing retrieved strength standards based on user details
     private DataSnapshot mStrengthStandards;
     private ArrayList< DBListener > mDBListeners;
-    // DB root reference
-    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-    private LinearLayout mUserDetailsOptionsLayout;
 
     // Goal option selection
     public enum GoalOption {
@@ -91,14 +80,6 @@ public class ExerciseListItemFragment extends Fragment {
         // Required empty public constructor
     }
 
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param mExerciseName Parameter 1.
-     * @return A new instance of fragment ExerciseListItemFragment.
-     */
     public static ExerciseListItemFragment newInstance( String mExerciseName ) {
         ExerciseListItemFragment fragment = new ExerciseListItemFragment();
         Bundle args = new Bundle();
@@ -115,7 +96,7 @@ public class ExerciseListItemFragment extends Fragment {
             mExerciseName = getArguments().getString( EXERCISE_NAME );
         }
 
-        // This callback will only be called when MyFragment is at least Started.
+        // Set back button behaviour
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
@@ -126,8 +107,6 @@ public class ExerciseListItemFragment extends Fragment {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override
@@ -146,7 +125,6 @@ public class ExerciseListItemFragment extends Fragment {
         mLoadingText = view.findViewById( R.id.text_loading_group_list );
         mNoDetailsSetErrorText = view.findViewById( R.id.text_no_details_set_error );
         mUserDetailsOptionsLayout = view.findViewById( R.id.layout_user_details_options );
-
 
         // Set spinner adapter
         mLevelSpinner.setAdapter( mLevelSpinnerAdapter );
@@ -223,17 +201,15 @@ public class ExerciseListItemFragment extends Fragment {
 
         // Set the fragment title
         mSetGoalTitleText.setText( getResources().getString( R.string.set_goal_title ) + " " + mExerciseName );
-        mDBListeners = new ArrayList<>();
-
 
         // Get the strength standards from the DB based on the user details
+        // TODO: whats happening here? why is this commented out?
 //        retrieveStrengthStandards( mExerciseName );
         DBListener strengthStandardsListener = new DBListener() {
             public void onRetrievalFinished( Object retrievedData ) {
                 mStrengthStandards = ( DataSnapshot ) retrievedData;
                 calculateSuggestedWeight();
                 mDBListeners.remove( this );
-
             }
         };
         mDBListeners.add( strengthStandardsListener );
@@ -252,13 +228,11 @@ public class ExerciseListItemFragment extends Fragment {
             mNoDetailsSetErrorText.setVisibility( View.VISIBLE );
         }
 
-//        retrieveGroupIds();
         mGroupIds = new ArrayList<>();
         mAdminGroupIds = new ArrayList<>();
         DBListener groupIdsListener = new DBListener() {
 
             public void onRetrievalFinished() {
-
                 mAdminGroups = new ArrayList<>();
                 // Set the list as the list for the items adapter
                 mItemsAdapter = new SimpleGroupItemsAdapter( getActivity(), mAdminGroups );
@@ -274,7 +248,6 @@ public class ExerciseListItemFragment extends Fragment {
                 mDBListeners.add( groupNamesListener );
                 Group.retrieveGroupNames( mAdminGroupIds, mAdminGroups, groupNamesListener );
                 mDBListeners.remove( this );
-
             }
 
 
@@ -287,6 +260,8 @@ public class ExerciseListItemFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Set all DB listeners to inactive
         for ( DBListener dbListener : mDBListeners ) {
             dbListener.setActive( false );
         }
@@ -393,12 +368,6 @@ public class ExerciseListItemFragment extends Fragment {
     }
 
     /**
-     * Get the strength standards from the DB based on the user details
-     *
-     * @param exerciseName the name of the exercise to retrieve
-     */
-
-    /**
      * Display the current suggested weight based on the user details and selected level
      */
     private void calculateSuggestedWeight() {
@@ -411,7 +380,6 @@ public class ExerciseListItemFragment extends Fragment {
         }
     }
 
-
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
@@ -419,15 +387,11 @@ public class ExerciseListItemFragment extends Fragment {
         return inflater.inflate( R.layout.fragment_exercise_list_item, container, false );
     }
 
-    public void onButtonPressed( Uri uri ) {
-        if ( mListener != null ) {
-            mListener.onFragmentInteraction( uri );
-        }
-    }
-
     @Override
     public void onAttach( Context context ) {
         super.onAttach( context );
+        mDBListeners = new ArrayList<>();
+// TODO: make sure DBlisteners are initialised in onAttach for all fragments and disabled in onDestroy
         if ( context instanceof OnFragmentInteractionListener ) {
             mListener = ( OnFragmentInteractionListener ) context;
         } else {
@@ -445,5 +409,4 @@ public class ExerciseListItemFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction( Uri uri );
     }
-
 }

@@ -135,17 +135,6 @@ public class GroupFragment extends Fragment {
                 }
             }
         } );
-//        mDeleteGroupBtn.setOnClickListener( new View.OnClickListener() {
-//            @Override
-//            public void onClick( View view ) {
-//                mGroup.deleteGroup();
-//                // Return to my groups fragment
-//                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-//                MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
-//                ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
-//                ft.commit();
-//            }
-//        } );
 
         // Retrieve the group information
         DBListener groupInfoListener = new DBListener() {
@@ -195,6 +184,7 @@ public class GroupFragment extends Fragment {
      */
     private void setupGroupMemberListeners() {
         final String path = "groups/" + mGroupId + "/members";
+
         // Get the DB reference
         mGroupMembersRef = FirebaseDatabase.getInstance().getReference().child( path );
         mGroupMembersListener = new ValueEventListener() {
@@ -228,7 +218,6 @@ public class GroupFragment extends Fragment {
         mGroupMembersRef.addValueEventListener( mGroupMembersListener );
     }
 
-
     private View createGroupGoalUIComponent( Goal goal ) {
         View goalView = getLayoutInflater().inflate( R.layout.layout_goal_list_item, null );
         TextView exerciseNameText = goalView.findViewById( R.id.goal_exercise_name );
@@ -245,8 +234,9 @@ public class GroupFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Deactivate any active listeners
         for ( DBListener dbListener : mDBListeners ) {
-            // Deactivate any active listeners
             dbListener.setActive( false );
         }
 

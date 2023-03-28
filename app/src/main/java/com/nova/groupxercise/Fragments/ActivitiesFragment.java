@@ -32,15 +32,13 @@ public class ActivitiesFragment extends Fragment {
     protected ArrayList< DBListener > mDBListeners;
     private boolean backButtonPressed;
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Set back button behaviour
         backButtonPressed = false;
-
-        // This callback will only be called when MyFragment is at least Started.
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if(!backButtonPressed) {
@@ -56,8 +54,6 @@ public class ActivitiesFragment extends Fragment {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override
@@ -81,6 +77,7 @@ public class ActivitiesFragment extends Fragment {
         mListView = view.findViewById( R.id.activities_list );
         mLoadingText = view.findViewById( R.id.text_loading_activities );
 
+        // Create arraylist to store activities retrieved from the database and create an adapter to display them
         mActivitesList = new ArrayList<>();
         mItemsAdapter = new ActivityItemsAdapter( getActivity(), mActivitesList );
         DBListener activitiesListener = new DBListener() {
@@ -89,7 +86,7 @@ public class ActivitiesFragment extends Fragment {
                 if ( mActivitesList.isEmpty() ) {
                     mLoadingText.setText( "No activities" );
                 } else {
-                    // Sort activites by time
+                    // Sort activities by time
                     Collections.sort( mActivitesList );
                     // Update UI
                     mLoadingText.setVisibility( View.GONE );
@@ -102,14 +99,13 @@ public class ActivitiesFragment extends Fragment {
         };
         mDBListeners.add( activitiesListener );
         ExerciseActivity.retrieveActivities( mActivitesList,  activitiesListener);
-
     }
-
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
+        // Set all DB listeners to inactive
         for(DBListener dbListener : mDBListeners) {
             dbListener.setActive( false );
         }

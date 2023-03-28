@@ -1,13 +1,12 @@
 package com.nova.groupxercise.Fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -16,8 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.WalkingPlan;
 import com.nova.groupxercise.R;
@@ -26,19 +23,9 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link WalkingPlanListItemFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CustomWalkingPlanListItemFragment extends Fragment {
-
-    // Parameters
     private static final String WALKING_PLAN_NAME = "Walking Plan Name";
     private String mWalkingPlanName;
-
-    private TextView mSetGoalTitleText;
-    ImageView mImage;
     private Button mSetWalkingPlanBtn;
     private ArrayList< DBListener > mDBListeners;
     private EditText mStepGoalEt;
@@ -47,13 +34,6 @@ public class CustomWalkingPlanListItemFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param mWalkingPlanName Parameter 1.
-     * @return A new instance of fragment WalkingPlanListItemFragment.
-     */
     public static CustomWalkingPlanListItemFragment newInstance( String mWalkingPlanName ) {
         CustomWalkingPlanListItemFragment fragment = new CustomWalkingPlanListItemFragment();
         Bundle args = new Bundle();
@@ -65,12 +45,14 @@ public class CustomWalkingPlanListItemFragment extends Fragment {
     @Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
+
+        // Set fragment arguments
         if ( getArguments() != null ) {
             mWalkingPlanName = getArguments().getString( WALKING_PLAN_NAME );
         }
 
-        // This callback will only be called when MyFragment is at least Started.
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        // Set back button behaviour
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
@@ -80,8 +62,12 @@ public class CustomWalkingPlanListItemFragment extends Fragment {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+    }
 
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
+    @Override
+    public void onAttach( @NonNull Context context ) {
+        super.onAttach( context );
+        mDBListeners = new ArrayList<>();
     }
 
     @Override
@@ -94,21 +80,12 @@ public class CustomWalkingPlanListItemFragment extends Fragment {
     @Override
     public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
         super.onViewCreated( view, savedInstanceState );
-        mDBListeners = new ArrayList<>();
 
-        mSetGoalTitleText = view.findViewById( R.id.text_set_goal_title );
+        // Initialise components
         mSetWalkingPlanBtn = view.findViewById( R.id.btn_set_walking_plan );
         mStepGoalEt = view.findViewById( R.id.et_step_goal );
 
-        // we will get the default FirebaseDatabase instance
-        FirebaseDatabase firebaseDatabase
-                = FirebaseDatabase.getInstance();
-
-        // we will get a DatabaseReference for the database
-        // root node
-        DatabaseReference databaseReference
-                = firebaseDatabase.getReference();
-
+        // Set on click listener for button
         mSetWalkingPlanBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 WalkingPlan walkingPlan = new WalkingPlan( mWalkingPlanName );
@@ -144,10 +121,7 @@ public class CustomWalkingPlanListItemFragment extends Fragment {
                         }
                     };
                     mDBListeners.add( walkingPlanDetailsListener );
-
                     walkingPlan.retrieveWalkingPlanDetails( walkingPlanDetailsListener );
-
-
                 } catch ( NumberFormatException e ) {
                     Toast.makeText( getActivity(), "Steps must be a number", Toast.LENGTH_LONG ).show();
                 }
@@ -158,6 +132,8 @@ public class CustomWalkingPlanListItemFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Set all DB listeners to inactive
         for ( DBListener dbListener : mDBListeners ) {
             dbListener.setActive( false );
         }
