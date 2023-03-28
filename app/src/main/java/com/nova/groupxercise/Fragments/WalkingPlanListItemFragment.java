@@ -1,5 +1,6 @@
 package com.nova.groupxercise.Fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,9 +78,14 @@ public class WalkingPlanListItemFragment extends Fragment {
     }
 
     @Override
+    public void onAttach( @NonNull Context context ) {
+        super.onAttach( context );
+        mDBListeners = new ArrayList<>();
+    }
+
+    @Override
     public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
         super.onViewCreated( view, savedInstanceState );
-        mDBListeners = new ArrayList<>();
 
         // Initialise components
         mSetGoalTitleText = view.findViewById( R.id.text_set_goal_title );

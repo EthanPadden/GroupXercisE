@@ -261,7 +261,7 @@ public class ExerciseListItemFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
 
-        // Set all DB listeners to inactive
+        // Deactivate any active listeners
         for ( DBListener dbListener : mDBListeners ) {
             dbListener.setActive( false );
         }
@@ -391,7 +391,6 @@ public class ExerciseListItemFragment extends Fragment {
     public void onAttach( Context context ) {
         super.onAttach( context );
         mDBListeners = new ArrayList<>();
-// TODO: make sure DBlisteners are initialised in onAttach for all fragments and disabled in onDestroy
         if ( context instanceof OnFragmentInteractionListener ) {
             mListener = ( OnFragmentInteractionListener ) context;
         } else {

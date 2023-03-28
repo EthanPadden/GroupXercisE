@@ -105,7 +105,7 @@ public class ActivitiesFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
 
-        // Set all DB listeners to inactive
+        // Deactivate any active listeners
         for(DBListener dbListener : mDBListeners) {
             dbListener.setActive( false );
         }

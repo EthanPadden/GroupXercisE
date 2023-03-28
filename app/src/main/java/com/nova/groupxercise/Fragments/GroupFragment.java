@@ -95,9 +95,6 @@ public class GroupFragment extends Fragment {
         mGroupMembersLayout = view.findViewById( R.id.layout_group_members );
         mGroupMembersFrameLayout = view.findViewById( R.id.frame_group_members );
 
-        // Create arraylist for DB single-value events
-        mDBListeners = new ArrayList<>();
-
         // Set event listeners
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
             @Override

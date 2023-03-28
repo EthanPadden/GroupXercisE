@@ -228,6 +228,8 @@ public class GoalsFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Deactivate any active listeners
         for ( DBListener dbListener : mDBListeners ) {
             dbListener.setActive( false );
         }
