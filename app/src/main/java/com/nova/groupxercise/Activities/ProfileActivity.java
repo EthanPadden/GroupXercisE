@@ -93,7 +93,7 @@ public class ProfileActivity extends AppCompatActivity {
         displayUsername();
 
         // Set back button behaviour
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 Intent intent = new Intent( ProfileActivity.this, HomeScreenActivity.class );

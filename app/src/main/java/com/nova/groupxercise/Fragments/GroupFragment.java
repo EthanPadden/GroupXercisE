@@ -64,7 +64,7 @@ public class GroupFragment extends Fragment {
         super.onCreate( savedInstanceState );
 
         // This callback will only be called when MyFragment is at least Started.
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();

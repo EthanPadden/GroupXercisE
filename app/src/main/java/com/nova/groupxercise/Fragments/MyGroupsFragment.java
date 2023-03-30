@@ -44,7 +44,7 @@ public class MyGroupsFragment extends Fragment {
 
         // Set back button behaviour
         backButtonPressed = false;
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if(!backButtonPressed) {

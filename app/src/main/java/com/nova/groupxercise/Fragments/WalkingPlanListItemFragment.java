@@ -58,7 +58,7 @@ public class WalkingPlanListItemFragment extends Fragment {
         }
 
         // Set back button behaviour
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();

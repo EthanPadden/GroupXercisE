@@ -63,7 +63,7 @@ public class RegistrationActivity extends AppCompatActivity {
         } );
 
         // Set back button behaviour
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);

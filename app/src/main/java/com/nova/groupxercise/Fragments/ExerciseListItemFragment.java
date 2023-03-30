@@ -97,7 +97,7 @@ public class ExerciseListItemFragment extends Fragment {
         }
 
         // Set back button behaviour
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
@@ -202,9 +202,14 @@ public class ExerciseListItemFragment extends Fragment {
         // Set the fragment title
         mSetGoalTitleText.setText( getResources().getString( R.string.set_goal_title ) + " " + mExerciseName );
 
-        // Get the strength standards from the DB based on the user details
-        // TODO: whats happening here? why is this commented out?
-//        retrieveStrengthStandards( mExerciseName );
+        // Get the current user
+        User currentUser = User.getInstance();
+
+        // Set the loading message
+        mSuggestedGoalText.setText( R.string.loading );
+
+        // Check if all user details are set correctly
+        // If so, get the strength standards from the DB based on the user details
         DBListener strengthStandardsListener = new DBListener() {
             public void onRetrievalFinished( Object retrievedData ) {
                 mStrengthStandards = ( DataSnapshot ) retrievedData;
@@ -213,14 +218,6 @@ public class ExerciseListItemFragment extends Fragment {
             }
         };
         mDBListeners.add( strengthStandardsListener );
-
-        // Get the current user
-        User currentUser = User.getInstance();
-
-        // Set the loading message
-        mSuggestedGoalText.setText( R.string.loading );
-
-        // Check if all user details are set correctly
         if ( currentUser.isUserDetailsAreSet() && currentUser.detailsAreValid() ) {
             Goal.retrieveStrengthStandards( mExerciseName, strengthStandardsListener );
         } else {

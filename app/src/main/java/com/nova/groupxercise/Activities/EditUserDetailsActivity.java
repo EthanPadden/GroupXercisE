@@ -119,7 +119,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
 
         // Set back button behaviour
         Toast detailsNotSavedToast = Toast.makeText( this, "Details not saved - press save button to save details!" , Toast.LENGTH_SHORT);
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 // Navigate to Profile activity and show toast
@@ -297,32 +297,27 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    // Create user DB object
-                    Instant dobInstant = dob.toInstant();
-                    long dobTimeStamp = dobInstant.getMillis();
-                    UserDetailsDBObject userDetailsDBObject = new UserDetailsDBObject( dobTimeStamp, weight, mSelectedSex.toString() );
+                // Create user DB object
+                Instant dobInstant = dob.toInstant();
+                long dobTimeStamp = dobInstant.getMillis();
+                UserDetailsDBObject userDetailsDBObject = new UserDetailsDBObject( dobTimeStamp, weight, mSelectedSex.toString() );
 
-                    // Check if details already exists for the user
-                    DataSnapshot userDetailsSnapshot = dataSnapshot.child( userID );
-                    if ( userDetailsSnapshot.exists() ) {
-                        // If so, the operation is an update
-                        Toast.makeText( EditUserDetailsActivity.this, R.string.info_updating_details, Toast.LENGTH_SHORT ).show();
+                // Check if details already exists for the user
+                DataSnapshot userDetailsSnapshot = dataSnapshot.child( userID );
+                if ( userDetailsSnapshot.exists() ) {
+                    // If so, the operation is an update
+                    Toast.makeText( EditUserDetailsActivity.this, R.string.info_updating_details, Toast.LENGTH_SHORT ).show();
 
-                    } else {
-                        // If not, the operation is a create
-                        Toast.makeText( EditUserDetailsActivity.this, R.string.info_setting_details, Toast.LENGTH_SHORT ).show();
-                    }
-
-                    // If no child exists, this will create a new one
-                    // If one does, this will update it
-                    childRef.child( userID ).setValue( userDetailsDBObject );
-
-                    setLocalUserDetails( dob, weight );
                 } else {
-                    // This is an error
-                    Toast.makeText( EditUserDetailsActivity.this, R.string.error_db_user_details, Toast.LENGTH_SHORT ).show();
+                    // If not, the operation is a create
+                    Toast.makeText( EditUserDetailsActivity.this, R.string.info_setting_details, Toast.LENGTH_SHORT ).show();
                 }
+
+                // If no child exists, this will create a new one
+                // If one does, this will update it
+                childRef.child( userID ).setValue( userDetailsDBObject );
+
+                setLocalUserDetails( dob, weight );
             }
 
             @Override

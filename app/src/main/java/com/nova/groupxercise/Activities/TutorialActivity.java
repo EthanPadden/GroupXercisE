@@ -72,7 +72,7 @@ public class TutorialActivity extends AppCompatActivity {
         // Set back button behaviour
         backButtonPressed = false;
         Toast backBtnToast = Toast.makeText( this, "Press back button again to skip tutorial", Toast.LENGTH_SHORT );
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if(!backButtonPressed) {
