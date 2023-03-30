@@ -200,9 +200,10 @@ public class GroupFragment extends Fragment {
                 mGroup.setmMembers( updatedMembers );
 
                 GroupMembersFragment newGroupMembersFragment = new GroupMembersFragment( mGroup );
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
 
-                ft.replace( R.id.frame_group_members, newGroupMembersFragment );
+                FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+                ft.replace(R.id.frame_group_members, newGroupMembersFragment);
+                ft.addToBackStack(null);
                 ft.commit();
             }
 
