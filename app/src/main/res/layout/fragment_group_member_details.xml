@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragments.GroupMemberDetailsFragment"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/text_member_details_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="Group member:"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Admin"
+        android:gravity="center"
+        android:layout_below="@id/text_member_details_title"
+        android:visibility="gone"
+        android:id="@+id/text_member_admin_status"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Loading..."
+        android:gravity="center"
+        android:layout_below="@id/text_member_admin_status"
+        android:id="@+id/text_member_progress_loading"/>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_member_progress_loading"
+        android:id="@+id/list_member_progress"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/btn_remove_member"
+        android:text="Remove Member"
+        android:visibility="gone"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"
+        android:layout_margin="10dp"/>
+</RelativeLayout>

@@ -90,6 +90,48 @@ public class Goal {
         } );
     }
 
+    public static void retrieveUserProgress( final DBListener listener, String userID )
+    {
+        // Path to the user progress subtree for all goals
+        String path = "user_progress/" + userID;
+
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
+
+        childRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange( DataSnapshot dataSnapshot ) {
+                ArrayList<Goal> userProgresses = null;
+                if (dataSnapshot.exists()) {
+                    userProgresses = new ArrayList<>();
+
+                    for ( DataSnapshot exerciseDataSnapshot : dataSnapshot.getChildren() ) {
+                        String exerciseName = exerciseDataSnapshot.getKey().toString();
+
+                        Float progress = null;
+                        Object progressObj = exerciseDataSnapshot.getValue();
+
+                        if ( progressObj instanceof Long ) {
+                            progress = ( ( Long ) progressObj ).floatValue();
+                        } else {
+                            progress = ( ( Float ) progressObj ).floatValue(); //java.util.HashMap cannot be cast to java.lang.Float
+                        }
+
+                        Goal goal = new Goal( exerciseName );
+                        goal.setmProgress( progress );
+
+                        userProgresses.add( goal );
+                    }
+                }
+
+                if ( listener != null && listener.isActive() ) listener.onRetrievalFinished( userProgresses );
+            }
+
+            @Override
+            public void onCancelled( DatabaseError databaseError ) {
+            }
+        } );
+    }
+
     public static void retrieveStrengthStandards( final String exerciseName, final DBListener listener ) {
 
         User currentUser = User.getInstance();

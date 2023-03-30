@@ -18,7 +18,7 @@ public class Group {
     private String mGroupId;
     private String mCreator;
     private ArrayList< Goal > mGoals;
-    private ArrayList< Member > mMembers;
+    private ArrayList< User > mMembers;
 
     public Group( String mName, String mGroupId ) {
         this( mGroupId );
@@ -31,11 +31,11 @@ public class Group {
         mGoals = new ArrayList<>();
     }
 
-    public ArrayList< Member > getmMembers() {
+    public ArrayList< User > getmMembers() {
         return mMembers;
     }
 
-    public void setmMembers( ArrayList< Member > mMembers ) {
+    public void setmMembers( ArrayList< User > mMembers ) {
         this.mMembers = mMembers;
     }
 
@@ -172,8 +172,6 @@ public class Group {
 
         groupsChildRef.child( username ).setValue( false );
 
-        // TODO: check if the user is already a member - error?
-
         /** Updating user_groups subtree */
         String userGroupsPath = "user_groups/" + userId;
         DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
@@ -193,42 +191,6 @@ public class Group {
                 childRef.setValue( goal.getmTarget() );
                 listener.onRetrievalFinished();
             }
-
-            @Override
-            public void onCancelled( DatabaseError databaseError ) {
-            }
-        } );
-    }
-
-    public void removeMember( final Member member ) {
-        /** Updating groups subtree */
-        // Path to this groups members child
-        String thisGroupMembersPath = "groups/" + mGroupId + "/members";
-
-        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference groupsChildRef = rootRef.child( thisGroupMembersPath );
-
-        // TODO: check if the user is already a member - error?
-        // TODO: what if that user is not a member? = error?
-        groupsChildRef.child( member.getmUsername() ).removeValue();
-
-
-        /** Updating user_groups subtree */
-        String usernamePath = "usernames/" + member.getmUsername();
-        DatabaseReference usernameChildRef = rootRef.child( usernamePath );
-        usernameChildRef.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange( DataSnapshot dataSnapshot ) {
-                String userId = dataSnapshot.getValue().toString();
-
-                String userGroupsPath = "user_groups/" + userId;
-                DatabaseReference userGroupsChildRef = rootRef.child( userGroupsPath );
-                userGroupsChildRef.child( mGroupId ).removeValue();
-
-                /** Updating group in memory and UI */
-                mMembers.remove( member );
-            }
-
 
             @Override
             public void onCancelled( DatabaseError databaseError ) {
@@ -289,7 +251,7 @@ public class Group {
                 if ( dataSnapshot.exists() ) {
                     for ( DataSnapshot memberDataSnapshot : dataSnapshot.getChildren() ) {
                         String memberName = memberDataSnapshot.getKey();
-                        mMembers.add( new Member( memberName ) );
+                        mMembers.add( new User( memberName ) );
                     }
                 }
 

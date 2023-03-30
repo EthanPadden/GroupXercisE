@@ -41,6 +41,10 @@
         android:paddingRight="16dp"
         android:text="Next"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="#FFFFFF"
+        android:layout_margin="10dp"/>
 
 </RelativeLayout>

@@ -8,8 +8,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_margin="20dp"
-        android:text="Login" />
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="GroupXercisE"
+        android:textSize="30dp" />
 
     <EditText
         android:id="@+id/et_email"
@@ -45,19 +49,37 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="20dp"
-        android:text="Login" />
+        android:text="Login"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="#FFFFFF"/>
 
-    <Button
-        android:id="@+id/btn_register_link"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btn_login"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="20dp"
-        android:text="Register
-" />
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        android:layout_alignParentBottom="true">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Don't have an account?"
+            android:layout_weight="3"
+            android:textAlignment="center"/>
+        <Button
+            android:id="@+id/btn_register_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:layout_weight="1"
+            android:background="@drawable/round_button"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="#FFFFFF"/>
+    </LinearLayout>
+
+
+
+
 
 
 </RelativeLayout>

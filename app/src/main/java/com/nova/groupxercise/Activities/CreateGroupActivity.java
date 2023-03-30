@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,9 +31,11 @@ public class CreateGroupActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
+        // Initialize components
         mCreateGroupBtn = findViewById( R.id.btn_create_group );
         mGroupNameEt = findViewById( R.id.et_group_name );
 
+        // Set event listeners
         mCreateGroupBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
@@ -49,6 +52,18 @@ public class CreateGroupActivity extends AppCompatActivity {
                 }
             }
         } );
+
+        // Set back button behaviour
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Navigate to Groups fragment
+                Intent intent = new Intent( CreateGroupActivity.this, HomeScreenActivity.class );
+                intent.putExtra( "FRAGMENT_ID", R.id.navigation_groups );
+                startActivity( intent );
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     /**
@@ -59,29 +74,32 @@ public class CreateGroupActivity extends AppCompatActivity {
      * @param groupName the name of the group to be created
      */
     private void createGroup( String groupName ) {
-        // Path to the groups child
+        // Path to the groups subtree
         String groupsPath = "groups/";
         final DatabaseReference groupsChildRef = mRootRef.child( groupsPath );
 
-        // Generate a reference to a new location and add some data
+        // Create a GroupDBObject to put into the database
         User currentUser = User.getInstance();
         GroupDBObject groupDBObject = new GroupDBObject( groupName, currentUser.getUsername() );
         DatabaseReference groupRef = groupsChildRef.push();
         groupRef.setValue( groupDBObject );
-          groupRef.child( "members" ).child( currentUser.getUsername() ).setValue( true );
+
+        // Create a child in the members subtree and set the value to true, indicating that this is a group admin
+        groupRef.child( "members" ).child( currentUser.getUsername() ).setValue( true );
 
         // Updating users_groups child
         String groupId = groupRef.getKey();
-
-        // Path to the user_groups child
         String userGroupsPath = "user_groups/";
         final DatabaseReference usersGroupsChildRef = mRootRef.child( userGroupsPath );
         String currentUserId = mAuth.getCurrentUser().getUid();
         usersGroupsChildRef.child( currentUserId ).child( groupId ).setValue( true );
 
+        // Inform the user the group has been created
         Toast.makeText( CreateGroupActivity.this, "Group " + groupName + " created", Toast.LENGTH_SHORT ).show();
 
+        // Navigate to the groups fragment
         Intent intent = new Intent( CreateGroupActivity.this, HomeScreenActivity.class );
+        intent.putExtra( "FRAGMENT_ID", R.id.navigation_groups );
         startActivity( intent );
     }
 }

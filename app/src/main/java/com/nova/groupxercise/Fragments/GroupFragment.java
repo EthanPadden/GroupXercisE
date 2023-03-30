@@ -7,26 +7,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.nova.groupxercise.Adapters.GroupMemberRecyclerAdapter;
 import com.nova.groupxercise.Objects.DBListener;
 import com.nova.groupxercise.Objects.Goal;
 import com.nova.groupxercise.Objects.Group;
-import com.nova.groupxercise.Objects.Member;
 import com.nova.groupxercise.Objects.User;
 import com.nova.groupxercise.R;
 
@@ -39,15 +39,13 @@ public class GroupFragment extends Fragment {
     private Button mDeleteGroupBtn;
     private EditText mMemberNameEt;
     private TextView mGroupGoalsLoadingText;
-    //    private LinearLayout mGroupMembersLayout;
+    private LinearLayout mGroupMembersLayout;
     private LinearLayout mGroupGoalsLayout;
     private ArrayList< DBListener > mDBListeners;
     private boolean adminGroup;
-    private RecyclerView mGroupMembersRecycler;
-    private GroupMemberRecyclerAdapter mGroupMemberRecyclerAdapter;
     private DatabaseReference mGroupMembersRef;
     private ValueEventListener mGroupMembersListener;
-
+    private FrameLayout mGroupMembersFrameLayout;
 
     public GroupFragment( String mGroupId ) {
         this.mGroupId = mGroupId;
@@ -56,8 +54,28 @@ public class GroupFragment extends Fragment {
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState ) {
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle( "Group details" );
         // Inflate the layout for this fragment
         return inflater.inflate( R.layout.fragment_group, container, false );
+    }
+
+    @Override
+    public void onCreate( @Nullable Bundle savedInstanceState ) {
+        super.onCreate( savedInstanceState );
+
+        // This callback will only be called when MyFragment is at least Started.
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
+                ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
+                ft.commit();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // The callback can be enabled or disabled here or in handleOnBackPressed()
     }
 
     @Override
@@ -74,10 +92,8 @@ public class GroupFragment extends Fragment {
         mDeleteGroupBtn = view.findViewById( R.id.btn_delete_group );
         mGroupGoalsLoadingText = view.findViewById( R.id.text_group_goals_loading );
         mGroupGoalsLayout = view.findViewById( R.id.layout_group_goals );
-        mGroupMembersRecycler = view.findViewById( R.id.recycler_members );
-
-        // Create arraylist for DB single-value events
-        mDBListeners = new ArrayList<>();
+        mGroupMembersLayout = view.findViewById( R.id.layout_group_members );
+        mGroupMembersFrameLayout = view.findViewById( R.id.frame_group_members );
 
         // Set event listeners
         mAddMemberBtn.setOnClickListener( new View.OnClickListener() {
@@ -116,17 +132,6 @@ public class GroupFragment extends Fragment {
                 }
             }
         } );
-//        mDeleteGroupBtn.setOnClickListener( new View.OnClickListener() {
-//            @Override
-//            public void onClick( View view ) {
-//                mGroup.deleteGroup();
-//                // Return to my groups fragment
-//                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-//                MyGroupsFragment myGroupsFragment = new MyGroupsFragment();
-//                ft.replace( R.id.frame_home_screen_fragment_placeholder, myGroupsFragment );
-//                ft.commit();
-//            }
-//        } );
 
         // Retrieve the group information
         DBListener groupInfoListener = new DBListener() {
@@ -139,6 +144,8 @@ public class GroupFragment extends Fragment {
                     mDeleteGroupBtn.setVisibility( View.VISIBLE );
                     adminGroup = true;
                 }
+
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle( mGroup.getmName() );
 
                 // Set up listener for changes to the members subtree
                 setupGroupMemberListeners();
@@ -174,48 +181,30 @@ public class GroupFragment extends Fragment {
      */
     private void setupGroupMemberListeners() {
         final String path = "groups/" + mGroupId + "/members";
-        mGroupMembersRecycler.setLayoutManager( new LinearLayoutManager( getContext() ) );
-        mGroupMemberRecyclerAdapter = new GroupMemberRecyclerAdapter( getContext(), mGroup, adminGroup);
-        mGroupMembersRecycler.setAdapter( mGroupMemberRecyclerAdapter );
 
         // Get the DB reference
         mGroupMembersRef = FirebaseDatabase.getInstance().getReference().child( path );
-
         mGroupMembersListener = new ValueEventListener() {
             @Override
             public void onDataChange( @NonNull DataSnapshot membersDataSnapshot ) {
-//                 Parse the snapshot, updating the group in memory
+                // Clear the current group members list
+                ArrayList<User> updatedMembers = new ArrayList<User>();
+
+                // Parse the snapshot, updating the group in memory
                 for ( DataSnapshot memberDataSnapshot : membersDataSnapshot.getChildren() ) {
                     // Retrieve member username and create member object
                     final String username = memberDataSnapshot.getKey();
-                    Member member = new Member( username );
-
-                    // For every progress in the progress subtree, create a goal object
-                    // and add to the member object
-                    for ( DataSnapshot progressDataSnapshot : memberDataSnapshot.child( "progress" ).getChildren() ) {
-                        // Get the exercise name
-                        String exerciseName = progressDataSnapshot.getKey();
-
-                        // Get the current status (member progress towards that goal
-                        Object currentStatusObj = progressDataSnapshot.getValue();
-                        float currentStatus;
-                        if ( currentStatusObj instanceof Long ) {
-                            currentStatus = ( ( Long ) currentStatusObj ).floatValue();
-                        } else {
-                            currentStatus = ( ( Float ) currentStatusObj ).floatValue();
-                        }
-
-                        // We are not concerned with the target, it is stored in the group goal
-                        float target = 0;
-
-                        Goal goal = new Goal( exerciseName, target );
-                        member.getmProgress().add( goal );
-                    }
-
-                    mGroup.getmMembers().add( member );
+                    User member = new User( username );
+                    updatedMembers.add( member );
                 }
+                mGroup.setmMembers( updatedMembers );
 
-                mGroupMemberRecyclerAdapter.notifyDataSetChanged();
+                GroupMembersFragment newGroupMembersFragment = new GroupMembersFragment( mGroup );
+
+                FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+                ft.replace(R.id.frame_group_members, newGroupMembersFragment);
+                ft.addToBackStack(null);
+                ft.commit();
             }
 
             @Override
@@ -243,8 +232,9 @@ public class GroupFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Deactivate any active listeners
         for ( DBListener dbListener : mDBListeners ) {
-            // Deactivate any active listeners
             dbListener.setActive( false );
         }
 

@@ -15,7 +15,6 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name=".Activities.LogActivityActivity" />
         <activity android:name=".Activities.CreateGroupActivity" />
         <activity android:name=".Activities.SetUsernameActivity" />
         <activity android:name=".Activities.ProfileActivity" />

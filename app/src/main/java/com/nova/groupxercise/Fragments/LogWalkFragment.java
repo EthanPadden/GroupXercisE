@@ -28,11 +28,6 @@ import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link LogWalkFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class LogWalkFragment extends Fragment {
     private Button mLogWalkBtn;
     private EditText mStepsEt;
@@ -41,13 +36,6 @@ public class LogWalkFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment LogWalkFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static LogWalkFragment newInstance() {
         LogWalkFragment fragment = new LogWalkFragment();
         Bundle args = new Bundle();
@@ -58,8 +46,9 @@ public class LogWalkFragment extends Fragment {
     @Override
     public void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-        // This callback will only be called when MyFragment is at least Started.
-        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+
+        // Set back button behaviour
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
 
@@ -71,7 +60,6 @@ public class LogWalkFragment extends Fragment {
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-
     }
 
     @Override
@@ -84,9 +72,12 @@ public class LogWalkFragment extends Fragment {
     @Override
     public void onViewCreated( @NonNull View view, @Nullable Bundle savedInstanceState ) {
         super.onViewCreated( view, savedInstanceState );
+
+        // Initialise components
         mLogWalkBtn = getActivity().findViewById( R.id.btn_log_walk );
         mStepsEt = getActivity().findViewById( R.id.et_steps );
 
+        // Set on click listeners
         mLogWalkBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick( View view ) {
@@ -130,10 +121,6 @@ public class LogWalkFragment extends Fragment {
         goalsRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
-                // Get the value for the last walk time
-                // TODO: test!!!
-                // https://www.baeldung.com/joda-time
-
                 // LocalDate represents a date without time
                 long lastWalkTimeTS = (Long) dataSnapshot.child( "last_walk_time" ).getValue();
                 DateTime lastWalkTimeDT = new DateTime( lastWalkTimeTS );

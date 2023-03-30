@@ -31,10 +31,14 @@ public class ActivityItemsAdapter extends ArrayAdapter {
                     R.layout.layout_activity_list_item, parent, false );
         }
 
+        // Get the exerciseActivity object
         ExerciseActivity currentActivity = ( ExerciseActivity ) getItem( position );
 
+        // Set the exercise name text
         TextView exerciseNameText = listItemView.findViewById( R.id.activity_exercise_name );
         exerciseNameText.setText( currentActivity.getmExerciseName() );
+
+        // Set the level of the activity
         TextView levelText = listItemView.findViewById( R.id.activity_level );
         // If the activity is a walking activity, we dont want the decimal point
         if(currentActivity.getmExerciseName().compareTo( "Walking" ) == 0) {
@@ -43,14 +47,16 @@ public class ActivityItemsAdapter extends ArrayAdapter {
         } else {
             levelText.setText( Float.toString( currentActivity.getmLevel() ));
         }
+
+        // Set the unit
         TextView unitText = listItemView.findViewById( R.id.activity_unit );
         if (currentActivity.getmExerciseName().compareTo( "Walking" ) == 0) {
             unitText.setText( "steps" );
         }
+
+        // Format and display the time of the activity
         TextView timeText = listItemView.findViewById( R.id.activity_time );
-        // Format for output
         DateTimeFormatter dtfOut = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm");
-        // Printing the date
         String timeStr = dtfOut.print(currentActivity.getmTime());
         timeText.setText( timeStr);
 

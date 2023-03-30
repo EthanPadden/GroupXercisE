@@ -1,6 +1,7 @@
 package com.nova.groupxercise.Activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -45,6 +47,7 @@ public class ProfileActivity extends AppCompatActivity {
             Intent intent = new Intent( ProfileActivity.this, RegistrationActivity.class );
             startActivity( intent );
         }
+
         // Set content view
         setContentView( R.layout.activity_profile );
 
@@ -57,6 +60,13 @@ public class ProfileActivity extends AppCompatActivity {
         mSexText = findViewById( R.id.text_sex );
         mUserDetailsTable = findViewById( R.id.layout_user_details );
         mUsernameText = findViewById( R.id.text_username );
+        Toolbar toolbar = findViewById( R.id.toolbar );
+
+        // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
+        // Make sure the toolbar exists in the activity and is not null
+        toolbar.setTitleTextColor( Color.WHITE );
+        setSupportActionBar( toolbar );
+        getSupportActionBar().setTitle( "Profile" );
 
         // Set event listeners
         mEditBtn.setOnClickListener( new View.OnClickListener() {
@@ -70,6 +80,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
         // Make sure the toolbar exists in the activity and is not null
+        mToolbar.setTitleTextColor( Color.WHITE );
         setSupportActionBar( mToolbar );
 
         // Initialise and set up navigation drawer
@@ -77,8 +88,19 @@ public class ProfileActivity extends AppCompatActivity {
         mDrawer = findViewById( R.id.drawer );
         setupDrawerContent();
 
+        // Call methods to update UI
         displayUserDetails();
         displayUsername();
+
+        // Set back button behaviour
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent( ProfileActivity.this, HomeScreenActivity.class );
+                startActivity( intent );
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     /**
@@ -143,9 +165,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected( MenuItem item ) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if ( id == R.id.toolbar_btn_open_drawer ) {
             mDrawerContainer.openDrawer( GravityCompat.START );

@@ -1,6 +1,7 @@
 package com.nova.groupxercise.Activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -92,6 +93,7 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
 
         // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
         // Make sure the toolbar exists in the activity and is not null
+        toolbar.setTitleTextColor( Color.WHITE );
         setSupportActionBar( toolbar );
 
         // Initialise and set up navigation drawer
@@ -107,14 +109,12 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
 
         // Set the fragment to be displayed in the frame view
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
         if ( getIntent().getExtras() != null ) {
             int fragmentNumber = getIntent().getExtras().getInt( "FRAGMENT_ID" );
             navView.setSelectedItemId(fragmentNumber);
         } else {
             navView.setSelectedItemId(R.id.navigation_discoveries);
         }
-
 
         // If the user details are not set locally, retrieve them from the database
         User currentUser = User.getInstance();
@@ -145,11 +145,6 @@ public class HomeScreenActivity extends AppCompatActivity implements ExerciseLis
             mDrawerContainer.openDrawer( GravityCompat.START );
         }
         return super.onOptionsItemSelected( item );
-    }
-
-
-    public FirebaseAuth getmAuth() {
-        return mAuth;
     }
 
     public DatabaseReference getmRootRef() {

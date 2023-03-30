@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -60,6 +61,16 @@ public class RegistrationActivity extends AppCompatActivity {
                 startActivity( intent );
             }
         } );
+
+        // Set back button behaviour
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     /**

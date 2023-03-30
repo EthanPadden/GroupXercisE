@@ -3,6 +3,7 @@ package com.nova.groupxercise.Activities;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -54,6 +56,8 @@ public class EditUserDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
+        setContentView( R.layout.activity_edit_user_details );
+
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
@@ -63,8 +67,6 @@ public class EditUserDetailsActivity extends AppCompatActivity {
             Intent intent = new Intent( EditUserDetailsActivity.this, RegistrationActivity.class );
             startActivity( intent );
         }
-        // Set content view
-        setContentView( R.layout.activity_edit_user_details );
 
         // Initialise components
         mDobText = findViewById( R.id.text_dob );
@@ -74,7 +76,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById( R.id.toolbar );
 
         // Sets the Toolbar to act as the ActionBar for this ExerciseActivity window.
-        // Make sure the toolbar exists in the activity and is not null
+        toolbar.setTitleTextColor( Color.WHITE );
         setSupportActionBar( toolbar );
 
         // Initialise and set up navigation drawer
@@ -86,16 +88,13 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         mSelectedSex = User.Sex.MALE;
         mSelectedDob = Calendar.getInstance();
 
-        /** Set adapters */
-        // Create an ArrayAdapter using the string array and a default spinner layout
+        // Create an array adapter for the spinner component and apply
         ArrayAdapter< CharSequence > adapter = ArrayAdapter.createFromResource( this,
                 R.array.sex_array, android.R.layout.simple_spinner_item );
-        // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-        // Apply the adapter to the spinner
         mSexSpinner.setAdapter( adapter );
 
-        /** Set event listeners */
+        // Set event listeners
         mUpdateBtn.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
                 validateEnteredDetails();
@@ -113,11 +112,23 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         } );
         mDobText.setOnClickListener( new View.OnClickListener() {
             public void onClick( View v ) {
-                // Create new dialog fragment, passing the date and textview objects to update them
                 DialogFragment newFragment = new DatePickerFragment( mSelectedDob, mDobText );
                 newFragment.show( getSupportFragmentManager(), "datePicker" );
             }
         } );
+
+        // Set back button behaviour
+        Toast detailsNotSavedToast = Toast.makeText( this, "Details not saved - press save button to save details!" , Toast.LENGTH_SHORT);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Navigate to Profile activity and show toast
+                Intent intent = new Intent( EditUserDetailsActivity.this, ProfileActivity.class );
+                detailsNotSavedToast.show();
+                startActivity( intent );
+            }
+        };
+        this.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     /**
@@ -132,6 +143,7 @@ public class EditUserDetailsActivity extends AppCompatActivity {
                     Intent intent = new Intent( EditUserDetailsActivity.this, HomeScreenActivity.class );
                     startActivity( intent );
                 } else if ( item.getItemId() == R.id.drawer_logout ) {
+                    // Sign out the user and navigate to hte Login activity
                     User.getInstance().signOutUser();
                     Intent intent = new Intent( EditUserDetailsActivity.this, LoginActivity.class );
                     startActivity( intent );
@@ -285,32 +297,27 @@ public class EditUserDetailsActivity extends AppCompatActivity {
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( DataSnapshot dataSnapshot ) {
-                if ( dataSnapshot.exists() ) {
-                    // Create user DB object
-                    Instant dobInstant = dob.toInstant();
-                    long dobTimeStamp = dobInstant.getMillis();
-                    UserDetailsDBObject userDetailsDBObject = new UserDetailsDBObject( dobTimeStamp, weight, mSelectedSex.toString() );
+                // Create user DB object
+                Instant dobInstant = dob.toInstant();
+                long dobTimeStamp = dobInstant.getMillis();
+                UserDetailsDBObject userDetailsDBObject = new UserDetailsDBObject( dobTimeStamp, weight, mSelectedSex.toString() );
 
-                    // Check if details already exists for the user
-                    DataSnapshot userDetailsSnapshot = dataSnapshot.child( userID );
-                    if ( userDetailsSnapshot.exists() ) {
-                        // If so, the operation is an update
-                        Toast.makeText( EditUserDetailsActivity.this, R.string.info_updating_details, Toast.LENGTH_SHORT ).show();
+                // Check if details already exists for the user
+                DataSnapshot userDetailsSnapshot = dataSnapshot.child( userID );
+                if ( userDetailsSnapshot.exists() ) {
+                    // If so, the operation is an update
+                    Toast.makeText( EditUserDetailsActivity.this, R.string.info_updating_details, Toast.LENGTH_SHORT ).show();
 
-                    } else {
-                        // If not, the operation is a create
-                        Toast.makeText( EditUserDetailsActivity.this, R.string.info_setting_details, Toast.LENGTH_SHORT ).show();
-                    }
-
-                    // If no child exists, this will create a new one
-                    // If one does, this will update it
-                    childRef.child( userID ).setValue( userDetailsDBObject );
-
-                    setLocalUserDetails( dob, weight );
                 } else {
-                    // This is an error
-                    Toast.makeText( EditUserDetailsActivity.this, R.string.error_db_user_details, Toast.LENGTH_SHORT ).show();
+                    // If not, the operation is a create
+                    Toast.makeText( EditUserDetailsActivity.this, R.string.info_setting_details, Toast.LENGTH_SHORT ).show();
                 }
+
+                // If no child exists, this will create a new one
+                // If one does, this will update it
+                childRef.child( userID ).setValue( userDetailsDBObject );
+
+                setLocalUserDetails( dob, weight );
             }
 
             @Override
