@@ -85,6 +85,7 @@ public class LogActivityFragment extends Fragment {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                // Navigate to Goals fragment
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 GoalsFragment goalsFragment = new GoalsFragment();
                 ft.replace( R.id.frame_home_screen_fragment_placeholder, goalsFragment );

@@ -109,7 +109,7 @@ public class WalkingPlan {
 
         /**
          * Prob = last walk time went to 0 - FIXED??, last time step goal reset updated for no reason?, progress went to 0
-         * With act logged ^^
+         * With act logged ^^ TODO
          * */
 
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
@@ -202,7 +202,6 @@ public class WalkingPlan {
                         LocalDate todayDate = todayDT.toLocalDate();
 
                         if (!dayLastStepGoalResetDate.equals( todayDate )) {
-                            /**    NEED TO GET INCREMENT FROM DB    */
                             // Reset the progress for a new day
                             walkingPlan.setmProgress( 0 );
                             walkingPlanGoalDBObject.progress = 0;

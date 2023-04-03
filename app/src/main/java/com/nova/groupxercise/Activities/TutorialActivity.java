@@ -75,11 +75,11 @@ public class TutorialActivity extends AppCompatActivity {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                // If back button is pressed twice - exit app
                 if(!backButtonPressed) {
                     backBtnToast.show();
                     backButtonPressed = true;
                 } else {
-                    // Back button pressed twice - exit appp
                     Intent intent = new Intent(TutorialActivity.this, HomeScreenActivity.class);
                     startActivity(intent);
                     backButtonPressed = false;

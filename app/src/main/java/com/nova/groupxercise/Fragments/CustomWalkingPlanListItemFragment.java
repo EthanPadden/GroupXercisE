@@ -55,6 +55,7 @@ public class CustomWalkingPlanListItemFragment extends Fragment {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                // Navigate to Discoveries fragment
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 DiscoveriesFragment discoveriesFragment = new DiscoveriesFragment();
                 ft.replace( R.id.frame_home_screen_fragment_placeholder, discoveriesFragment );

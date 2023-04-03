@@ -41,11 +41,11 @@ public class ActivitiesFragment extends Fragment {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                // If back button is pressed twice - exit app
                 if(!backButtonPressed) {
                     Toast.makeText( getActivity(), "Press back button again to exit", Toast.LENGTH_SHORT ).show();
                     backButtonPressed = true;
                 } else {
-                    // Back button pressed twice - exit appp
                     Intent intent = new Intent(Intent.ACTION_MAIN);
                     intent.addCategory(Intent.CATEGORY_HOME);
                     startActivity(intent);

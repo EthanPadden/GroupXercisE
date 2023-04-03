@@ -66,6 +66,7 @@ public class SetUsernameActivity extends AppCompatActivity {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                // Navigate to RegistrationActivity
                 Intent intent = new Intent(SetUsernameActivity.this, RegistrationActivity.class);
                 startActivity(intent);
             }
