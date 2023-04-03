@@ -107,11 +107,6 @@ public class WalkingPlan {
         final String path = "personal_goals/" + userId + "/Walking";
         DatabaseReference childRef = FirebaseDatabase.getInstance().getReference().child( path );
 
-        /**
-         * Prob = last walk time went to 0 - FIXED??, last time step goal reset updated for no reason?, progress went to 0
-         * With act logged ^^ TODO
-         * */
-
         childRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
