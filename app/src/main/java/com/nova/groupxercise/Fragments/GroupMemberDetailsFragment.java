@@ -50,6 +50,7 @@ public class GroupMemberDetailsFragment extends Fragment {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                // Navigate to Group fragment
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 GroupFragment groupFragment = new GroupFragment( mGroup.getmGroupId() );
                 ft.replace( R.id.frame_home_screen_fragment_placeholder, groupFragment );
@@ -89,7 +90,10 @@ public class GroupMemberDetailsFragment extends Fragment {
                                 ArrayList< Goal > userProgresses = ( ArrayList< Goal > ) retrievedData;
 
                                 // Remove any goal from the userProgresses that is not in the group goals
-                                for(Goal userProgress : userProgresses) {
+                                // Cannot modify a collection while iterating over it, so creating a shallow copy of it to iterate over
+                                ArrayList<Goal> userProgressesShallowCopy = (ArrayList<Goal>) userProgresses.clone();
+
+                                for(Goal userProgress : userProgressesShallowCopy) {
                                     boolean isInGroupGoals = false;
                                     for(Goal groupGoal : mGroup.getmGoals()) {
                                         if(userProgress.getmExerciseName().compareTo( groupGoal.getmExerciseName() ) == 0) {

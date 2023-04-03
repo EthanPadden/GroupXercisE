@@ -96,6 +96,7 @@ public class ProfileActivity extends AppCompatActivity {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                // Navigate to HomeScreenActivity
                 Intent intent = new Intent( ProfileActivity.this, HomeScreenActivity.class );
                 startActivity( intent );
             }
